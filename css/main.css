@@ -1,0 +1,26 @@
+/*
+*   Se traen la fuentes de Raleway 400  y 700 y la de roboto en 400 y 900
+*   Tanto en forma normal y cursiva
+*/
+@import url("https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,900;1,400;1,900&display=swap");
+
+:root{
+    --title_font: 'Raleway', sans-serif;
+    --body_font: 'Roboto', sans-serif;
+}
+
+*, ::before, ::after{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+  font-family: var(--body_font)
+}
+
+p{
+    font-family: var(--body_font);
+    font-weight: 400;
+    font-style: italic;
+}
