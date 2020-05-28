@@ -1,26 +1,212 @@
 /*
-*   Se traen la fuentes de Raleway 400  y 700 y la de roboto en 400 y 900
-*   Tanto en forma normal y cursiva
+*   Reglas de estilos del todo el sitio web
+*   Author: Andrés Zuñiga <andres.zuniga.063@gmail.com>
+*   Version: 0.1
+*   History:
+*   ---
+*   La priemra version fue escrita por Andrés Zuñiga el 28 de mayo de 2020
 */
+
+/********************************************************************************************/
+/*                            TIPOGRAFIAS DE GOOGLE FONTS                                   */
+/********************************************************************************************/
 @import url("https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,900;1,400;1,900&display=swap");
 
-:root{
-    --title_font: 'Raleway', sans-serif;
-    --body_font: 'Roboto', sans-serif;
+/********************************************************************************************/
+/*                                VARIABLES DEL DOCUMENTO                                   */
+/********************************************************************************************/
+:root {
+  --title_font: "Raleway", sans-serif;
+  --body_font: "Roboto", sans-serif;
+  --black: #190a05;
+  --red: #870000;
+  --primary: #007bff;
+  --secondary: #6c757d;
+  --success: #28a745;
+  --info: #17a2b8;
+  --warning: #ffc107;
+  --danger: #dc3545;
+  --light: #f8f9fa;
+  --dark: #343a40;
+  --nephritis: #27ae60;
+  --asbestos: #7f8c8d;
+  --concrete: #95a5a6;
+  --midnightblue: #2c3e50;
 }
 
-*, ::before, ::after{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/********************************************************************************************/
+/*                                     REGLAS GENERALES                                     */
+/********************************************************************************************/
+*,
+::before,
+::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  font-family: var(--body_font)
+  font-family: var(--body_font);
+  font-size: 16px;
 }
 
-p{
-    font-family: var(--body_font);
-    font-weight: 400;
-    font-style: italic;
+/********************************************************************************************/
+/*                            ESTILOS DE LOS BOTONES                                        */
+/********************************************************************************************/
+.btn {
+  display: block;
+  width: 100%;
+  font-weight: 900;
+  letter-spacing: 3px;
+  font-size: 1.2em;
+  color: white;
+  text-align: center;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-color: transparent;
+  border: 1px solid #7f8c8d;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 0.25rem;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.btn:hover {
+  background-color: #e2e6ea;
+  color: #000;
+}
+
+.btn--disabled {
+  opacity: 0.5;
+}
+
+.btn--disabled:hover {
+  background-color: inherit;
+  color: inherit;
+}
+
+/********************************************************************************************/
+/*                            ESTILOS DE LAS ALERTAS                                        */
+/********************************************************************************************/
+
+.alert--danger {
+  color: #721c24;
+  background-color: #f8d7d9;
+  border-color: #f5c6cb;
+}
+
+.alert--warning{
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}
+
+.alert--success{
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+/********************************************************************************************/
+/*                            ESTILOS DEL LOGIN                                             */
+/********************************************************************************************/
+
+.login-body {
+  background: -webkit-linear-gradient(
+    to bottom,
+    var(--black),
+    #870000
+  ); /* Chrome 10-25, Safari 5.1-6 */
+
+  background: linear-gradient(
+    to bottom,
+    var(--black),
+    var(--red)
+  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+  min-height: 100vh;
+}
+
+.login-card {
+  background-color: #000;
+  border: 1px solid rgba(39, 38, 38, 0.993);
+  opacity: 0.9;
+  width: 90%;
+  max-width: 20em;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 10px;
+  color: #fff;
+  padding: 4.375em 1.25em 1.25em;
+}
+
+.login-card__avatar {
+  width: 6.625em;
+  opacity: 1;
+  height: 6.625em;
+  position: absolute;
+  top: -3.125em;
+  left: calc(50% - 3.125em);
+  background-color: #eb0b25;
+  border-radius: 50%;
+}
+
+.login-card__brand {
+  width: 100%;
+  text-align: center;
+  padding: 0 1.25em;
+  margin-bottom: 0.625em;
+}
+
+.login-card__form {
+  margin-bottom: 1.25em;
+}
+
+.login-card__input {
+  margin: 0.5rem 0;
+  background-color: #fff;
+  opacity: 0.9;
+  border: 1px solid transparent;
+  border-left-width: 4px;
+  border-right-width: 4px;
+  color: black;
+  padding: 0.375rem 0.75rem;
+  border-radius: 5px;
+  font-size: 1.2em;
+  display: flex;
+  margin-bottom: 30px;
+  transition: border-color 0.15s ease-in-out;
+}
+
+.login-card__input:hover,
+.login-card__input--active {
+  border-color: rgba(241, 8, 39, 0.85);
+}
+
+.login-card__input__prepend {
+  align-self: center;
+  margin-right: 5px;
+}
+
+.login-card__input__body {
+  width: 100%;
+  font-size: 1.125em;
+  border: none;
+  outline: none;
+  font-family: var(--body_font);
+}
+
+.login-card__alert {
+  border-radius: 0.25rem;
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  margin-bottom: 20px;
+  opacity: 1;
 }
