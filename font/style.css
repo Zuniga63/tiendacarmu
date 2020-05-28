@@ -1,0 +1,87 @@
+@font-face {
+  font-family: 'iconbasic';
+  src:  url('fonts/iconbasic.eot?1n4b3o');
+  src:  url('fonts/iconbasic.eot?1n4b3o#iefix') format('embedded-opentype'),
+    url('fonts/iconbasic.ttf?1n4b3o') format('truetype'),
+    url('fonts/iconbasic.woff?1n4b3o') format('woff'),
+    url('fonts/iconbasic.svg?1n4b3o#iconbasic') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'iconbasic' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-password:before {
+  content: "\e912";
+}
+.icon-user:before {
+  content: "\e913";
+}
+.icon-whatsapp-bold:before {
+  content: "\e90f";
+}
+.icon-location:before {
+  content: "\e910";
+}
+.icon-mobil-phone:before {
+  content: "\e911";
+}
+.icon-chevron-left:before {
+  content: "\e90d";
+}
+.icon-chevron-right:before {
+  content: "\e90e";
+}
+.icon-buy-bag:before {
+  content: "\e90a";
+}
+.icon-chevron-down:before {
+  content: "\e90b";
+}
+.icon-chevron-up:before {
+  content: "\e90c";
+}
+.icon-bars:before {
+  content: "\e900";
+}
+.icon-bars-bold:before {
+  content: "\e901";
+}
+.icon-correo:before {
+  content: "\e902";
+}
+.icon-email:before {
+  content: "\e903";
+}
+.icon-facebook:before {
+  content: "\e904";
+}
+.icon-home:before {
+  content: "\e905";
+}
+.icon-instagram:before {
+  content: "\e906";
+}
+.icon-redes:before {
+  content: "\e907";
+}
+.icon-shop:before {
+  content: "\e908";
+}
+.icon-whatsapp:before {
+  content: "\e909";
+}
