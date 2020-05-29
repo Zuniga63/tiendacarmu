@@ -21,8 +21,8 @@ require 'config.php';
 //                  FUNCIONES PARA LA CONEXION A LA BASE DE DATOS
 //---------------------------------------------------------------------------------------
 /**
- * Utilizando los datos en el archivo config.php para la conexion a la base de datos
- * este metodo retonar un objeto PDO o null si la conexion falla. 
+ * Utilizando los datos en el archivo config.php para la conexión a la base de datos, 
+ * este método retorna un objeto PDO o null si la conexión falla.
  */
 function get_connection()
 {
@@ -79,7 +79,7 @@ function validate_user_and_password($username, $password)
 }
 
 /**
- * Este metodo crea las cookies de session en el caso de que el usuario
+ * Este método crea las cookies de sesión en el caso de que el usuario
  * y la contraseña sean correctas y posteriormente actualiza la base de datos
  * @param {string} $username El nombre de usuario 
  * @param {string} $password Es la contraseña ya cifrada
@@ -120,8 +120,8 @@ function login($username, $password)
 }
 
 /**
- * Esta funcion actualiza la tabla de usuario y crea un registro de seguimiento
- * antes de destruir la sesion
+ * Esta función actualiza la tabla de usuario y crea un registro de seguimiento
+ * antes de destruir la sesión
  */
 function logout()
 {
@@ -187,10 +187,10 @@ function get_last_access()
 }
 
 /**
- * Esta función retornará el estado de la session:
- * Sesion activa retornará true y sesion innactiva retornará false.
- * Al mismo tiempo se encargará de actualizar la variable de sesion 
- * login_date cuando la sesion se encuentre activa
+ * Esta función retornará el estado de la sesión:
+ * Sesión activa retornará true y sesión inactiva retornará false.
+ * Al mismo tiempo se encargará de actualizar la variable de sesión 
+ * login_date cuando la sesión se encuentre activa
  */
 function session_active()
 {
@@ -212,8 +212,8 @@ function session_active()
 }
 
 /**
- * Esta es la funcion que se invocará desde cada una de la páginas 
- * a las cuales querramos restringir el acceso y redirecciona al login
+ * Esta es la función que se invocará desde cada una de las páginas 
+ * a las cuales queramos restringir el acceso y re direcciona al login
  */
 function validate_session()
 {
@@ -226,8 +226,8 @@ function validate_session()
 //                      UTILIDADES
 //---------------------------------------------------------------------------------------
 /**
- * Este metodo escribe en el fichero los errores que se van capturando 
- * por la ejecucion del codigo y le agrega la fecha del servidor
+ * Este método escribe en el fichero los errores que se van capturando 
+ * por la ejecución del código y le agrega la fecha del servidor
  * @param (string) $message El mensaje que se desea escribir
  */
 function write_error($message)
@@ -244,8 +244,8 @@ function write_error($message)
 }
 
 /**
- * Envía la cabecera a la nueva bicacion
- * @param {string} $page nombre de la pagína a visitar
+ * Envía la cabecera a la nueva ubicación
+ * @param {string} $page nombre de la página a visitar
  */
 function go_to_page($page)
 {
