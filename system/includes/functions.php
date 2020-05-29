@@ -213,7 +213,7 @@ function session_active()
 
 /**
  * Esta es la funcion que se invocará desde cada una de la páginas 
- * a las cuales querramos restringir el acceso
+ * a las cuales querramos restringir el acceso y redirecciona al login
  */
 function validate_session()
 {
