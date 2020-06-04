@@ -81,3 +81,118 @@ class Gender{
     }
 }
 
+/**
+ * Es una instancia de la direccion de la imagen de un producto * 
+ */
+class ItemImage{
+    /**
+     * @constructor
+     * @param {string} src Direccion relativa del archivo
+     * @param {number} width Ancho en pixeles
+     * @param {number} height Alto en pixeles
+     */
+    constructor(src, width, height){
+        this.src = src;
+        this.width = width;
+        this.height = height;
+    }
+}
+
+/**
+ * Instancia de un producto
+ */
+class Item{
+    /**
+     * @constructor
+     * @param {number} id Identificador otorgado por la base de datos
+     * @param {string} name Nombre del producto, debe ser unico
+     * @param {string} description Descripción breve del producto
+     * @param {number} retailPrice Es el precio de venta al publico
+     * @param {string} ref Referencia de compra del producto
+     * @param {string} barcode Codigo de barra del producto
+     * @param {Gender} gender Es el genero del producto, por defecto es unisex
+     * @param {number} stock La unidades disponibles para la venta
+     * @param {boolean} published Si el producto se encuentra en la web
+     * @param {boolean} isNew Si está catalogado como articulo nuevo
+     * @param {boolean} outstanding Si se ha marcado como destacado
+     * @param {string} dischargeDate La fecha en la que se dio de alta
+     */
+    constructor(id = 0, name, description, retailPrice = 0, ref = '', barcode = '', gender = 'x', stock = 0, published = false, isNew = false, outstanding = false, dischargeDate = ''){
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.retailPrice = retailPrice;
+        this.ref = ref;
+        this.barcode = barcode;
+        this.gender = gender;
+        this.stock = stock;
+        this.published = published;
+        this.isNew = isNew;
+        this.outstanding = outstanding;
+        this.dischargeDate = dischargeDate;
+        this.categories = [];
+        this.labels = [];
+        this.images = [];
+        this.errors = [];
+    }
+
+    /**
+     * Agrega de forma segura categorías al array de categories
+     * @param {Category} category Instancia de Category
+     */
+    addCategory(category){
+        if(category && category.id && category.id > 0){
+            if(this.categories.length === 0){
+                if(category.categoryClass === 1){
+                    this.categories.push(category);
+                }else{
+                    this.errors.push(`La categoría ${category.name} (${category.id}) no es una raiz`);
+                }
+            }else{
+                let lastIndex = this.categories.length - 1;
+                let isSon = this.categories[lastIndex].isFatherOf(category.id);
+                if(isSon){
+                    this.categories.push(category);
+                }else{
+                    this.errors.push(`La categoría ${category.name} no es una subcategoría valida`);
+                }
+            }
+        }else{
+            this.errors.push('Se intenta agregar un objeto que no es una categoría');
+        }
+
+    }
+
+    /**
+     * Agrega la etiqueta al array despues de comprobar que no este repetido
+     * @param {Label} label Intancia de Label
+     */
+    addLabel(label){
+        if(label && label.id && label.id > 0){
+            let coincidence = this.labels.some(l => l.id === label.id);
+            if(!coincidence){
+                this.labels.push(label);
+            }else{
+                this.errors.push(`La etiqueta ${label.name} ya se agregó`);
+            }
+        }else{
+            this.errors.push(`La etiqueta ${label.name} no cumple con las condiciones`);
+        }
+    }
+
+    /**
+     * Agrega el objeto al array despues de validar que no esté repetido
+     * @param {ItemImage} image Instancia de ItemImage
+     */
+    addImages(image){
+        if(image, image.src){
+            let coincidence = this.images.some(img => img.src === image.src);
+            if(!coincidence){
+                this.images.push(image);
+            }else{
+                this.errors.push(`La imagen "${image.src}" ya está en el array`);
+            }
+        }
+    }
+}
+
