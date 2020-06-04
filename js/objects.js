@@ -27,7 +27,7 @@ class Category {
     addSubcategory(category){
         if(category && category.id && category.id > 0){
             let coincidence = this.isFatherOf(category.id);
-            
+
             if(!coincidence){
                 if(this.categoryClass + 1 === category.categoryClass){
                     this.subcategories.push(category);
@@ -50,3 +50,34 @@ class Category {
         return false;
     }
 }
+
+/**
+ * Instancia de Label
+ */
+class Label{
+    /**
+     * @constructor
+     * @param {number} id Identificador otorgado por la base de datos
+     * @param {string} name Nombre unico con un maximo de 45 caracteres
+     */
+    constructor (id = 0, name){
+        this.id = id;
+        this.name = name;
+    }
+}
+
+/**
+ * Instancia de un genero
+ */
+class Gender{
+    /**
+     * @constructor
+     * @param {string} genderValue Valor de un solo caracter
+     * @param {string} name El nombre del genero
+     */
+    constructor(genderValue, name){
+        this.genderValue = genderValue;
+        this.name = name;
+    }
+}
+
