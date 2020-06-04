@@ -42,13 +42,16 @@
   </header>
 
   <!-- <h1 class="header__title">Bienvenido <?php echo $_SESSION['first_name'] ?></h1> -->
+  <!-- SECCION PARA INGRESAR O MODIFICAR PRODUCTOS -->
   <section class="section">
     <h2 class="section__header">Formulario de inscripcion de nuevos productos</h2>
     <div class="section__body">
-      <form class="item-form">
-        <div class="item-form__container">
-          <span class="item-form__container__name">Informacion general</span>
-          <div class="item-form__container__column">
+      <!-- INICIO DEL FORMULARIO -->
+      <form class="form">
+        <!-- PRIMER CONTENEDOR CON LOS CAMPOS PARA LOS DATOS GENERALES -->
+        <div class="form__container">
+          <span class="form__container__name">Informacion general</span>
+          <div class="form__container__column">
 
             <div class="form__group">
               <div class="form__group__body">
@@ -78,7 +81,7 @@
             </div>
           </div>
 
-          <div class="item-form__container__column">
+          <div class="form__container__column">
 
             <div class="form__group">
               <div class="form__group__body">
@@ -127,7 +130,7 @@
             </div>
           </div>
 
-          <div class="item-form__container__row-span">
+          <div class="form__container__row-span">
             <div class="form__group">
               <div class="form__group__body">
                 <label for="" class="form__label form__label--center">Descripción</label>
@@ -140,15 +143,30 @@
             </div>
           </div>
         </div>
+        <!-- FIN DEL PRIMER COTENEDOR E INICIO DEL CONTENDOR DE LA IMAGENES -->
+        <div class="form__container">
+          <span class="form__container__name">Imagenes</span>
 
-        <div class="item-form__container">
-          <span class="item-form__container__name">Imagenes</span>
-
-          <div class="item-form__container__row-span">
+          <div class="form__container__row-span">
             <div class="form__group">
               <label for="" class="form__label form__label--center">Imagenes</label>
               <div class="form__gallery">
                 <div class="form__gallery__container">
+                  <figure class="form__gallery__fig">
+                    <img src="../img/user-min.png" alt="" class="form__gallery__img">
+                  </figure>
+                  <figure class="form__gallery__fig">
+                    <img src="../img/user-min.png" alt="" class="form__gallery__img">
+                  </figure>
+                  <figure class="form__gallery__fig">
+                    <img src="../img/user-min.png" alt="" class="form__gallery__img">
+                  </figure>
+                  <figure class="form__gallery__fig">
+                    <img src="../img/user-min.png" alt="" class="form__gallery__img">
+                  </figure>
+                  <figure class="form__gallery__fig">
+                    <img src="../img/user-min.png" alt="" class="form__gallery__img">
+                  </figure>
                   <figure class="form__gallery__fig">
                     <img src="../img/user-min.png" alt="" class="form__gallery__img">
                   </figure>
@@ -173,11 +191,11 @@
             </div>
           </div>
         </div>
+        <!-- FIN DEL SEGUNDO CONTENEDOR E INICIO DE LA SELECCION DE CATEGORÍAS Y ETIQUETAS -->
+        <div class="form__container">
+          <span class="form__container__name">Categorías y Etiquetas</span>
 
-        <div class="item-form__container">
-          <span class="item-form__container__name">Categorías y Etiquetas</span>
-
-          <div class="item-form__container__column">
+          <div class="form__container__column">
             <div class="form__group">
               <label for="" class="form__label form__label--center">Categorías</label>
               <select name="" id="" class="form__input">
@@ -188,25 +206,409 @@
                   <div class="form__selected__item__body">
                     <span>Relojería</span>
                   </div>
-                  <button class="form__selected__item__append" type="button">X</button>
+                </div>
+                <div class="form__selected__item">
+                  <div class="form__selected__item__body">
+                    <span>Analogo</span>
+                  </div>
+                </div>
+                <div class="form__selected__item">
+                  <div class="form__selected__item__body">
+                    <span>Relojería</span>
+                  </div>
+                </div>
+                <div class="form__selected__item">
+                  <div class="form__selected__item__body">
+                    <span>Analogo</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-      
-          <div class="item-form__container__column">
+
+          <div class="form__container__column">
             <div class="form__group">
               <label for="" class="form__label form__label--center">Etiquetas</label>
               <select name="" id="" class="form__input">
                 <option value="0">Seleccionar</option>
               </select>
+              <div class="form__selected">
+                <div class="form__selected__item">
+                  <div class="form__selected__item__body">
+                    <span>Q&Q</span>
+                  </div>
+                  <button class="form__selected__item__append" type="button">X</button>
+                </div>
+                <div class="form__selected__item">
+                  <div class="form__selected__item__body">
+                    <span>Deportivo</span>
+                  </div>
+                  <button class="form__selected__item__append" type="button">X</button>
+                </div>
+              </div>
             </div>
           </div>
-          
+
         </div>
+        <!-- FIN DEL ULTIMO CONTENEDOR  -->
+        
       </form>
+      <!-- FIN DEL FORMULARIO -->
     </div>
     <div class="section__footer">
+      <button class="btn btn--success" type="button">Enviar datos</button>
+      <button class="btn btn--danger" type="button">Descartar</button>
+    </div>
+  </section>
+  <!-- FIN DE LA PRIMERA SECCION -->
+  <section class="section">
+    <h2 class="section__header">Articulos del sistema</h2>
+    <div class="section__body">
+      <input type="text" id="" class="search-box" placeholder="Ingresar nombre del producto">
+      <div class="items-list">
+        <!-- item 1 -->
+        <div class="item-info">
+          <div class="item-info__fig">
+            <img src="../img/user-min.png" alt="" class="item-info__img">
+          </div>
+          <div class="item-info__body">
+            <h3 class="item-info__name">Nombre del producto</h3>
+            <p class="item-info__label">Stock: <span class="item-info__value">0</span></p>
+            <p class="item-info__label">Ref: <span class="item-info__value">VERF-INDIGO BLUE</span></p>
+            <p class="item-info__label">Categoría: <span class="item-info__value">Relojería</span></p>
+            <p class="item-info__label">Codigo: <span class="item-info__value">454564554554</span></p>
+            <!-- A CONTINUACION SE ENCUENTRAN LOS CAMPOS MODIFICABLES -->
+            <div class="item-info__inputs">
+              <input type="text" name="" id="" class="item-info__price">
+              <div class="item-info__checks">
+                <label class="item-info__check">
+                  <input type="checkbox" name="" id=""> NEW
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Destacado
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Publicar
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- item 2 -->
+        <div class="item-info">
+          <div class="item-info__fig">
+            <img src="../img/user-min.png" alt="" class="item-info__img">
+          </div>
+          <div class="item-info__body">
+            <h3 class="item-info__name">Nombre del producto</h3>
+            <p class="item-info__label">Stock: <span class="item-info__value">0</span></p>
+            <p class="item-info__label">Ref: <span class="item-info__value">VERF-INDIGO BLUE</span></p>
+            <p class="item-info__label">Categoría: <span class="item-info__value">Relojería</span></p>
+            <p class="item-info__label">Codigo: <span class="item-info__value">454564554554</span></p>
+            <!-- A CONTINUACION SE ENCUENTRAN LOS CAMPOS MODIFICABLES -->
+            <div class="item-info__inputs">
+              <input type="text" name="" id="" class="item-info__price">
+              <div class="item-info__checks">
+                <label class="item-info__check">
+                  <input type="checkbox" name="" id=""> NEW
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Destacado
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Publicar
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- item 3 -->
+        <div class="item-info">
+          <div class="item-info__fig">
+            <img src="../img/user-min.png" alt="" class="item-info__img">
+          </div>
+          <div class="item-info__body">
+            <h3 class="item-info__name">Nombre del producto</h3>
+            <p class="item-info__label">Stock: <span class="item-info__value">0</span></p>
+            <p class="item-info__label">Ref: <span class="item-info__value">VERF-INDIGO BLUE</span></p>
+            <p class="item-info__label">Categoría: <span class="item-info__value">Relojería</span></p>
+            <p class="item-info__label">Codigo: <span class="item-info__value">454564554554</span></p>
+            <!-- A CONTINUACION SE ENCUENTRAN LOS CAMPOS MODIFICABLES -->
+            <div class="item-info__inputs">
+              <input type="text" name="" id="" class="item-info__price">
+              <div class="item-info__checks">
+                <label class="item-info__check">
+                  <input type="checkbox" name="" id=""> NEW
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Destacado
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Publicar
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- item 4 -->
+        <div class="item-info">
+          <div class="item-info__fig">
+            <img src="../img/user-min.png" alt="" class="item-info__img">
+          </div>
+          <div class="item-info__body">
+            <h3 class="item-info__name">Nombre del producto</h3>
+            <p class="item-info__label">Stock: <span class="item-info__value">0</span></p>
+            <p class="item-info__label">Ref: <span class="item-info__value">VERF-INDIGO BLUE</span></p>
+            <p class="item-info__label">Categoría: <span class="item-info__value">Relojería</span></p>
+            <p class="item-info__label">Codigo: <span class="item-info__value">454564554554</span></p>
+            <!-- A CONTINUACION SE ENCUENTRAN LOS CAMPOS MODIFICABLES -->
+            <div class="item-info__inputs">
+              <input type="text" name="" id="" class="item-info__price">
+              <div class="item-info__checks">
+                <label class="item-info__check">
+                  <input type="checkbox" name="" id=""> NEW
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Destacado
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Publicar
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- item 5 -->
+        <div class="item-info">
+          <div class="item-info__fig">
+            <img src="../img/user-min.png" alt="" class="item-info__img">
+          </div>
+          <div class="item-info__body">
+            <h3 class="item-info__name">Nombre del producto</h3>
+            <p class="item-info__label">Stock: <span class="item-info__value">0</span></p>
+            <p class="item-info__label">Ref: <span class="item-info__value">VERF-INDIGO BLUE</span></p>
+            <p class="item-info__label">Categoría: <span class="item-info__value">Relojería</span></p>
+            <p class="item-info__label">Codigo: <span class="item-info__value">454564554554</span></p>
+            <!-- A CONTINUACION SE ENCUENTRAN LOS CAMPOS MODIFICABLES -->
+            <div class="item-info__inputs">
+              <input type="text" name="" id="" class="item-info__price">
+              <div class="item-info__checks">
+                <label class="item-info__check">
+                  <input type="checkbox" name="" id=""> NEW
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Destacado
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Publicar
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- item 6 -->
+        <div class="item-info">
+          <div class="item-info__fig">
+            <img src="../img/user-min.png" alt="" class="item-info__img">
+          </div>
+          <div class="item-info__body">
+            <h3 class="item-info__name">Nombre del producto</h3>
+            <p class="item-info__label">Stock: <span class="item-info__value">0</span></p>
+            <p class="item-info__label">Ref: <span class="item-info__value">VERF-INDIGO BLUE</span></p>
+            <p class="item-info__label">Categoría: <span class="item-info__value">Relojería</span></p>
+            <p class="item-info__label">Codigo: <span class="item-info__value">454564554554</span></p>
+            <!-- A CONTINUACION SE ENCUENTRAN LOS CAMPOS MODIFICABLES -->
+            <div class="item-info__inputs">
+              <input type="text" name="" id="" class="item-info__price">
+              <div class="item-info__checks">
+                <label class="item-info__check">
+                  <input type="checkbox" name="" id=""> NEW
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Destacado
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Publicar
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- item 1 -->
+        <div class="item-info">
+          <div class="item-info__fig">
+            <img src="../img/user-min.png" alt="" class="item-info__img">
+          </div>
+          <div class="item-info__body">
+            <h3 class="item-info__name">Nombre del producto</h3>
+            <p class="item-info__label">Stock: <span class="item-info__value">0</span></p>
+            <p class="item-info__label">Ref: <span class="item-info__value">VERF-INDIGO BLUE</span></p>
+            <p class="item-info__label">Categoría: <span class="item-info__value">Relojería</span></p>
+            <p class="item-info__label">Codigo: <span class="item-info__value">454564554554</span></p>
+            <!-- A CONTINUACION SE ENCUENTRAN LOS CAMPOS MODIFICABLES -->
+            <div class="item-info__inputs">
+              <input type="text" name="" id="" class="item-info__price">
+              <div class="item-info__checks">
+                <label class="item-info__check">
+                  <input type="checkbox" name="" id=""> NEW
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Destacado
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Publicar
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- item 2 -->
+        <div class="item-info">
+          <div class="item-info__fig">
+            <img src="../img/user-min.png" alt="" class="item-info__img">
+          </div>
+          <div class="item-info__body">
+            <h3 class="item-info__name">Nombre del producto</h3>
+            <p class="item-info__label">Stock: <span class="item-info__value">0</span></p>
+            <p class="item-info__label">Ref: <span class="item-info__value">VERF-INDIGO BLUE</span></p>
+            <p class="item-info__label">Categoría: <span class="item-info__value">Relojería</span></p>
+            <p class="item-info__label">Codigo: <span class="item-info__value">454564554554</span></p>
+            <!-- A CONTINUACION SE ENCUENTRAN LOS CAMPOS MODIFICABLES -->
+            <div class="item-info__inputs">
+              <input type="text" name="" id="" class="item-info__price">
+              <div class="item-info__checks">
+                <label class="item-info__check">
+                  <input type="checkbox" name="" id=""> NEW
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Destacado
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Publicar
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- item 3 -->
+        <div class="item-info">
+          <div class="item-info__fig">
+            <img src="../img/user-min.png" alt="" class="item-info__img">
+          </div>
+          <div class="item-info__body">
+            <h3 class="item-info__name">Nombre del producto</h3>
+            <p class="item-info__label">Stock: <span class="item-info__value">0</span></p>
+            <p class="item-info__label">Ref: <span class="item-info__value">VERF-INDIGO BLUE</span></p>
+            <p class="item-info__label">Categoría: <span class="item-info__value">Relojería</span></p>
+            <p class="item-info__label">Codigo: <span class="item-info__value">454564554554</span></p>
+            <!-- A CONTINUACION SE ENCUENTRAN LOS CAMPOS MODIFICABLES -->
+            <div class="item-info__inputs">
+              <input type="text" name="" id="" class="item-info__price">
+              <div class="item-info__checks">
+                <label class="item-info__check">
+                  <input type="checkbox" name="" id=""> NEW
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Destacado
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Publicar
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- item 4 -->
+        <div class="item-info">
+          <div class="item-info__fig">
+            <img src="../img/user-min.png" alt="" class="item-info__img">
+          </div>
+          <div class="item-info__body">
+            <h3 class="item-info__name">Nombre del producto</h3>
+            <p class="item-info__label">Stock: <span class="item-info__value">0</span></p>
+            <p class="item-info__label">Ref: <span class="item-info__value">VERF-INDIGO BLUE</span></p>
+            <p class="item-info__label">Categoría: <span class="item-info__value">Relojería</span></p>
+            <p class="item-info__label">Codigo: <span class="item-info__value">454564554554</span></p>
+            <!-- A CONTINUACION SE ENCUENTRAN LOS CAMPOS MODIFICABLES -->
+            <div class="item-info__inputs">
+              <input type="text" name="" id="" class="item-info__price">
+              <div class="item-info__checks">
+                <label class="item-info__check">
+                  <input type="checkbox" name="" id=""> NEW
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Destacado
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Publicar
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- item 5 -->
+        <div class="item-info">
+          <div class="item-info__fig">
+            <img src="../img/user-min.png" alt="" class="item-info__img">
+          </div>
+          <div class="item-info__body">
+            <h3 class="item-info__name">Nombre del producto</h3>
+            <p class="item-info__label">Stock: <span class="item-info__value">0</span></p>
+            <p class="item-info__label">Ref: <span class="item-info__value">VERF-INDIGO BLUE</span></p>
+            <p class="item-info__label">Categoría: <span class="item-info__value">Relojería</span></p>
+            <p class="item-info__label">Codigo: <span class="item-info__value">454564554554</span></p>
+            <!-- A CONTINUACION SE ENCUENTRAN LOS CAMPOS MODIFICABLES -->
+            <div class="item-info__inputs">
+              <input type="text" name="" id="" class="item-info__price">
+              <div class="item-info__checks">
+                <label class="item-info__check">
+                  <input type="checkbox" name="" id=""> NEW
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Destacado
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Publicar
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- item 6 -->
+        <div class="item-info">
+          <div class="item-info__fig">
+            <img src="../img/user-min.png" alt="" class="item-info__img">
+          </div>
+          <div class="item-info__body">
+            <h3 class="item-info__name">Nombre del producto</h3>
+            <p class="item-info__label">Stock: <span class="item-info__value">0</span></p>
+            <p class="item-info__label">Ref: <span class="item-info__value">VERF-INDIGO BLUE</span></p>
+            <p class="item-info__label">Categoría: <span class="item-info__value">Relojería</span></p>
+            <p class="item-info__label">Codigo: <span class="item-info__value">454564554554</span></p>
+            <!-- A CONTINUACION SE ENCUENTRAN LOS CAMPOS MODIFICABLES -->
+            <div class="item-info__inputs">
+              <input type="text" name="" id="" class="item-info__price">
+              <div class="item-info__checks">
+                <label class="item-info__check">
+                  <input type="checkbox" name="" id=""> NEW
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Destacado
+                </label>
+                <label class="item-info__check">
+                  <input type="checkbox"> Publicar
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="section__footer">
+      <button class="btn btn--success" type="button">Modificar</button>
+      <button class="btn btn--danger" type="button">Eliminar</button>
     </div>
   </section>
 
