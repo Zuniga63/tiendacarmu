@@ -87,7 +87,7 @@ function validate_user_and_password($username, $password)
 function login($username, $password)
 {
     $validation = validate_user_and_password($username, $password);
-    if($validation){
+    if ($validation) {
         $_SESSION['user'] = $username;
         $_SESSION['login_date'] = time();
         $conn = get_connection();
@@ -135,14 +135,14 @@ function logout()
         $user_id = intval($_SESSION['user_id']);
         $conn = get_connection();
 
-        if($conn){
+        if ($conn) {
             try {
                 $conn->beginTransaction();
                 $stmt = $conn->prepare('UPDATE user SET start_session = NULL WHERE user_id = :user_id AND username = :user_name');
                 $stmt->bindParam(':username', $username, PDO::PARAM_STR);
                 $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
                 $stmt->execute();
-    
+
                 //Finalmente actualizo el log
                 $conn->query("INSERT INTO user_log (user_id, log_description) VALUES ($user_id, 'Cierre de la sesión')");
                 $conn->commit();
@@ -151,10 +151,10 @@ function logout()
                 write_error($message);
                 $conn->rollBack();
             }
-        }//Fin de if
+        } //Fin de if
     }
 
-        /**
+    /**
      * Ahora se procede a destruir la sesión, independiente de lo anterior
      */
     session_destroy();
@@ -222,6 +222,291 @@ function validate_session()
         go_to_page('login.php');
     }
 }
+
+//---------------------------------------------------------------------------------------
+//                      FUNCIONES PARA LA CONSULTA DE DATOS
+//---------------------------------------------------------------------------------------
+/**
+ * Esta funcion retorna una array con los nombres de las imagenes contenidas en 
+ * la direccion pasado como parametro
+ * @param {string} $path_base Corresponde al numero de carpetas antes del path
+ * @param {string} $path Corresponde a la direccion relativa del directorio
+ */
+function get_all_images($path_base, $path)
+{
+    $files = [];                        //El array donde se guardan los resultados
+    $dir = opendir("$path_base/$path");            //Se abre el directorio
+
+    while ($file = readdir($dir)) {
+        if (!is_dir("$file")) {
+            if (exif_imagetype("$path_base/$path/$file")) {
+                $files[] = "$path/$file";
+            }
+        }
+    }
+
+    return $files;
+}
+/**
+ * Este metodo retorna una array con la direccion de todas las imagenes
+ * que han sido asignadas a un producto en especifico
+ */
+function get_asigned_images()
+{
+    $all_img_asigned = [];
+
+    try {
+        $conn = get_connection();
+        $stmt = $conn->query('SELECT src FROM item_image');
+        while ($row = $stmt->fetch()) {
+            $all_img_asigned[] = $row['src'];
+        }
+    } catch (PDOException $e) {
+        $message = $e->getMessage();
+        $message = "Error al consultar las imagenes: $message";
+        write_error($message);
+    }
+
+    return $all_img_asigned;
+}
+
+/**
+ * Esta función retorna la direccion relativa de todas las imagenes que no han sido
+ * asignadas a ningun producto en especifico
+ * @param string $path_base Corresponde al numero de carpetas antes del path relativo
+ * @param string $path Es la direccion relativa de la carpeta donde se van a buscar las imagenes
+ * @return array Arreglo con la direccion relativa de la imagen, el acnho y el alto
+ */
+function get_available_images($path_base, $path)
+{
+    $all_img_asigned = get_asigned_images();
+    $all_images = get_all_images($path_base, $path);
+    $diff = array_diff($all_images, $all_img_asigned);
+    $result = [];
+
+    //Ahora recupero los de las imagenes
+    foreach ($diff as $img) {
+        $path2 = "$path_base/$img";
+        // echo $path2;
+        if (file_exists($path2)) {
+            if (exif_imagetype($path2)) {
+                list($width, $height) = getimagesize($path2);
+                // echo $path .  . "<br>";
+                $result[] = array(
+                    'src' => "$path/$img",
+                    'width' => $width,
+                    'height' => $height
+                );
+            }
+        }
+    }
+
+    return $result;
+}
+
+/**
+ * Este metodo retorna un array de enterors con los identificadores de las
+ * subcategorías
+ * @param int $category_id Identificador de la categoría padre
+ * @return array Arreglo con los identificadores de las subcategorías
+ */
+function get_subcategories($category_id)
+{
+    $subcategories = [];
+    try {
+        $conn = get_connection();
+        $stmt = $conn->query("SELECT son_id FROM category_has_subcategory WHERE father_id = $category_id");
+
+        while ($row = $stmt->fetch()) {
+            $subcategories[] = intval($row['son_id']);
+        }
+    } catch (PDOException $e) {
+        $message = $e->getMessage();
+        $message = "Error al consultar las subcategorías: $message";
+        write_error($message);
+    }
+
+    return $subcategories;
+}
+
+/**
+ * Este metodo retorna un array con toda la informacion de las
+ * categorias contenidas en la base de datos, y un array con los
+ * identificadores de las subcategorías
+ */
+function get_all_categories()
+{
+    $categories = [];
+    try {
+        $conn = get_connection();
+        $stmt = $conn->query('SELECT * FROM category');
+
+        while ($row = $stmt->fetch()) {
+            $categories[] = [
+                'id' => intval($row['category_id']),
+                'name' => $row['name'],
+                'categoryClass' => intval($row['category_class']),
+                'code' => intval($row['code']),
+                'path' => $row['path'],
+                'subcategories' => get_subcategories(intval($row['category_id']))
+            ];
+        }
+    } catch (PDOException $e) {
+        $message = "Error al consultar las categorías: {$e->getMessage()}";
+        write_error($message);
+    }
+
+    return $categories;
+}
+
+/**
+ * Retrna un array con todas las etiquetas de la base de datos
+ */
+function get_all_labels()
+{
+    $labels = [];
+    try{
+        $conn = get_connection();
+        $stmt = $conn->query('SELECT * FROM label');
+
+        while($row = $stmt->fetch()){
+            $id = intval($row['label_id']);
+            $name = $row['name'];
+
+            $labels[] = [
+                'id' => $id,
+                'name' => $name
+            ];
+        }
+    }catch(PDOException $e){
+        $message = "Error al consultar las etiquetas: {$e->getMessage()}";
+        write_error($message);
+    }
+
+    return $labels;
+}
+
+/**
+ * Caonsulta ala base de datos los identificadores de las categorias
+ * que estan asociadas al item
+ * @param int $item_id El identificado del producto a consultar
+ * @return array Un arreglo de enteros
+ */
+function get_categories_of_item($item_id)
+{
+    $categories = [];
+    try{
+        $conn = get_connection();
+        $stmt = $conn->query(("SELECT category_id as id FROM item_hascategory WHERE item_id = $item_id"));
+
+        while($row = $stmt->fetch()){
+            $categories[] = intval($row['id']);
+        }
+    }catch(PDOException $e){
+        $message = "Consulta de los id de las categorías: {$e->getMessage()}";
+        write_error($message);
+    }
+
+    return $categories;
+}
+
+/**
+ * Consulta a la base de datos los identificadores de las etiquetas
+ * que están asociadas al aticulo
+ * @param int $item_id El identificado del producto a consultar
+ * @return array Un arreglo de enteros
+ */
+function get_labels_of_item($item_id)
+{
+    $labels = [];
+    try{
+        $conn = get_connection();
+        $stmt = $conn->query("SELECT label_id AS id FROM item_has_label WHERE item_id = $item_id");
+
+        while($row = $stmt->fetch()){
+            $labels[] = intval($row['id']);
+        }
+    }catch(PDOException $e){
+        $message = "Error al consultar los id de la etiquetas: {$e->getMessage()}";
+        write_error($message);
+    }
+
+    return $labels;
+}
+
+/**
+ * Consulta a la base de datos las imagenes asociadas al articulo y
+ * retona un array con la informacion
+ * @param int $item_id Identificador del producto a consultar
+ */
+function get_images_of_item($item_id)
+{
+    $images = [];
+    try{
+        $conn = get_connection();
+        $stmt = $conn->query("SELECT * FROM item_image WHERE item_id = $item_id");
+
+        while($row = $stmt->fetch()){
+            $src = $row['src'];
+            $width = $row['width'] === 'NULL' ? 0 : intval($row['width']);
+            $height = $row['height'] === 'NULL' ? 0 : intval($row['width']);
+
+            $images[] = [
+                'src' => $src,
+                'width' => $width,
+                'height' => $height
+            ];
+        }
+    }catch(PDOException $e){
+        $message = "Error al tratar de consultar la informacion de las imagenes del articulo: {$e->getMessage()}";
+        write_error($message);
+    }
+
+    return $images;
+}
+
+/**
+ * Consulta a la base de datos tda la informacion de los productos
+ */
+function get_all_items()
+{
+    $items = [];
+    try{
+        $conn = get_connection();
+        $stmt = $conn->query('SELECT * FROM item');
+
+        while($row = $stmt->fetch()){
+            $id = intval($row['item_id']);
+            $categories = get_categories_of_item($id);
+            $labels = get_labels_of_item($id);
+            $images = get_images_of_item($id);
+
+            $items[] = [
+                'id' => $id,
+                'name' => $row['name'],
+                'description' => $row['description'], 
+                'retailPrice' => floatval($row['retail_price']),
+                'ref' => $row['ref'] === 'NULL' ? '' : $row['ref'],
+                'barcode' => $row['barcode'] === 'NULL' ? '' : $row['barcode'],
+                'gender' => $row['gender'],
+                'stock' => intval($row['stock']),
+                'outstandig' => intval($row['outstanding']) === 0 ? FALSE : TRUE,
+                'isNew' => intval($row['is_new']) === 0 ? FALSE : TRUE,
+                'published' => intval($row['pusblished']) === 0 ? FALSE : TRUE,
+                'dischargeDate' => $row['discharge_date'],
+                'webDirection' => $row['web_direction'] === 'NULL' ? '' : $row['web_direction'],
+                'images' => $images,
+                'categories' => $categories,
+                'labels' => $labels
+            ];
+        }
+    }catch(PDOException $e){
+        $message = "Error al tratar de consultar la informacion de los productos: {$e->getMessage()}";
+        write_error($message);
+    }
+
+    return $items;
+}
 //---------------------------------------------------------------------------------------
 //                      UTILIDADES
 //---------------------------------------------------------------------------------------
@@ -232,7 +517,8 @@ function validate_session()
  */
 function write_error($message)
 {
-    $path = './error.log';
+    //Se utiliza una ruta absoluta para poder facilitar el registro
+    $path = $_SERVER['DOCUMENT_ROOT'] . '/Proyectos/Proyectos Comerciales/tiendacarmu/system/includes/error.log';
     $now = date('d/m/y H:i a');
     $message = "[$now]: $message\n\r";
 
