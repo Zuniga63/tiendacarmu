@@ -529,7 +529,81 @@ function get_all_items()
  */
 function create_new_item($name, $description, $retail_price, $ref, $barcode, $gender, $stock, $outstanding, $is_new, $pusblished, $web_direction, $images, $categories, $labels)
 {
-}
+    if (validate_item($name, $description, $retail_price, $stock, $gender)) {
+        $ref = empty($ref) ? 'NULL' : $ref;
+        $barcode = empty($barcode) ? 'NULL' : $barcode;
+        $web_direction = empty('$web_direction') ? 'NULL' : $web_direction;
+
+        try {
+            $conn = get_connection();
+            /**
+             * Se inicia la transaccion porque se modifican varias tablas:
+             * item, item_has_category, item_has_label, item_images y user_log
+             */
+            $conn->beginTransaction();
+
+            //Se aggregan los datos especificos del producto
+            $stmt = $conn->prepare('INSERT INTO item (name, description, retail_price, ref, barcode, gender, stock, outstanding, is_new, published, web_direction VALUES (:name, :description, :retail_price, :ref, :barcode, :gender, :stock, :outstanding, :is_new, :published, :web_direction)');
+
+            $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+            $stmt->bindParam(':description', $description, PDO::PARAM_STR);
+            $stmt->bindParam(':retail_price', $retail_price, PDO::PARAM_STR);
+            $stmt->bindParam(':ref', $ref, PDO::PARAM_STR);
+            $stmt->bindParam(':barcode', $barcode, PDO::PARAM_STR);
+            $stmt->bindParam(':gender', $gender, PDO::PARAM_STR);
+            $stmt->bindParam(':stock', $stock, PDO::PARAM_INT);
+            $stmt->bindParam(':outstanding', $outstanding, PDO::PARAM_BOOL);
+            $stmt->bindParam(':is_new', $is_new, PDO::PARAM_BOOL);
+            $stmt->bindParam(':published', $pusblished, PDO::PARAM_BOOL);
+            $stmt->bindParam(':web_direction', $web_direction, PDO::PARAM_STR);
+
+            $stmt->execute();
+            $last_id = $conn->lastInsertId();
+
+            //Se agregan la imagenes del prodcuto
+            if(count($images) > 0){
+                $stmt = $conn->prepare('INSERT INTO item_image(item_id, src, width, height) VALUES (:item_id, :src, :width, :height');
+                $stmt->bindParam(':item_id', $last_id);
+
+                foreach($images as $img){
+                    $stmt->bindParam(':src', $img['src'], PDO::PARAM_STR);
+                    $stmt->bindParam(':width', $img['width'], PDO::PARAM_INT);
+                    $stmt->bindParam(':height', $img['height'], PDO::PARAM_INT);
+                    $stmt->execute();
+                }//Fin de foreach
+            }//Fin de iff
+
+            //Se agregan las categorías
+            if(count($categories) > 0){
+                $stmt = $conn->prepare('INSERT INTO item_has_category(item_id, category_id) VALUES (:item_id, :category_id');
+                $stmt->bindParam(':item_id', $last_id, PDO::PARAM_INT);
+                foreach($categories as $category){
+                    $stmt->bindParam(':category_id', $category, PDO::PARAM_INT);
+                    $stmt->execute();
+                }//Fin de foreach
+            }//Fin de if
+
+            //Se agregan las etiquetas
+            if(count($labels) > 0){
+                $stmt = $conn->prepare('INSERT INTO item_has_label(item_id, label_id) VALUES (:item_id, :label_id');
+                $stmt->bindParam(':item_id', $last_id, PDO::PARAM_INT);
+                foreach($labels as $label){
+                    $stmt->bindParam(':label_id', $label, PDO::PARAM_INT);
+                    $stmt->execute();
+                }//Fin de foreach
+            }//Fin de if
+
+            //Finalmente se guarda un registro de quien hizo las modificaciones
+            $user_id = $_SESSION['user_id'];
+            $conn->query("INSERT INTO user_log (user_id, log_description) VALUES ($user_id, 'Se creo un nuevo producto [id=$last_id]')");
+
+            $conn->commit();
+        } catch (PDOException $e) {
+            $message = "Error al intentar agregar un nuevo producto: {$e->getMessage()}";
+            write_error($message);
+        } //Fin de try catch
+    } //Fin de if
+} //Fin del metodo
 
 /**
  * Este metodo valida que el nombre del articulo cumpla con todos 
@@ -554,7 +628,7 @@ function validate_item_name(&$item_name)
                 //Si el conteo es null o cero el resultado será correcto
                 $row = $stmt->fetch();
                 $count = $row['count'];
-                if($count === 'NULL' || $count === '0'){
+                if ($count === 'NULL' || $count === '0') {
                     $result = TRUE;
                 }
             } catch (PDOException $e) {
@@ -563,6 +637,57 @@ function validate_item_name(&$item_name)
             } //Fin de try catch
         } //Fin de if
     } //Fin de if
+
+    return $result;
+} //Fin del metodo
+
+function validate_item_description(&$item_description)
+{
+    $result = FALSE;
+    //Primero se valida que la variable exista y que sea un string
+    if (isset($item_description) && gettype($item_description) === 'string') {
+        //Se eliminan espacios en blanco al inicio y al final
+        $item_description = trim($item_description);
+        //Se cmprueba que no supere el maximo de caracteres
+        if (255 >= strlen($item_description) && 0 < strlen($item_description)) {
+            $result = TRUE;
+        } //Fin de if
+    } //Fin de if
+
+    return $result;
+} //Fin del metodo
+
+/**
+ * Este metodo hace una validacion de los parametros criticos al momento
+ * de intentar agregar un item
+ */
+function validate_item(&$name, &$description, &$retail_price, &$stock, &$gender)
+{
+    $result = FALSE;
+
+    if (validate_item_name($name)) {
+        if (validate_item_description($description)) {
+            //Se verifica si el precio y el stock son numericos
+            if (is_numeric($retail_price) && is_numeric($stock)) {
+                $retail_price = floatval($retail_price);
+                $stock = intval($stock);
+
+                //Se compruba que los datos san cero o mayor que cero
+                if ($retail_price >= 0 && $stock >= 0) {
+                    $result = TRUE;
+
+                    //Por ultimo se hace una comprobacion
+                    if (isset($gender) && gettype($gender) === 'string' && !empty($gender)) {
+                        if ($gender !== 'x' || $gender !== 'f' || $gender !== 'm') {
+                            $gender = 'x';
+                        }
+                    } //Fin de if
+                } //Fin de if
+
+            } //Fin de if
+        } //Fin de if
+    } //Fin de if
+
 
     return $result;
 } //Fin del metodo
