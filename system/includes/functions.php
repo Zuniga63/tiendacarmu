@@ -365,11 +365,11 @@ function get_all_categories()
 function get_all_labels()
 {
     $labels = [];
-    try{
+    try {
         $conn = get_connection();
         $stmt = $conn->query('SELECT * FROM label');
 
-        while($row = $stmt->fetch()){
+        while ($row = $stmt->fetch()) {
             $id = intval($row['label_id']);
             $name = $row['name'];
 
@@ -378,7 +378,7 @@ function get_all_labels()
                 'name' => $name
             ];
         }
-    }catch(PDOException $e){
+    } catch (PDOException $e) {
         $message = "Error al consultar las etiquetas: {$e->getMessage()}";
         write_error($message);
     }
@@ -395,14 +395,14 @@ function get_all_labels()
 function get_categories_of_item($item_id)
 {
     $categories = [];
-    try{
+    try {
         $conn = get_connection();
         $stmt = $conn->query(("SELECT category_id as id FROM item_hascategory WHERE item_id = $item_id"));
 
-        while($row = $stmt->fetch()){
+        while ($row = $stmt->fetch()) {
             $categories[] = intval($row['id']);
         }
-    }catch(PDOException $e){
+    } catch (PDOException $e) {
         $message = "Consulta de los id de las categorías: {$e->getMessage()}";
         write_error($message);
     }
@@ -419,14 +419,14 @@ function get_categories_of_item($item_id)
 function get_labels_of_item($item_id)
 {
     $labels = [];
-    try{
+    try {
         $conn = get_connection();
         $stmt = $conn->query("SELECT label_id AS id FROM item_has_label WHERE item_id = $item_id");
 
-        while($row = $stmt->fetch()){
+        while ($row = $stmt->fetch()) {
             $labels[] = intval($row['id']);
         }
-    }catch(PDOException $e){
+    } catch (PDOException $e) {
         $message = "Error al consultar los id de la etiquetas: {$e->getMessage()}";
         write_error($message);
     }
@@ -442,11 +442,11 @@ function get_labels_of_item($item_id)
 function get_images_of_item($item_id)
 {
     $images = [];
-    try{
+    try {
         $conn = get_connection();
         $stmt = $conn->query("SELECT * FROM item_image WHERE item_id = $item_id");
 
-        while($row = $stmt->fetch()){
+        while ($row = $stmt->fetch()) {
             $src = $row['src'];
             $width = $row['width'] === 'NULL' ? 0 : intval($row['width']);
             $height = $row['height'] === 'NULL' ? 0 : intval($row['width']);
@@ -457,7 +457,7 @@ function get_images_of_item($item_id)
                 'height' => $height
             ];
         }
-    }catch(PDOException $e){
+    } catch (PDOException $e) {
         $message = "Error al tratar de consultar la informacion de las imagenes del articulo: {$e->getMessage()}";
         write_error($message);
     }
@@ -471,11 +471,11 @@ function get_images_of_item($item_id)
 function get_all_items()
 {
     $items = [];
-    try{
+    try {
         $conn = get_connection();
         $stmt = $conn->query('SELECT * FROM item');
 
-        while($row = $stmt->fetch()){
+        while ($row = $stmt->fetch()) {
             $id = intval($row['item_id']);
             $categories = get_categories_of_item($id);
             $labels = get_labels_of_item($id);
@@ -484,7 +484,7 @@ function get_all_items()
             $items[] = [
                 'id' => $id,
                 'name' => $row['name'],
-                'description' => $row['description'], 
+                'description' => $row['description'],
                 'retailPrice' => floatval($row['retail_price']),
                 'ref' => $row['ref'] === 'NULL' ? '' : $row['ref'],
                 'barcode' => $row['barcode'] === 'NULL' ? '' : $row['barcode'],
@@ -500,13 +500,73 @@ function get_all_items()
                 'labels' => $labels
             ];
         }
-    }catch(PDOException $e){
+    } catch (PDOException $e) {
         $message = "Error al tratar de consultar la informacion de los productos: {$e->getMessage()}";
         write_error($message);
     }
 
     return $items;
 }
+//---------------------------------------------------------------------------------------
+//                      FUNCIONES PARA MODIFICAR DATOS
+//---------------------------------------------------------------------------------------
+/**
+ * Crea un nuevo articulo en la base de datos
+ * @param string $name Nombre del prodcuto
+ * @param string $description Descripcion del producto a agregar
+ * @param float $retail_price Es el precio de venta al publico
+ * @param string $ref Es la referencia de compra del producto
+ * @param string $barcode Es el codigo que se le asigna al producto
+ * @param string $gender Es el genero al que va dirigido el producto
+ * @param int $stock Las unidades disponibles del producto
+ * @param bool $outstanding Si el producto se encuentra destacado
+ * @param bool $is_new Si es un producto nuevo
+ * @param bool $pusblished Si está habilitado para publicarse
+ * @param string $web_direction La direccion del sitio donde está publicado
+ * @param array $images Arreglo con la informacion de las imagenes asociadas
+ * @param array $categories Arreglo con los identificadores de las categorías asignadas
+ * @param array $labels Arreglo con los identificadores de las etiquetas asociadas
+ */
+function create_new_item($name, $description, $retail_price, $ref, $barcode, $gender, $stock, $outstanding, $is_new, $pusblished, $web_direction, $images, $categories, $labels)
+{
+}
+
+/**
+ * Este metodo valida que el nombre del articulo cumpla con todos 
+ * los requisitos
+ * @param $item_name Nombre del producto
+ */
+function validate_item_name(&$item_name)
+{
+    $result = false;
+    //Primero compruebo que existe y que sea un string
+    if (isset($item_name) && gettype($item_name) === 'string') {
+        //Se limpia los espacios en blanco al inicio y al final
+        $item_name = trim($item_name);
+        //Se comprueba que el tamaño sea menor o igual al maximo permitido 100 caracteres
+        if (100 >= strlen($item_name)) {
+            try {
+                $conn = get_connection();
+                $stmt = $conn->prepare('SELECT COUNT(*) as count FROM item WHERE name = :name');
+                $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+                $stmt->execute();
+
+                //Si el conteo es null o cero el resultado será correcto
+                $row = $stmt->fetch();
+                $count = $row['count'];
+                if($count === 'NULL' || $count === '0'){
+                    $result = TRUE;
+                }
+            } catch (PDOException $e) {
+                $message = "Error al validar nombre en la base de datos: {$e->getMessage()}";
+                write_error($message);
+            } //Fin de try catch
+        } //Fin de if
+    } //Fin de if
+
+    return $result;
+} //Fin del metodo
+
 //---------------------------------------------------------------------------------------
 //                      UTILIDADES
 //---------------------------------------------------------------------------------------
