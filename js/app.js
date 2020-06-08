@@ -63,3 +63,50 @@ const mainMenuController = () => {
 window.addEventListener('load', () => {
     mainMenuController();
 })
+
+//----------------------------------------------------------------------------------------------
+//                              CONTROLADORES DE LOS MENÚS
+//----------------------------------------------------------------------------------------------
+/**
+ * Esta funcion generica funciona para dar formato de moneda a los numeros pasados como parametros
+ * @param {string} locales Es el leguaje Eje: es-CO
+ * @param {string} currency Eltipo de moneda a utilizar ej: COP
+ * @param {number} fractionDigits El numero de digitos decimales que se van a mostrar
+ * @param {number} number Es la cantidad de dinero que se va a dar formato
+ */
+function formatCurrency(locales, currency, fractionDigits, number) {
+    var formatted = new Intl.NumberFormat(locales, {
+        style: 'currency',
+        currency: currency,
+        minimumFractionDigits: fractionDigits
+    }).format(number);
+    return formatted;
+}
+
+/**
+ * Esta es una version simplificada de formatCurreny para moneda colombiana
+ * @param {number} number Numero para establecer formato
+ * @param {number} fractionDigits Fracciones a mostrar
+ */
+function formatCurrencyLite(number, fractionDigits) {
+    return formatCurrency('es-CO', 'COP', fractionDigits, number);
+}
+
+const selectText = object =>{
+    object.select();
+}
+
+/**
+ * Recibe un objeto html al que va a dar formato al su valor tipo moneda
+ * @param {object} object Un input tipo texto al que se le quiere dar formato de moneda a su valor
+ */
+const formatCurrencyInputText = object =>{
+    if(object && object.value){
+        let number = parseFloat(object.value);
+        if(!isNaN(number)){
+            object.value = formatCurrencyLite(number, 0);
+        }else{
+            object.value = '';
+        }
+    }
+}

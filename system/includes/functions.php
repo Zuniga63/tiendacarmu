@@ -132,14 +132,14 @@ function logout()
      */
     if ($_SESSION['user']) {
         $username = $_SESSION['user'];
-        $user_id = intval($_SESSION['user_id']);
+        $user_id = $_SESSION['user_id'];
         $conn = get_connection();
 
         if ($conn) {
             try {
                 $conn->beginTransaction();
                 $stmt = $conn->prepare('UPDATE user SET start_session = NULL WHERE user_id = :user_id AND username = :user_name');
-                $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+                $stmt->bindParam(':user_name', $username, PDO::PARAM_STR);
                 $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
                 $stmt->execute();
 
@@ -293,7 +293,7 @@ function get_available_images($path_base, $path)
                 list($width, $height) = getimagesize($path2);
                 // echo $path .  . "<br>";
                 $result[] = array(
-                    'src' => "$path/$img",
+                    'src' => "$img",
                     'width' => $width,
                     'height' => $height
                 );
@@ -397,7 +397,7 @@ function get_categories_of_item($item_id)
     $categories = [];
     try {
         $conn = get_connection();
-        $stmt = $conn->query(("SELECT category_id as id FROM item_hascategory WHERE item_id = $item_id"));
+        $stmt = $conn->query(("SELECT category_id as id FROM item_has_category WHERE item_id = $item_id"));
 
         while ($row = $stmt->fetch()) {
             $categories[] = intval($row['id']);
@@ -490,9 +490,9 @@ function get_all_items()
                 'barcode' => $row['barcode'] === 'NULL' ? '' : $row['barcode'],
                 'gender' => $row['gender'],
                 'stock' => intval($row['stock']),
-                'outstandig' => intval($row['outstanding']) === 0 ? FALSE : TRUE,
+                'outstanding' => intval($row['outstanding']) === 0 ? FALSE : TRUE,
                 'isNew' => intval($row['is_new']) === 0 ? FALSE : TRUE,
-                'published' => intval($row['pusblished']) === 0 ? FALSE : TRUE,
+                'published' => intval($row['published']) === 0 ? FALSE : TRUE,
                 'dischargeDate' => $row['discharge_date'],
                 'webDirection' => $row['web_direction'] === 'NULL' ? '' : $row['web_direction'],
                 'images' => $images,
@@ -532,7 +532,7 @@ function create_new_item($name, $description, $retail_price, $ref, $barcode, $ge
     if (validate_item($name, $description, $retail_price, $stock, $gender)) {
         $ref = empty($ref) ? 'NULL' : $ref;
         $barcode = empty($barcode) ? 'NULL' : $barcode;
-        $web_direction = empty('$web_direction') ? 'NULL' : $web_direction;
+        $web_direction = empty($web_direction) ? 'NULL' : $web_direction;
 
         try {
             $conn = get_connection();
@@ -543,7 +543,7 @@ function create_new_item($name, $description, $retail_price, $ref, $barcode, $ge
             $conn->beginTransaction();
 
             //Se aggregan los datos especificos del producto
-            $stmt = $conn->prepare('INSERT INTO item (name, description, retail_price, ref, barcode, gender, stock, outstanding, is_new, published, web_direction VALUES (:name, :description, :retail_price, :ref, :barcode, :gender, :stock, :outstanding, :is_new, :published, :web_direction)');
+            $stmt = $conn->prepare("INSERT INTO item (name, description, retail_price, ref, barcode, gender, stock, outstanding, is_new, published, web_direction) VALUES (:name, :description, :retail_price, :ref, :barcode, :gender, :stock, :outstanding, :is_new, :published, :web_direction)");
 
             $stmt->bindParam(':name', $name, PDO::PARAM_STR);
             $stmt->bindParam(':description', $description, PDO::PARAM_STR);
@@ -562,7 +562,7 @@ function create_new_item($name, $description, $retail_price, $ref, $barcode, $ge
 
             //Se agregan la imagenes del prodcuto
             if(count($images) > 0){
-                $stmt = $conn->prepare('INSERT INTO item_image(item_id, src, width, height) VALUES (:item_id, :src, :width, :height');
+                $stmt = $conn->prepare("INSERT INTO item_image(item_id, src, width, height) VALUES (:item_id, :src, :width, :height)");
                 $stmt->bindParam(':item_id', $last_id);
 
                 foreach($images as $img){
@@ -575,20 +575,20 @@ function create_new_item($name, $description, $retail_price, $ref, $barcode, $ge
 
             //Se agregan las categorías
             if(count($categories) > 0){
-                $stmt = $conn->prepare('INSERT INTO item_has_category(item_id, category_id) VALUES (:item_id, :category_id');
+                $stmt = $conn->prepare("INSERT INTO item_has_category(item_id, category_id) VALUES (:item_id, :category_id)");
                 $stmt->bindParam(':item_id', $last_id, PDO::PARAM_INT);
                 foreach($categories as $category){
-                    $stmt->bindParam(':category_id', $category, PDO::PARAM_INT);
+                    $stmt->bindParam(':category_id', $category['id'], PDO::PARAM_INT);
                     $stmt->execute();
                 }//Fin de foreach
             }//Fin de if
 
             //Se agregan las etiquetas
             if(count($labels) > 0){
-                $stmt = $conn->prepare('INSERT INTO item_has_label(item_id, label_id) VALUES (:item_id, :label_id');
+                $stmt = $conn->prepare("INSERT INTO item_has_label(item_id, label_id) VALUES (:item_id, :label_id)");
                 $stmt->bindParam(':item_id', $last_id, PDO::PARAM_INT);
                 foreach($labels as $label){
-                    $stmt->bindParam(':label_id', $label, PDO::PARAM_INT);
+                    $stmt->bindParam(':label_id', $label['id'], PDO::PARAM_INT);
                     $stmt->execute();
                 }//Fin de foreach
             }//Fin de if
@@ -598,11 +598,15 @@ function create_new_item($name, $description, $retail_price, $ref, $barcode, $ge
             $conn->query("INSERT INTO user_log (user_id, log_description) VALUES ($user_id, 'Se creo un nuevo producto [id=$last_id]')");
 
             $conn->commit();
+            return true;
         } catch (PDOException $e) {
             $message = "Error al intentar agregar un nuevo producto: {$e->getMessage()}";
             write_error($message);
+            return false;
         } //Fin de try catch
     } //Fin de if
+
+    return false;
 } //Fin del metodo
 
 /**
@@ -678,7 +682,7 @@ function validate_item(&$name, &$description, &$retail_price, &$stock, &$gender)
 
                     //Por ultimo se hace una comprobacion
                     if (isset($gender) && gettype($gender) === 'string' && !empty($gender)) {
-                        if ($gender !== 'x' || $gender !== 'f' || $gender !== 'm') {
+                        if ($gender !== 'x' && $gender !== 'f' && $gender !== 'm') {
                             $gender = 'x';
                         }
                     } //Fin de if

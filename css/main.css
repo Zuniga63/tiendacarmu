@@ -125,13 +125,17 @@ body {
 /********************************************************************************************/
 
 .alert {
-  display: block;
+  display: none;
   border-radius: 0.25rem;
   padding: 0.3rem 0.25rem;
   font-size: 0.8em;
   margin-bottom: 0.3rem;
   opacity: 1;
   border: 1px solid transparent;
+}
+
+.alert.show{
+  display: block;
 }
 
 .alert--danger {
@@ -232,11 +236,16 @@ body {
   display: block;
   width: 100%;
   margin-bottom: 5px;
+  padding: 0 3px;
 }
 
 .form__input:focus,
 .form__option:focus {
   outline-color: var(--primary);
+}
+
+.form__input.error{
+  border-color: rgba(255, 0, 0, 0.5);
 }
 
 /* Para los elementos label de la descripcion o la galería */
@@ -254,7 +263,7 @@ body {
 }
 
 .form__input__length {
-  text-align: center;
+  text-align: right;
   align-self: center;
 }
 
@@ -313,6 +322,10 @@ background: #d4d4d4;
   padding: 5px;
   margin: 5px;
   display: inline-block;
+}
+
+.form__gallery__fig.select{
+  background-color: var(--nephritis);
 }
 
 .form__gallery__fig:hover {
@@ -597,11 +610,14 @@ background: #d4d4d4;
 }
 
 .section__header {
+  border-radius: 20px 20px 0 0;
+  margin-bottom: 0.5rem;
+}
+
+.section__title{
   font-family: var(--title_font);
   text-align: center;
   text-transform: uppercase;
-  border-radius: 20px 20px 0 0;
-  margin-bottom: 0.5rem;
 }
 
 .section__body {
@@ -679,6 +695,7 @@ background: #d4d4d4;
   border-radius: 5px;
   border: 2px solid var(--clouds);
   overflow: hidden;
+  min-height: 300px;
 }
 
 .items-list .item-info:nth-child(even) {
