@@ -185,7 +185,7 @@ body {
 
 /* 
  *  Corresponde a una pestaña que se ubica en medio del borde superior del contenedor
-*/
+ */
 .form__container__name {
   display: inline-block;
   position: absolute;
@@ -692,6 +692,9 @@ body {
   border: 1px solid #666;
 }
 
+/********************************************************************************************/
+/*                      TARJETAS DE VISUALIZACION DE PRODUCTOS                              */
+/********************************************************************************************/
 .items-list {
   width: 95%;
   margin-left: auto;
@@ -795,6 +798,81 @@ body {
   margin-left: auto;
 }
 
+.text-header__info{
+  color: white;
+  font-weight: bold;
+  margin: 0;
+  padding: 10px;
+  text-align: center;
+  font-size: 0.9em;
+}
+
+.text-header__info--red{
+  background-color: #ff3a24;
+}
+
+.text-header__info--yellow{
+  background-color: #f1c40f;
+}
+
+.text-header__info--purple{
+  background-color: #8e44ad;
+}
+
+.feature-products{
+  width: 100%;
+  margin-bottom: 100px;
+}
+
+.feature-products__title{
+  margin-top: 0;
+  margin-bottom: 30px;
+  padding-left: 20px;
+  text-transform: uppercase;
+}
+
+.footer{
+  background-color: var(--dark);
+  color: white;
+  padding: 20px 10px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 1em;
+}
+
+.contact-us,
+.social{
+  margin-bottom: 40px;
+}
+
+.contact-us__txt,
+.social__txt{
+  margin: 0;
+  margin-left: 10px;
+  padding: 10px 0;
+}
+
+
+.contact-us__txt span,
+.social span{
+  margin-left: 5px;
+}
+
+.social__link{
+  display: block;
+  color: white;
+  text-decoration: none;
+  margin-left: 10px;
+  padding: 10px 0;
+}
+
+.copy{
+  text-align: center;
+  font-size: 0.8em;
+}
+
+/********************************************************************************************/
+/*                      ESTILOS DEL SLIDER UTILIZADO EN LA VISTA PRINCIPAL                  */
+/********************************************************************************************/
 .slider {
   margin: auto;
   width: 100%;
@@ -842,27 +920,9 @@ body {
   right: 10px;
 }
 
-.text-header__info{
-  color: white;
-  font-weight: bold;
-  margin: 0;
-  padding: 10px;
-  text-align: center;
-  font-size: 0.9em;
-}
-
-.text-header__info--red{
-  background-color: #ff3a24;
-}
-
-.text-header__info--yellow{
-  background-color: #f1c40f;
-}
-
-.text-header__info--purple{
-  background-color: #8e44ad;
-}
-
+/********************************************************************************************/
+/*                      ESTILOS DEL BANNER PRINCIPAL TIPO SLIDER                            */
+/********************************************************************************************/
 .banner{
   position: relative;
   margin-bottom: 60px;
@@ -984,18 +1044,10 @@ input[id="3"]:checked~ .banner__pagination__item[for='3']{
   }
 }
 
-.feature-products{
-  width: 100%;
-  margin-bottom: 100px;
-}
 
-.feature-products__title{
-  margin-top: 0;
-  margin-bottom: 30px;
-  padding-left: 20px;
-  text-transform: uppercase;
-}
-
+/********************************************************************************************/
+/*                      ESTILOS DE LA TARJETA DE PRODUCTO                                   */
+/********************************************************************************************/
 .card{
   /* background: lightgrey; */
   max-width: 300px;
@@ -1161,43 +1213,4 @@ input[id="3"]:checked~ .banner__pagination__item[for='3']{
   color: #666;
   font-size: 1.2em;
   margin: 1.25rem 0;
-}
-
-.footer{
-  background-color: var(--dark);
-  color: white;
-  padding: 20px 10px;
-  font-family: 'Roboto', sans-serif;
-  font-size: 1em;
-}
-
-.contact-us,
-.social{
-  margin-bottom: 40px;
-}
-
-.contact-us__txt,
-.social__txt{
-  margin: 0;
-  margin-left: 10px;
-  padding: 10px 0;
-}
-
-
-.contact-us__txt span,
-.social span{
-  margin-left: 5px;
-}
-
-.social__link{
-  display: block;
-  color: white;
-  text-decoration: none;
-  margin-left: 10px;
-  padding: 10px 0;
-}
-
-.copy{
-  text-align: center;
-  font-size: 0.8em;
 }
