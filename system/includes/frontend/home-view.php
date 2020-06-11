@@ -17,7 +17,7 @@
 <body class="home-body">
   <header class="header">
     <nav class="main-navbar" id="mainNavbar">
-      <a href="#" class="main-navbar__brand">
+      <a href="home.php" class="main-navbar__brand">
         <img src="../img/logo.png" alt="Logo de Carmú" class="main-navbar__img">
       </a>
 
@@ -27,12 +27,18 @@
 
       <div class="main-navbar__nav" id="navbar-collapse">
         <ul class="main-navbar__list">
-          <!-- <li class="main-navbar__item">
-            <a href="#" class="main-navbar__link link__active">
+          <li class="main-navbar__item">
+            <a href="#" class="main-navbar__link main-navbar__link--active">
               <i class="main-navbar__link__prepend icon-home"></i>
               <span class="main-navbar__link__body">Principal</span>
             </a>
-          </li> -->
+          </li>
+          <li class="main-navbar__item">
+            <a href="customers.php" class="main-navbar__link link__active">
+              <i class="main-navbar__link__prepend icon-home"></i>
+              <span class="main-navbar__link__body">Clientes</span>
+            </a>
+          </li>
         </ul>
 
         <a href="./logout.php" class="btn btn--red">Cerrar sesión</a>
