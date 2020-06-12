@@ -10,41 +10,72 @@ console.log('Funcionando')
  * hijos
  * @param {*} menu Es el menú html al que se le va a modificar el alto
  */
-const showMenu = menu => {
+const showMenu = (menu, fatherMenu = undefined) => {
 
+    //Se obtiene el alto del menu que se quiere modificar
+    height = elementHeight(menu);
 
+    /**
+     * Si el menu está visible simplemnete se elimina el atributo
+     * style y este por defecto termina con la propiedad height en 0px
+     */
     if (menu.classList.contains('show')) {
-        //Si el menú está visible simplemente se elimina el atributo que modifica el height
+        /**
+         * Si es un dropdown dentro de otro menú deslegable antes de
+         * remover el atributo style del menú se modifica el alto del menú padre
+         */ 
+        if(fatherMenu){
+            let fatherHeight = elementHeight(fatherMenu) - height;
+            fatherMenu.style.height = `${fatherHeight}px`;
+            console.log(fatherMenu);
+        }
+
         menu.classList.remove('show');
         menu.removeAttribute('style');
     } else {
-        //Antes de modificar el alto del menú debo saber cual el el height total
-        let height = 0;
+        menu.classList.add('show');
 
-        //Obtengo los elementos hijo
-        let children = menu.children;
-
-        for (let index = 0; index < children.length; index++) {
-            const child = children[index];
-
-            let style = window.getComputedStyle(child);
-            //Obtengo los valores de los margenes
-            let margins = parseFloat(style['marginTop']) + parseFloat(style['marginBottom']);
-            //Sumo el alto del elemento y le sumo los margenes
-            height += child.offsetHeight + margins;
+        /**
+         * Se modifica el alto del menú padre en el caso de que sea un 
+         * dropdown dentro de otro panel de navegacion
+         */
+        if(fatherMenu){
+            let fatherHeight = height + elementHeight(fatherMenu);
+            fatherMenu.style.height = `${fatherHeight}px`;
+            console.log(fatherMenu);
         }
 
-        //Se aproxima para obtener un entero
-        height = Math.ceil(height);
-
-        menu.classList.add('show');
-        //Se modifica el alto del menu
         menu.style.height = `${height}px`
 
     }
 
 }
 
+/**
+ * Recorre los hijos del elemento y va computando margenes y paddin para obtener el
+ * alto en pixeles que el cliente ve en pantalla
+ * @param {object} element Elemento del dom al que se va a calcular el alto
+ */
+const elementHeight = element => {
+    //Antes de modificar el alto del menú debo saber cual el el height total
+    let height = 0;
+
+    //Obtengo los elementos hijo
+    let children = element.children;
+
+    for (let index = 0; index < children.length; index++) {
+        const child = children[index];
+
+        let style = window.getComputedStyle(child);
+        //Obtengo los valores de los margenes
+        let margins = parseFloat(style['marginTop']) + parseFloat(style['marginBottom']);
+        //Sumo el alto del elemento y le sumo los margenes
+        height += child.offsetHeight + margins;
+    }
+
+    //Se aproxima para obtener un entero
+    return Math.ceil(height);
+}
 
 const mainMenuController = () => {
     //Se recupera el toggler de la barra de menú
@@ -56,8 +87,21 @@ const mainMenuController = () => {
         showMenu(navbarCollapse);
     })
 
+    //Ahora se agrega la funcionalidad a los dropdown
+    const dropdowns = document.getElementsByClassName('dropdown');
+    for (let index = 0; index < dropdowns.length; index++) {
+        const dropdown = dropdowns[index];
+        //Al hacer click en un dropwn se debe desplegar el menú
+        dropdown.addEventListener('click', () => {
+            //Se selecciona el menu
+            let dropdownMenu = dropdown.querySelector('.dropdown__nav');
+            if (dropdownMenu) {
+                showMenu(dropdownMenu, navbarCollapse);
+            }
 
-    
+        });//Fin de addEventListener
+    }//Fin de for
+
 }
 
 window.addEventListener('load', () => {
@@ -71,7 +115,7 @@ window.addEventListener('load', () => {
  * Contiene los sliders que poseen autoplay
  */
 let sliderIntervals = [];
-const sliderController = () =>{
+const sliderController = () => {
     //Se recuperan todos los sliders del docuemento
     const sliders = document.querySelectorAll('.slider');
     sliders.forEach(slider => {
@@ -82,21 +126,21 @@ const sliderController = () =>{
         const items = sliderContainer.querySelectorAll('.slider__item');
         let id = slider.getAttribute('id');
 
-        if(items && items.length > 0){
+        if (items && items.length > 0) {
             //Se ajusta el ancho del contenedor
             sliderContainer.style.width = `${items.length * 100}%`;
             //Se mueve el ultimo elemento al inicio
             sliderContainer.insertBefore(items[items.length - 1], items[0]);
             //Se mueve el margen un 100% a la izquierda
             sliderContainer.style.marginLeft = '-100%';
-    
+
             //Si el slider tiene botones se agrega la funcionalidad
             if (btnNext && btnPrev) {
                 btnNext.addEventListener('click', (e) => {
                     sliderNext(id, 700);
                     sliderAutoplayStop(searchSliderRoot(e.target));
                 })
-    
+
                 btnPrev.addEventListener('click', (e) => {
                     sliderPrev(id, 700);
                     sliderAutoplayStop(searchSliderRoot(e.target));
@@ -220,12 +264,12 @@ const cardGalleryControler = () => {
 
     //Se agrega la funcionalidad a cada una de las tarjetas
     cards.forEach(card => {
-        
+
         let cardImg = card.querySelector('.card__img');
         let gallery = card.querySelector('.card__gallery');
-        
-        
-        if(gallery){
+
+
+        if (gallery) {
             let galleryImgs = gallery.querySelectorAll('.card__gallery__img');
             let pill = card.querySelector('.card__pill');
 
@@ -233,15 +277,15 @@ const cardGalleryControler = () => {
          * Pendiente que las imagenes de los producto se deben descargar cuando el cliente
          * le de click a la pildora de imagenes
          */
-        pill.addEventListener('click', () => {
-            if (pill.classList.contains('active')) {
-                pill.classList.remove('active');
-                gallery.classList.remove('show');
-            } else {
-                pill.classList.add('active');
-                gallery.classList.add('show');
-            }
-        })
+            pill.addEventListener('click', () => {
+                if (pill.classList.contains('active')) {
+                    pill.classList.remove('active');
+                    gallery.classList.remove('show');
+                } else {
+                    pill.classList.add('active');
+                    gallery.classList.add('show');
+                }
+            })
 
             galleryImgs.forEach(img => {
                 img.addEventListener('click', () => {
@@ -284,7 +328,7 @@ function formatCurrencyLite(number, fractionDigits) {
     return formatCurrency('es-CO', 'COP', fractionDigits, number);
 }
 
-const selectText = object =>{
+const selectText = object => {
     object.select();
 }
 
@@ -292,12 +336,12 @@ const selectText = object =>{
  * Recibe un objeto html al que va a dar formato al su valor tipo moneda
  * @param {object} object Un input tipo texto al que se le quiere dar formato de moneda a su valor
  */
-const formatCurrencyInputText = object =>{
-    if(object && object.value){
+const formatCurrencyInputText = object => {
+    if (object && object.value) {
         let number = parseFloat(object.value);
-        if(!isNaN(number)){
+        if (!isNaN(number)) {
             object.value = formatCurrencyLite(number, 0);
-        }else{
+        } else {
             object.value = '';
         }
     }

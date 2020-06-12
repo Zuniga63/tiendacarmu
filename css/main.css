@@ -532,7 +532,7 @@ body {
   flex-grow: 1;
   align-items: center;
   overflow: hidden;
-  height: 0px;
+  height: 0;
   /* Los siguiente se hace para que exista una suave transicion al modificar el alto por js */
   transition-property: height;
   transition-duration: 0.5s;
@@ -565,6 +565,48 @@ body {
 
 .main-navbar__link--active {
   color: #fff;
+}
+
+/********************************************************************************************/
+/*               ESTILOS DEL DROPDOWN DEL PANEL DE NAVEGACION                               */
+/********************************************************************************************/
+.dropdown__nav{
+  transition-property: height;
+  transition-duration: 0.5s;
+  transition-timing-function: ease-in;
+  height: 0;
+  overflow: hidden;
+}
+
+.dropdown__list{
+  list-style: none;
+  background-color: #fff;
+  background-clip: padding-box;
+  padding: 0.5rem 0;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.25rem;
+  margin:0.125rem 0;
+  color: #212529;
+}
+
+.dropdown__link{
+  color: inherit;
+  text-decoration: none;
+  display: block;
+  width: 90%;
+  margin-right: auto;
+  margin-left: auto;
+  padding: 0.25rem 1rem;
+  border-radius: 5px;
+}
+
+.dropdown__link--active{
+  background-color: var(--dark);
+  color: white;
+}
+
+.dropdown__link--disabled{
+  color: var(--asbestos);
 }
 
 /********************************************************************************************/

@@ -34,11 +34,32 @@
                 <span class="main-navbar__link__body">Principal</span>
               </a>
             </li>
-            <li class="main-navbar__item">
-              <a href="customers.php" class="main-navbar__link main-navbar__link--active">
-                <i class="main-navbar__link__prepend icon-home"></i>
+            <li class="main-navbar__item dropdown">
+              <a href="#" class="main-navbar__link main-navbar__link--active">
+                <i class="main-navbar__link__prepend icon-user"></i>
                 <span class="main-navbar__link__body">Clientes</span>
+                <i class="main-navbar__link__append icon-chevron-down"></i>
               </a>
+
+              <nav class="dropdown__nav">
+                <ul class="dropdown__list">
+                  <li class="dropdown__item">
+                    <a href="#" class="dropdown__link dropdown__link--active">Resumen</a>
+                  </li>
+                  <li class="dropdown__item">
+                    <a href="#" class="dropdown__link dropdown__link--disabled">Nuevo Cliente</a>
+                  </li>
+                  <li class="dropdown__item">
+                    <a href="#" class="dropdown__link">Agregar Transaccion</a>
+                  </li>
+                  <li class="dropdown__item">
+                    <a href="#" class="dropdown__link dropdown__link--disabled">Actualizar Cliente</a>
+                  </li>
+                  <li class="dropdown__item">
+                    <a href="#" class="dropdown__link dropdown__link--disabled">Consultar creditos</a>
+                  </li>
+                </ul>
+              </nav>
             </li>
           </ul>
 
