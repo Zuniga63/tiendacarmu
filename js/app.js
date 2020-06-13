@@ -27,7 +27,7 @@ const showMenu = (menu, fatherMenu = undefined) => {
         if(fatherMenu){
             let fatherHeight = elementHeight(fatherMenu) - height;
             fatherMenu.style.height = `${fatherHeight}px`;
-            console.log(fatherMenu);
+            // console.log(fatherMenu);
         }
 
         menu.classList.remove('show');
@@ -42,7 +42,7 @@ const showMenu = (menu, fatherMenu = undefined) => {
         if(fatherMenu){
             let fatherHeight = height + elementHeight(fatherMenu);
             fatherMenu.style.height = `${fatherHeight}px`;
-            console.log(fatherMenu);
+            // console.log(fatherMenu);
         }
 
         menu.style.height = `${height}px`
@@ -92,10 +92,17 @@ const mainMenuController = () => {
     for (let index = 0; index < dropdowns.length; index++) {
         const dropdown = dropdowns[index];
         //Al hacer click en un dropwn se debe desplegar el menú
-        dropdown.addEventListener('click', () => {
+        let dropdownIcon = dropdown.querySelector('.dropdown__icon');
+        dropdownIcon.addEventListener('click', () => {
             //Se selecciona el menu
             let dropdownMenu = dropdown.querySelector('.dropdown__nav');
             if (dropdownMenu) {
+                if(dropdownMenu.classList.contains('show')){
+                    dropdownIcon.classList.remove('rotate');
+                }else{
+                    dropdownIcon.classList.add('rotate');
+                }
+
                 showMenu(dropdownMenu, navbarCollapse);
             }
 
