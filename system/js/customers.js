@@ -163,42 +163,6 @@ const showView = (viewName = 'sumary') => {
     }//Fin de switch
 }//Fin de showView
 
-const showSumary = () => {
-    //En primer lugar debo agregar la clase al link
-    sumaryLink.classList.add('dropdown__link--active');
-    const sumary = document.getElementById('sumary');
-
-    if (actualView) {
-        let temporal = document.getElementById(actualView);
-        if (temporal && temporal.classList && temporal.classList.contains('show')) {
-            temporal.classList.remove('show');
-        }
-    }
-
-    sumary.classList.add('show');
-    printCharts();
-
-    systemLegend.innerText = 'Resumen';
-    actualView = 'sumary';
-    localStorage.actualView = actualView;
-}
-
-const showNewCustomer = () => {
-    newCustomerLink.classList.add('dropdown__link--active');
-    const newCustomer = document.getElementById('newCustomer');
-    if (actualView) {
-        let temporal = document.getElementById(actualView);
-        if (temporal && temporal.classList && temporal.classList.contains('show')) {
-            temporal.classList.remove('show');
-        }
-    }
-
-    newCustomer.classList.add('show');
-    systemLegend.innerText = 'Nuevo Usuario';
-    actualView = 'newCustomer';
-    localStorage.actualView = actualView;
-}
-
 /**
  * Agrega la funcionalidad a los link que se encuentran en la seccion de
  * clientes y que son los encargados de mostrar los distintos elementos de esta vista

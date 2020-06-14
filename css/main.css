@@ -169,6 +169,18 @@ body {
   padding: 1rem 0.5rem;
 }
 
+.form--bg-light{
+  background-color: #ecf0f1a8;
+  border-radius: 10px;
+  border: 2px solid var(--concrete);
+}
+
+.form__title{
+  text-align: center;
+  font-family: var(--title_font);
+  margin-bottom: 1rem;
+}
+
 .form__container {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1286,9 +1298,13 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   opacity: 0;
   transform-origin: top;
   transition: opacity 1s ease-in-out;
+  height: 0;
+  /* display: none; */
 }
 
 .customers-view__container.show{
+  height: auto;
+  display: block;
   transform: scale(1,1);
   opacity: 1;
 }
