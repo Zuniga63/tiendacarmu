@@ -561,37 +561,37 @@ function create_new_item($name, $description, $retail_price, $ref, $barcode, $ge
             $last_id = $conn->lastInsertId();
 
             //Se agregan la imagenes del prodcuto
-            if(count($images) > 0){
+            if (count($images) > 0) {
                 $stmt = $conn->prepare("INSERT INTO item_image(item_id, src, width, height) VALUES (:item_id, :src, :width, :height)");
                 $stmt->bindParam(':item_id', $last_id);
 
-                foreach($images as $img){
+                foreach ($images as $img) {
                     $stmt->bindParam(':src', $img['src'], PDO::PARAM_STR);
                     $stmt->bindParam(':width', $img['width'], PDO::PARAM_INT);
                     $stmt->bindParam(':height', $img['height'], PDO::PARAM_INT);
                     $stmt->execute();
-                }//Fin de foreach
-            }//Fin de iff
+                } //Fin de foreach
+            } //Fin de iff
 
             //Se agregan las categorías
-            if(count($categories) > 0){
+            if (count($categories) > 0) {
                 $stmt = $conn->prepare("INSERT INTO item_has_category(item_id, category_id) VALUES (:item_id, :category_id)");
                 $stmt->bindParam(':item_id', $last_id, PDO::PARAM_INT);
-                foreach($categories as $category){
+                foreach ($categories as $category) {
                     $stmt->bindParam(':category_id', $category['id'], PDO::PARAM_INT);
                     $stmt->execute();
-                }//Fin de foreach
-            }//Fin de if
+                } //Fin de foreach
+            } //Fin de if
 
             //Se agregan las etiquetas
-            if(count($labels) > 0){
+            if (count($labels) > 0) {
                 $stmt = $conn->prepare("INSERT INTO item_has_label(item_id, label_id) VALUES (:item_id, :label_id)");
                 $stmt->bindParam(':item_id', $last_id, PDO::PARAM_INT);
-                foreach($labels as $label){
+                foreach ($labels as $label) {
                     $stmt->bindParam(':label_id', $label['id'], PDO::PARAM_INT);
                     $stmt->execute();
-                }//Fin de foreach
-            }//Fin de if
+                } //Fin de foreach
+            } //Fin de if
 
             //Finalmente se guarda un registro de quien hizo las modificaciones
             $user_id = $_SESSION['user_id'];
@@ -697,6 +697,67 @@ function validate_item(&$name, &$description, &$retail_price, &$stock, &$gender)
 } //Fin del metodo
 
 //---------------------------------------------------------------------------------------
+//                      SECCION DE CLIENTES
+//---------------------------------------------------------------------------------------
+/**
+ * Agrega un nuevo cliente a la base de datos
+ */
+function create_new_customer($first_name, $last_name, $nit, $phone, $email)
+{
+    $result = false;
+    //Se comprueva que el nombre del cliente no esté vacío
+    $first_name = trim($first_name);
+    if (!empty($first_name)) {
+        $last_name = empty(trim($last_name)) ? 'NULL' : trim($last_name);
+        $nit = empty(trim($nit)) ? 'NULL' : trim($nit);
+        $phone = empty(trim($phone)) ? 'NULL' : trim($phone);
+        $email = empty(trim($email)) ? 'NULL' : trim($email);
+
+        try {
+            $conn = get_connection();
+            $conn->beginTransaction();
+
+            $stmt = $conn->prepare("INSERT INTO customer(first_name, last_name, nit, phone, email) 
+            VALUES(:first_name, :last_name, :nit, :phone, :email)");
+            //Solo si se ha preparado continúa
+            if ($stmt) {
+                $stmt->bindParam(':first_name', $first_name, PDO::PARAM_STR);
+                $stmt->bindParam(':last_name', $last_name, PDO::PARAM_STR);
+                $stmt->bindParam(':nit', $nit, PDO::PARAM_STR);
+                $stmt->bindParam(':phone', $phone, PDO::PARAM_STR);
+                $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+
+                $stmt->execute();
+
+                //Ahora se procede a actualizar el registro de usuario
+                $user_id = $_SESSION['user_id'];
+                $conn->query("INSERT INTO user_log (user_id, log_description) VALUES ($user_id, 'Creó al cliente $first_name')");
+
+                $conn->commit();
+                $result = true;
+            } else {
+                $message = "No se pudo preparar la sentencia para agregar un nuevo cliente";
+                write_error($message);
+                $conn->rollBack();
+                $result = false;
+            } //Fin de if-else
+
+        } catch (PDOException $e) {
+            $message = "Error al intentar crear un nuevo cliente: {$e->getMessage()}";
+            write_error($message);
+            return false;
+        } //Fin de try-catch
+    } else {
+        $message = "Se intente agregar un cliente con nombre en blanco";
+        write_error($message);
+    } //Fin de else
+
+    return $result;
+}
+
+
+
+//---------------------------------------------------------------------------------------
 //                      UTILIDADES
 //---------------------------------------------------------------------------------------
 /**
@@ -727,4 +788,8 @@ function go_to_page($page)
     if (isset($page) && !empty($page)) {
         header("location: $page");
     }
+}
+
+function update_user_log($message)
+{
 }
