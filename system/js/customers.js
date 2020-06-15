@@ -30,7 +30,12 @@ class View {
 
 const VIEWS = {
     sumary: new View('sumary', 'sumaryLink', 'sumary'),
-    newCustomer: new View('newCustomer', 'newCustomerLink', 'newCustomer')
+    newCustomer: new View('newCustomer', 'newCustomerLink', 'newCustomer'),
+    newPayment: new View('newPayment', 'newPaymentLink', 'newPayment'),
+    newDebt: new View('newDebt', 'newDebtLink', 'newDebt'),
+    customerUpdate: new View('customerUpdate', 'customerUpdateLink', 'customerUpdate'),
+    consultDebts: new View('consultDebts', 'consultDebtsLink', 'consultDebts')
+
 };
 
 window.addEventListener('load', () => {
@@ -149,9 +154,29 @@ const showView = (viewName = 'sumary') => {
             VIEWS.newCustomer.show();
             systemLegend.innerText = 'Nuevo Cliente';
 
-            //Se cargan los graficos
+            //Se actualiza el localStorages
             localStorage.actualView = viewName;
         } break;//Fin del caso 1
+        case 'newPayment': {
+            VIEWS.newPayment.show();
+            systemLegend.innerText = 'Registrar Abono'
+            localStorage.actualView = viewName;
+        } break;//Fin del caso 2
+        case 'newDebt': {
+            VIEWS.newDebt.show();
+            systemLegend.innerText = 'Registrar Credito'
+            localStorage.actualView = viewName;
+        } break;//Fin del caso 3
+        case 'customerUpdate': {
+            VIEWS.customerUpdate.show();
+            systemLegend.innerText = 'Actulizar Clientes';
+            localStorage.actualView = viewName;
+        } break; //Fin del caso 4
+        case 'consultDebts': {
+            VIEWS.consultDebts.show();
+            systemLegend.innerText = 'Consultar Creditos';
+            localStorage.actualView = viewName;
+        } break;//Fin del caso 5
         default: {
             VIEWS.sumary.show();
             systemLegend.innerText = 'Resumen';
@@ -159,7 +184,7 @@ const showView = (viewName = 'sumary') => {
             //Se cargan los graficos
             printCharts();
             localStorage.actualView = 'sumary';
-        }break;//Fin de default
+        } break;//Fin de default
     }//Fin de switch
 }//Fin de showView
 
@@ -167,17 +192,33 @@ const showView = (viewName = 'sumary') => {
  * Agrega la funcionalidad a los link que se encuentran en la seccion de
  * clientes y que son los encargados de mostrar los distintos elementos de esta vista
  */
-const viewController = ()=>{
+const viewController = () => {
     //Se muestra la vista guardada
     showView(localStorage.actualView);
 
     //El link que muestra el resumen
-    VIEWS.sumary.link.addEventListener('click', ()=>{
+    VIEWS.sumary.link.addEventListener('click', () => {
         showView();
     });
 
     //El link que muestra el formulario para nuevo clientes
-    VIEWS.newCustomer.link.addEventListener('click', ()=>{
+    VIEWS.newCustomer.link.addEventListener('click', () => {
         showView('newCustomer');
+    })
+
+    VIEWS.newPayment.link.addEventListener('click', () => {
+        showView('newPayment');
+    })
+
+    VIEWS.newDebt.link.addEventListener('click', () => {
+        showView('newDebt');
+    })
+
+    VIEWS.customerUpdate.link.addEventListener('click', () => {
+        showView('customerUpdate');
+    })
+
+    VIEWS.consultDebts.link.addEventListener('click', () => {
+        showView('consultDebts');
     })
 }
