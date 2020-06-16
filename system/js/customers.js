@@ -13,6 +13,7 @@ const systemLegend = document.getElementById('systemLegend');
 window.addEventListener('load', () => {
     viewController();
     newCustomerController();
+    searchBoxController();
 })
 
 const printCharts = () => {
@@ -296,4 +297,26 @@ const newCustomerController = ()=>{
             }//Fin de else
         }//Fin de if        
     })
+}
+
+//---------------------------------------------------------------------------------------------
+//                  CODIGO PARA CONTROLAR LA BUSQUEDA DE CLIENTES
+//---------------------------------------------------------------------------------------------
+const searchBoxController = ()=>{
+    const searchBoxs = document.querySelectorAll('.search-box');
+    searchBoxs.forEach(searchBox => {
+        let input = searchBox.querySelector('.search-box__search');
+        let container = searchBox.querySelector('.search-box__result');
+        let footer = searchBox.querySelector('.search-box__count');
+
+        input.addEventListener('focus', ()=>{
+            container.classList.add('show');
+            footer.style.display = 'block';
+        });
+
+        input.addEventListener('blur', ()=>{
+            container.classList.remove('show');
+            footer.removeAttribute('style');
+        })
+    });
 }

@@ -68,7 +68,8 @@
         <a href="./logout.php" class="btn btn--red">Cerrar sesión</a>
       </div>
     </nav>
-  </header><!--Fin de la barra de navegacion-->
+  </header>
+  <!--Fin de la barra de navegacion-->
 
   <div class="customers-view__body">
     <div class="customers-view__header">
@@ -111,7 +112,7 @@
       </section>
     </div>
 
-  <!-- NEW CUSTOMER SECTION -->
+    <!-- NEW CUSTOMER SECTION -->
     <div class="customers-view__container" id="newCustomer">
       <form class="form form--bg-light" id="newCustomerForm">
         <h2 class="form__title">Formulario de registro</h2>
@@ -172,9 +173,9 @@
 
     <!-- SECCION PARA AGREGAR UN PAGO -->
     <div class="customers-view__container" id="newPayment">
-      <div class="customers-view__search-box">
-        <input type="text" class="form__input" placeholder="Buscar por nombre">
-        <div class="customers-view__search-box__container scroll">
+      <div class="search-box">
+        <input type="text" class="search-box__search" placeholder="Buscar por nombre">
+        <div class="search-box__result scroll">
           <div class="customer-card">
             <h3 class="customer-card__name">Nombre del cliente</h3>
             <p class="customer-card__balance">$ 1.000.000</p>
@@ -224,7 +225,7 @@
             </div>
           </div>
         </div>
-        <p class="customers-view__search-box__footer">6 Clientes</p>
+        <p class="search-box__count">6 Clientes</p>
       </div>
 
       <form action="" class="form form--bg-light">
@@ -260,7 +261,7 @@
         <div class="form__group">
           <div class="form__group__body">
             <label class="form__label" for="customerLastname">Importe</label>
-            <input class="form__input form__input--money form__input--money-big" type="text" name="customer_lastname" id="customerLastname" placeholder="$0">
+            <input class="form__input form__input--money form__input--money-big" type="text" name="customer_lastname" placeholder="$0">
           </div>
           <div class="form__group__footer">
             <span class="alert alert--danger">Este codigo ya está en uso</span>
@@ -272,9 +273,9 @@
 
     <!-- SECCION PARA AGREGAR UNA NUEVA DEUDA -->
     <div class="customers-view__container" id="newDebt">
-      <div class="customers-view__search-box">
-        <input type="text" class="form__input" placeholder="Buscar por nombre">
-        <div class="customers-view__search-box__container scroll">
+      <div class="search-box">
+        <input type="text" class="search-box__search" placeholder="Buscar por nombre">
+        <div class="search-box__result scroll">
           <div class="customer-card">
             <h3 class="customer-card__name">Nombre del cliente</h3>
             <p class="customer-card__balance">$ 1.000.000</p>
@@ -324,7 +325,7 @@
             </div>
           </div>
         </div>
-        <p class="customers-view__search-box__footer">6 Clientes</p>
+        <p class="search-box__count">6 Clientes</p>
       </div>
 
       <form action="" class="form form--bg-light">
@@ -352,7 +353,7 @@
         <div class="form__group">
           <div class="form__group__body">
             <label class="form__label" for="customerLastname">Importe</label>
-            <input class="form__input form__input--money form__input--money-big" type="text" name="customer_lastname" id="customerLastname" placeholder="$0">
+            <input class="form__input form__input--money form__input--money-big" type="text" name="customer_lastname" placeholder="$0">
           </div>
           <div class="form__group__footer">
             <span class="alert alert--danger">Este codigo ya está en uso</span>
@@ -364,9 +365,9 @@
 
     <!-- SECCION PARA ACTUALIZAR UN CLIENTE -->
     <div class="customers-view__container" id="customerUpdate">
-      <div class="customers-view__search-box">
-        <input type="text" class="form__input" placeholder="Buscar por nombre">
-        <div class="customers-view__search-box__container scroll">
+      <div class="search-box">
+        <input type="text" class="search-box__search" placeholder="Buscar por nombre">
+        <div class="search-box__result scroll">
           <div class="customer-card">
             <h3 class="customer-card__name">Nombre del cliente</h3>
             <p class="customer-card__balance">$ 1.000.000</p>
@@ -416,7 +417,7 @@
             </div>
           </div>
         </div>
-        <p class="customers-view__search-box__footer">6 Clientes</p>
+        <p class="search-box__count">6 Clientes</p>
       </div>
 
       <form action="" class="form form--bg-light">
@@ -434,7 +435,7 @@
         <div class="form__group">
           <div class="form__group__body">
             <label class="form__label" for="customerLastname">Apellido del cliente</label>
-            <input class="form__input" type="text" name="customer_lastname" id="customerLastname" placeholder="Ingresar el apellido aquí">
+            <input class="form__input" type="text" name="customer_lastname" placeholder="Ingresar el apellido aquí">
           </div>
           <div class="form__group__footer">
             <span class="alert alert--danger">Este codigo ya está en uso</span>
@@ -477,9 +478,9 @@
 
     <!-- SECCION PARA CONSULTAR DEUDAS -->
     <div class="customers-view__container" id="consultDebts">
-      <div class="customers-view__search-box">
-        <input type="text" class="form__input" placeholder="Buscar por nombre">
-        <div class="customers-view__search-box__container scroll">
+      <div class="search-box">
+        <input type="text" class="search-box__search" placeholder="Buscar por nombre">
+        <div class="search-box__result scroll">
           <div class="customer-card">
             <h3 class="customer-card__name">Nombre del cliente</h3>
             <p class="customer-card__balance">$ 1.000.000</p>
@@ -529,7 +530,7 @@
             </div>
           </div>
         </div>
-        <p class="customers-view__search-box__footer">6 Clientes</p>
+        <p class="search-box__count">6 Clientes</p>
       </div>
 
       <div class="customer-card">
@@ -575,7 +576,7 @@
             <p class="debt-card__money">$ 1.100.000</p>
           </div>
         </div>
-        <p class="customers-view__search-box__footer">2 Creditos; $ 4.400.000</p>
+        <p class="search-box__count show">2 Creditos; $ 4.400.000</p>
       </div>
 
       <div class="customer-sumary__container">
@@ -590,7 +591,7 @@
             <p class="payment-row__amount">$ 300.000</p>
           </div>
         </div>
-        <p class="customers-view__search-box__footer">2 Abonos; $ 1.300.000</p>
+        <p class="search-box__count show">2 Abonos; $ 1.300.000</p>
       </div>
     </div>
   </div>
