@@ -53,9 +53,10 @@ const addSelectToTextBox = () => {
     //En primer lugar se agrega el efecto a todos los elemento form__input
     let inputs = document.querySelectorAll('input.form__input');
     inputs.forEach(el => {
-        el.addEventListener('focus', () => {
-            selectText(el);
-        })
+        // el.addEventListener('focus', () => {
+        //     selectText(el);
+        // })
+        selectText(el);
     });
 
     seachrBox.addEventListener('focus', () => {

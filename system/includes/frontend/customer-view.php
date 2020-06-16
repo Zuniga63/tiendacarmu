@@ -14,6 +14,7 @@
 </head>
 
 <body class="customers-view">
+  <!-- Barra de navegacion -->
   <header class="header">
     <nav class="main-navbar" id="mainNavbar">
       <a href="home.php" class="main-navbar__brand">
@@ -67,7 +68,7 @@
         <a href="./logout.php" class="btn btn--red">Cerrar sesión</a>
       </div>
     </nav>
-  </header>
+  </header><!--Fin de la barra de navegacion-->
 
   <div class="customers-view__body">
     <div class="customers-view__header">
@@ -75,6 +76,7 @@
       <p class="customers-view__subtitle" id="systemLegend"></p>
     </div>
 
+    <!-- SECCION DE RESUMEN -->
     <div class="customers-view__container" id="sumary">
       <section class="chart-section">
         <h2 class="chart-section__title">Clientes Activos e Inactivos</h2>
@@ -109,23 +111,25 @@
       </section>
     </div>
 
+  <!-- NEW CUSTOMER SECTION -->
     <div class="customers-view__container" id="newCustomer">
-      <form action="" class="form form--bg-light">
+      <form class="form form--bg-light" id="newCustomerForm">
         <h2 class="form__title">Formulario de registro</h2>
+        <!-- CAMPO PARA EL NOMBRE DEL CLIENTE -->
         <div class="form__group">
           <div class="form__group__body">
-            <label class="form__label" for="customerName">Nombre del cliente</label>
-            <input class="form__input" type="text" name="customer_name" id="customerName" placeholder="Ingresar nombres aquí">
+            <label class="form__label" for="newCustomerFirstName">Nombre del cliente</label>
+            <input class="form__input" type="text" name="first_name" id="newCustomerFirstName" placeholder="Ingresar nombre aquí" required>
           </div>
           <div class="form__group__footer">
-            <span class="alert alert--danger">Este codigo ya está en uso</span>
+            <span class="alert alert--danger">El nombre ya está en uso</span>
           </div>
         </div>
         <!-- CAMPO PARA EL APELLIDO DEL CLIENTE -->
         <div class="form__group">
           <div class="form__group__body">
-            <label class="form__label" for="customerLastname">Apellido del cliente</label>
-            <input class="form__input" type="text" name="customer_lastname" id="customerLastname" placeholder="Ingresar el apellido aquí">
+            <label class="form__label" for="newCustomerLastName">Apellido del cliente</label>
+            <input class="form__input" type="text" name="last_name" id="newCustomerLastName" placeholder="Ingresar el apellido aquí">
           </div>
           <div class="form__group__footer">
             <span class="alert alert--danger">Este codigo ya está en uso</span>
@@ -134,8 +138,8 @@
         <!-- CAMPO PARA EL NIT o CC -->
         <div class="form__group">
           <div class="form__group__body">
-            <label class="form__label" for="customerNit">Nit o CC</label>
-            <input class="form__input" type="text" name="customer_nit" id="customerNit" placeholder="Ingresar Nit o C.C">
+            <label class="form__label" for="newCustomerNit">Nit o CC</label>
+            <input class="form__input" type="text" name="nit" id="newCustomerNit" placeholder="Ingresar Nit o C.C">
           </div>
           <div class="form__group__footer">
             <span class="alert alert--danger">Este codigo ya está en uso</span>
@@ -144,8 +148,8 @@
         <!-- CAMPO PARA EL TELEFONO -->
         <div class="form__group">
           <div class="form__group__body">
-            <label class="form__label" for="customerPhone">Numero de Telefono</label>
-            <input class="form__input" type="text" name="customer_phone" id="customerPhone" placeholder="Ingresar telefono">
+            <label class="form__label" for="newCustomerPhone">Numero de Telefono</label>
+            <input class="form__input" type="text" name="phone" id="newCustomerPhone" placeholder="Ingresar telefono">
           </div>
           <div class="form__group__footer">
             <span class="alert alert--danger">Este codigo ya está en uso</span>
@@ -154,21 +158,22 @@
         <!-- CAMPO PARA EL TELEFONO -->
         <div class="form__group">
           <div class="form__group__body">
-            <label class="form__label" for="customerEmail">Correo</label>
-            <input class="form__input" type="email" name="customer_phone" id="customerEmail" placeholder="Ingresar correo">
+            <label class="form__label" for="newCustomerEmail">Correo</label>
+            <input class="form__input" type="email" name="email" id="newCustomerEmail" placeholder="Ingresar correo">
           </div>
           <div class="form__group__footer">
             <span class="alert alert--danger">Este codigo ya está en uso</span>
           </div>
         </div>
-
-        <input type="submit" value="Registrar Cliente" class="btn btn--success">
+        <P class="alert alert--danger alert--big" id="newCustomerAlert">El nombre del cliente es obligatorio</P>
+        <input type="submit" value="Registrar Cliente" class="btn btn--success" id="newCustomerBtn">
       </form>
     </div>
 
+    <!-- SECCION PARA AGREGAR UN PAGO -->
     <div class="customers-view__container" id="newPayment">
       <div class="customers-view__search-box">
-        <input type="text" id="" class="form__input" placeholder="Buscar por nombre">
+        <input type="text" class="form__input" placeholder="Buscar por nombre">
         <div class="customers-view__search-box__container scroll">
           <div class="customer-card">
             <h3 class="customer-card__name">Nombre del cliente</h3>
@@ -265,9 +270,10 @@
       </form>
     </div>
 
+    <!-- SECCION PARA AGREGAR UNA NUEVA DEUDA -->
     <div class="customers-view__container" id="newDebt">
       <div class="customers-view__search-box">
-        <input type="text" id="" class="form__input" placeholder="Buscar por nombre">
+        <input type="text" class="form__input" placeholder="Buscar por nombre">
         <div class="customers-view__search-box__container scroll">
           <div class="customer-card">
             <h3 class="customer-card__name">Nombre del cliente</h3>
@@ -356,9 +362,10 @@
       </form>
     </div>
 
+    <!-- SECCION PARA ACTUALIZAR UN CLIENTE -->
     <div class="customers-view__container" id="customerUpdate">
       <div class="customers-view__search-box">
-        <input type="text" id="" class="form__input" placeholder="Buscar por nombre">
+        <input type="text" class="form__input" placeholder="Buscar por nombre">
         <div class="customers-view__search-box__container scroll">
           <div class="customer-card">
             <h3 class="customer-card__name">Nombre del cliente</h3>
@@ -468,9 +475,10 @@
       </form>
     </div>
 
+    <!-- SECCION PARA CONSULTAR DEUDAS -->
     <div class="customers-view__container" id="consultDebts">
       <div class="customers-view__search-box">
-        <input type="text" id="" class="form__input" placeholder="Buscar por nombre">
+        <input type="text" class="form__input" placeholder="Buscar por nombre">
         <div class="customers-view__search-box__container scroll">
           <div class="customer-card">
             <h3 class="customer-card__name">Nombre del cliente</h3>

@@ -6,40 +6,13 @@ const VIEW_SHOW = 'show';
  */
 const systemLegend = document.getElementById('systemLegend');
 
-class View {
-    constructor(id, link, view) {
-        this.id = id,
-            this.link = document.getElementById(link),
-            this.view = document.getElementById(view)
-    }
 
-    show() {
-        if ((this.link && this.link.classList) && (this.view && this.view.classList)) {
-            this.link.classList.add(ACTIVE_LINK);
-            this.view.classList.add(VIEW_SHOW);
-        }
-    }
 
-    hidden() {
-        if ((this.link && this.link.classList) && (this.view && this.view.classList)) {
-            this.link.classList.remove(ACTIVE_LINK);
-            this.view.classList.remove(VIEW_SHOW);
-        }
-    }
-}
 
-const VIEWS = {
-    sumary: new View('sumary', 'sumaryLink', 'sumary'),
-    newCustomer: new View('newCustomer', 'newCustomerLink', 'newCustomer'),
-    newPayment: new View('newPayment', 'newPaymentLink', 'newPayment'),
-    newDebt: new View('newDebt', 'newDebtLink', 'newDebt'),
-    customerUpdate: new View('customerUpdate', 'customerUpdateLink', 'customerUpdate'),
-    consultDebts: new View('consultDebts', 'consultDebtsLink', 'consultDebts')
-
-};
 
 window.addEventListener('load', () => {
     viewController();
+    newCustomerController();
 })
 
 const printCharts = () => {
@@ -136,6 +109,37 @@ const printBarChart = (ctx) => {
 //---------------------------------------------------------------------------------------------
 //                  CODIGO PARA CONTROLAR LAS VSITAS
 //---------------------------------------------------------------------------------------------
+class View {
+    constructor(id, link, view) {
+        this.id = id,
+            this.link = document.getElementById(link),
+            this.view = document.getElementById(view)
+    }
+
+    show() {
+        if ((this.link && this.link.classList) && (this.view && this.view.classList)) {
+            this.link.classList.add(ACTIVE_LINK);
+            this.view.classList.add(VIEW_SHOW);
+        }
+    }
+
+    hidden() {
+        if ((this.link && this.link.classList) && (this.view && this.view.classList)) {
+            this.link.classList.remove(ACTIVE_LINK);
+            this.view.classList.remove(VIEW_SHOW);
+        }
+    }
+}
+
+const VIEWS = {
+    sumary: new View('sumary', 'sumaryLink', 'sumary'),
+    newCustomer: new View('newCustomer', 'newCustomerLink', 'newCustomer'),
+    newPayment: new View('newPayment', 'newPaymentLink', 'newPayment'),
+    newDebt: new View('newDebt', 'newDebtLink', 'newDebt'),
+    customerUpdate: new View('customerUpdate', 'customerUpdateLink', 'customerUpdate'),
+    consultDebts: new View('consultDebts', 'consultDebtsLink', 'consultDebts')
+
+};
 
 /**
  * Este metodo realiza todo lo requerido para mostrar una vista al clientes
@@ -220,5 +224,76 @@ const viewController = () => {
 
     VIEWS.consultDebts.link.addEventListener('click', () => {
         showView('consultDebts');
+    })
+}
+
+//---------------------------------------------------------------------------------------------
+//                  CODIGO PARA CREAR NUEVO CLIENTE
+//---------------------------------------------------------------------------------------------
+let newCustomerProcessEnd = true;
+
+const newCustomerController = ()=>{
+    const newCustomerForm = document.getElementById('newCustomerForm');
+
+    //Agrego la funcionalidad para seleccionar el texto en su interior
+    selectText(document.getElementById('newCustomerFirstName'));
+    selectText(document.getElementById('newCustomerLastName'));
+    selectText(document.getElementById('newCustomerNit'));
+    selectText(document.getElementById('newCustomerPhone'));
+    selectText(document.getElementById('newCustomerEmail'));
+
+    //Ahora se agrega la funcionalidad al formulario
+    newCustomerForm.addEventListener('submit', (e)=>{
+        e.preventDefault();
+        if(newCustomerProcessEnd){
+            const data = new FormData(newCustomerForm);                 //Para el cuerpo de la peticion
+            const alert = document.getElementById('newCustomerAlert');  //Para mostrar el resultado
+            const btn = document.getElementById('newCustomerBtn');      //Para hacer modificaciones al texto
+
+            /**
+             * Se procede a hacer la solicitud si el nombre del nuevo cliente
+             * no se encuentra en blanco
+             */
+            if(data.get('first_name').trim()){
+                //Lo siguiente es para evitar que se hagan nuevas mientras se procesa
+                btn.value = 'Procesando Solicitud';
+                newCustomerProcessEnd = false;
+
+                /**
+                 * Queda pendiente el codigo que pregunta al usuario
+                 * si desea agregar al cliente a pesar de que el nombre 
+                 * se encuentra repetido o el telefono o el correo
+                 * TODO:
+                 */
+
+                fetch('./api/new_customer.php', {
+                    method:'POST',
+                    body: data
+                })
+                .then(res => res.json())
+                .then(res => {
+                    //Se devuelve a la normalidad el boton
+                    btn.value = 'Registrar Cliente';
+                    newCustomerProcessEnd = true;
+
+                    if(res.request){
+                        writeAlert(alert, 'success', 'Cliente agregado satisfactoriamente');
+                        newCustomerForm.reset();
+                    }else{
+                        writeAlert(alert, 'danger', 'No se ha podido crear el cliente');
+                    }
+
+                    //Tras 5 segundos desaparece la alerta
+                    setTimeout(() => {
+                        alert.classList.remove('show');
+                    }, 5000);
+                })
+
+            }else{
+                writeAlert(alert, 'danger', 'El nombre del cliente es obligatorio');
+                document.getElementById('newCustomerFirstName').focus();
+                btn.blur();
+            }//Fin de else
+        }//Fin de if        
     })
 }

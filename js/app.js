@@ -335,8 +335,40 @@ function formatCurrencyLite(number, fractionDigits) {
     return formatCurrency('es-CO', 'COP', fractionDigits, number);
 }
 
+/**
+ * Agrega el evento para que se seleccione el texto al obtener el foco
+ * @param {DOM} object Input del DOM al que se desea agregar el evento
+ */
 const selectText = object => {
+    object.addEventListener('focus', ()=>{
+        object.select();
+    })
     object.select();
+}
+
+/**
+ * Escribe la alerta en pantalla
+ * @param {object} uiElement Es la alerta del DOM que se va a modificar
+ * @param {string} alertType Tipo de alerta warning, danger, success
+ * @param {string} message El mensaje que se desea mostrar
+ */
+const writeAlert = (uiElement, alertType, message) => {
+    uiElement.innerText = message;
+    switch (alertType) {
+        case 'danger':
+            uiElement.classList.add('alert--danger', 'show');
+            uiElement.classList.add('show');
+            break;
+        case 'warning':
+            uiElement.classList.add('alert--warning', 'show');
+            break;
+        case 'success':
+            uiElement.classList.add('alert--success', 'show');
+            break;
+        default:
+            uiElement.classList.remove('show');
+            break;
+    }
 }
 
 /**

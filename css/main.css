@@ -144,6 +144,12 @@ body {
   display: block;
 }
 
+.alert--big{
+  font-size: 1.2em;
+  padding: 0.6rem 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
 .alert--danger {
   color: #721c24;
   background-color: #f8d7d9;
