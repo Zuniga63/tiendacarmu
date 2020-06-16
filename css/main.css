@@ -756,7 +756,7 @@ body {
 }
 
 /* Es la caja de texto que me permite filtrar los items */
-.search-box {
+.search-box__temporal {
   display: block;
   width: 95%;
   margin-left: auto;
@@ -1615,4 +1615,10 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 .scroll::-webkit-scrollbar-track:hover,
 .scroll::-webkit-scrollbar-track:active {
   background: #d4d4d4;
+}
+
+@media (max-width:999px){
+  .home-body{
+    display: none;
+  }
 }

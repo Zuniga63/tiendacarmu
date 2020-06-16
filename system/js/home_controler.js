@@ -134,30 +134,7 @@ const showValidation = (input, inputAlert, validation) => {
     }
 }
 
-/**
- * Escribe la alerta en pantalla
- * @param {object} uiElement Es la alerta del DOM que se va a modificar
- * @param {string} alertType Tipo de alerta warning, danger, success
- * @param {string} message El mensaje que se desea mostrar
- */
-const writeAlert = (uiElement, alertType, message) => {
-    uiElement.innerText = message;
-    switch (alertType) {
-        case 'danger':
-            uiElement.classList.add('alert--danger', 'show');
-            uiElement.classList.add('show');
-            break;
-        case 'warning':
-            uiElement.classList.add('alert--warning', 'show');
-            break;
-        case 'success':
-            uiElement.classList.add('alert--success', 'show');
-            break;
-        default:
-            uiElement.classList.remove('show');
-            break;
-    }
-}
+
 
 /**
  * Pinta en pantalla los imagenes que se encuentran disponibles para
