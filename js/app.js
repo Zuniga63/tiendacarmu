@@ -385,3 +385,39 @@ const formatCurrencyInputText = object => {
         }
     }
 }
+
+/**
+ * Este metodo elimina los signos de puntuacion, cerifas, virguillas, dieresis, cedillas, etc 
+ * @param {string} text Texto a normalizar
+ * @return {string} texto normalizado
+ */
+const normalizeText = text => {
+    text = text.normalize('NFD');
+    text = text.replace(/([^n\u0300-\u036f]|n(?!\u0303(?![\u0300-\u036f])))[\u0300-\u036f]+/gi, "$1");
+    text = text.normalize();
+    return text;
+
+    //FUENTE
+    //https://es.stackoverflow.com/questions/62031/eliminar-signos-diacr%C3%ADticos-en-javascript-eliminar-tildes-acentos-ortogr%C3%A1ficos
+}
+
+/**
+ * Este metodo normaliza las cadenas luego las cambia a mayusculas y verifica si el origen
+ * contiene el texto buscado. 
+ * @param {string} originText Texto en el cual se utiliza como base para la busqueda
+ * @param {string} searchTex Texto que se va a buscar en el origen
+ * @returns {boolean} True si el origen lo contine
+ */
+const textInclude = (originText, searchTex) => {
+    //Llevo a la forma descompuesta y se elimina el bloque con la marca
+
+    originText = normalizeText(originText);
+    searchTex = normalizeText(searchTex);
+
+
+    originText = originText.toUpperCase();
+    searchTex = searchTex.toUpperCase();
+
+
+    return originText.includes(searchTex);
+}
