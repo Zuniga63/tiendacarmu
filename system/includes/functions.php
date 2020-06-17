@@ -794,7 +794,8 @@ function get_all_customers()
                 'email' => $email,
                 'balance' => $balance,
                 'credits' => $credits['credits'],
-                'payments' => $payments['payments']
+                'payments' => $payments['payments'],
+                'points' => 0
             ];
         }
     } catch (PDOException $e) {
@@ -830,7 +831,8 @@ function get_customer_credits($customer_id)
                     'id' => $id,
                     'creditDate' => $credit_date,
                     'description' => $description,
-                    'amount' => $amount
+                    'amount' => $amount,
+                    'balance' => 0
                 ];
             } //Fin de while
 

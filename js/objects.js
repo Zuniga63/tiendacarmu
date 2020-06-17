@@ -322,7 +322,7 @@ class Controller{
 
     createAllItems(dataItems){
         dataItems.forEach(item => {
-            console.log(item.outstanding)
+            // console.log(item.outstanding)
             let newItem = new Item(item.id, item.name, item.description, item.retailPrice, item.ref, item.barcode, item.gender, item.stock, item.published, item.isNew, item.outstanding, item.dischargeDate);
 
             //Ahora agrego las categorías

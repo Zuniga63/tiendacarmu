@@ -1,15 +1,115 @@
 const ACTIVE_LINK = 'dropdown__link--active';
 const VIEW_SHOW = 'show';
 
+
 /**
  * Es la etiqueta que aparece debajo del titulo
  */
 const systemLegend = document.getElementById('systemLegend');
 
 
+//---------------------------------------------------------------------------------------------
+//                  OBJETOS DEL SISTEMA
+//---------------------------------------------------------------------------------------------
+
+/**
+ * Listado de clientes recuperados de la base de datos
+ */
+let customers = [];
+
+/**
+ * Clase view que permite cntrolar las vistas
+ */
+class View {
+    constructor(id, link, view) {
+        this.id = id,
+            this.link = document.getElementById(link),
+            this.view = document.getElementById(view)
+    }
+
+    show() {
+        if ((this.link && this.link.classList) && (this.view && this.view.classList)) {
+            this.link.classList.add(ACTIVE_LINK);
+            this.view.classList.add(VIEW_SHOW);
+        }
+    }
+
+    hidden() {
+        if ((this.link && this.link.classList) && (this.view && this.view.classList)) {
+            this.link.classList.remove(ACTIVE_LINK);
+            this.view.classList.remove(VIEW_SHOW);
+        }
+    }
+}
+
+class Customer {
+    /**
+     * @constructor
+     * @param {number} id El identificador del cliente
+     * @param {string} firstName Nombres del cliente
+     * @param {string} lastName Apellido del cliente
+     * @param {string} nit Cedula de ciudadanía o DNI
+     * @param {string} phone Numero de telefono celular
+     * @param {string} email Correo electronico
+     * @param {number} points Puntos de fiabilidad del cliente
+     */
+    constructor(id = 0, firstName, lastName = '', nit = '', phone = '', email = '', points = 0) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName,
+            this.nit = nit;
+        this.phone = phone;
+        this.email = email;
+        this.points = points;
+        this.credits = [];
+        this.payments = [];
+        this.balance = 0
+    }
+
+    addCredit(id, creditDate, amount, balance) {
+        let credit = new Credit(id, creditDate, amount, balance);
+        this.credits.push(credit);
+        this.balance += amount;
+    }
+
+    addPayment(id, paymentDate, amount, cash) {
+        let payment = new Payment(id, paymentDate, amount, cash);
+        this.payments.push(payment);
+        this.balance -= amount;
+    }
+
+    toString(){
+        return this.firstName;
+    }
+}
+
+class Transaction {
+    constructor(id, transactionDate, amount) {
+        this.id = id;
+        this.date = transactionDate;
+        this.amount = amount;
+    }
+}
+
+class Credit extends Transaction {
+    constructor(id, creditDate, amount, balance) {
+        super(id, creditDate, amount);
+        this.balance = balance;
+    }
+}
+
+class Payment extends Transaction {
+    constructor(id, paymentDate, amount, cash) {
+        super(id, creditDate, amount);
+        this.cash = cash;
+    }
+}
 
 
 
+//---------------------------------------------------------------------------------------------
+//                  LOADING SECTION
+//---------------------------------------------------------------------------------------------
 window.addEventListener('load', () => {
     viewController();
     newCustomerController();
@@ -110,27 +210,7 @@ const printBarChart = (ctx) => {
 //---------------------------------------------------------------------------------------------
 //                  CODIGO PARA CONTROLAR LAS VSITAS
 //---------------------------------------------------------------------------------------------
-class View {
-    constructor(id, link, view) {
-        this.id = id,
-            this.link = document.getElementById(link),
-            this.view = document.getElementById(view)
-    }
 
-    show() {
-        if ((this.link && this.link.classList) && (this.view && this.view.classList)) {
-            this.link.classList.add(ACTIVE_LINK);
-            this.view.classList.add(VIEW_SHOW);
-        }
-    }
-
-    hidden() {
-        if ((this.link && this.link.classList) && (this.view && this.view.classList)) {
-            this.link.classList.remove(ACTIVE_LINK);
-            this.view.classList.remove(VIEW_SHOW);
-        }
-    }
-}
 
 const VIEWS = {
     sumary: new View('sumary', 'sumaryLink', 'sumary'),
@@ -229,11 +309,11 @@ const viewController = () => {
 }
 
 //---------------------------------------------------------------------------------------------
-//                  CODIGO PARA CREAR NUEVO CLIENTE
+//                  CODIGOS PARA CREAR NUEVOS CLIENTE
 //---------------------------------------------------------------------------------------------
 let newCustomerProcessEnd = true;
 
-const newCustomerController = ()=>{
+const newCustomerController = () => {
     const newCustomerForm = document.getElementById('newCustomerForm');
 
     //Agrego la funcionalidad para seleccionar el texto en su interior
@@ -244,9 +324,9 @@ const newCustomerController = ()=>{
     selectText(document.getElementById('newCustomerEmail'));
 
     //Ahora se agrega la funcionalidad al formulario
-    newCustomerForm.addEventListener('submit', (e)=>{
+    newCustomerForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        if(newCustomerProcessEnd){
+        if (newCustomerProcessEnd) {
             const data = new FormData(newCustomerForm);                 //Para el cuerpo de la peticion
             const alert = document.getElementById('newCustomerAlert');  //Para mostrar el resultado
             const btn = document.getElementById('newCustomerBtn');      //Para hacer modificaciones al texto
@@ -255,7 +335,7 @@ const newCustomerController = ()=>{
              * Se procede a hacer la solicitud si el nombre del nuevo cliente
              * no se encuentra en blanco
              */
-            if(data.get('first_name').trim()){
+            if (data.get('first_name').trim()) {
                 //Lo siguiente es para evitar que se hagan nuevas mientras se procesa
                 btn.value = 'Procesando Solicitud';
                 newCustomerProcessEnd = false;
@@ -268,29 +348,29 @@ const newCustomerController = ()=>{
                  */
 
                 fetch('./api/new_customer.php', {
-                    method:'POST',
+                    method: 'POST',
                     body: data
                 })
-                .then(res => res.json())
-                .then(res => {
-                    //Se devuelve a la normalidad el boton
-                    btn.value = 'Registrar Cliente';
-                    newCustomerProcessEnd = true;
+                    .then(res => res.json())
+                    .then(res => {
+                        //Se devuelve a la normalidad el boton
+                        btn.value = 'Registrar Cliente';
+                        newCustomerProcessEnd = true;
 
-                    if(res.request){
-                        writeAlert(alert, 'success', 'Cliente agregado satisfactoriamente');
-                        newCustomerForm.reset();
-                    }else{
-                        writeAlert(alert, 'danger', 'No se ha podido crear el cliente');
-                    }
+                        if (res.request) {
+                            writeAlert(alert, 'success', 'Cliente agregado satisfactoriamente');
+                            newCustomerForm.reset();
+                        } else {
+                            writeAlert(alert, 'danger', 'No se ha podido crear el cliente');
+                        }
 
-                    //Tras 5 segundos desaparece la alerta
-                    setTimeout(() => {
-                        alert.classList.remove('show');
-                    }, 5000);
-                })
+                        //Tras 5 segundos desaparece la alerta
+                        setTimeout(() => {
+                            alert.classList.remove('show');
+                        }, 5000);
+                    })
 
-            }else{
+            } else {
                 writeAlert(alert, 'danger', 'El nombre del cliente es obligatorio');
                 document.getElementById('newCustomerFirstName').focus();
                 btn.blur();
@@ -302,21 +382,55 @@ const newCustomerController = ()=>{
 //---------------------------------------------------------------------------------------------
 //                  CODIGO PARA CONTROLAR LA BUSQUEDA DE CLIENTES
 //---------------------------------------------------------------------------------------------
-const searchBoxController = ()=>{
+const searchBoxController = () => {
     const searchBoxs = document.querySelectorAll('.search-box');
+
+    //Se agrega la funcialidad de mostrar u ocultar la caja de resultados
     searchBoxs.forEach(searchBox => {
         let input = searchBox.querySelector('.search-box__search');
         let container = searchBox.querySelector('.search-box__result');
         let footer = searchBox.querySelector('.search-box__count');
 
-        input.addEventListener('focus', ()=>{
+        input.addEventListener('focus', () => {
             container.classList.add('show');
             footer.style.display = 'block';
         });
 
-        input.addEventListener('blur', ()=>{
+        input.addEventListener('blur', () => {
             container.classList.remove('show');
             footer.removeAttribute('style');
         })
     });
 }
+
+const reloadCustomerList = async () => {
+    await fetch('./api/all_customers.php')
+        .then(res => res.json())
+        .then(res => {
+            if (res.sessionActive) {
+                createCustomers(res.customers);
+            } else {
+                location.reload();
+            }//Fin de if-else
+        });//Fin de fetch
+}//Fin del metodo
+
+const createCustomers = customersData => {
+    customers = [];
+
+    customersData.forEach(data => {
+        let customer = new Customer(data.id, data.firstName, data.lastName, data.nit, data.phone, data.email, data.points);
+
+        //Ahora agrego los creditos
+        data.credits.forEach(credit => {
+            customer.addCredit(credit.id, credit.creditDate, credit.amount, credit.balance);
+        })
+
+        //Ahora agrego los abonos
+        data.payments.forEach(payment => {
+            customer.addPayment(payment.id, payment.paymentDate, payment.amount, payment.cash);
+        })
+
+        customers.push(customer);
+    });
+}//Fin del metodo
