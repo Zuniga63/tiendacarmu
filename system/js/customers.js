@@ -18,6 +18,11 @@ const systemLegend = document.getElementById('systemLegend');
 let customers = [];
 
 /**
+ * Corresponde al identificador del cliente seleccionado
+ */
+let customerSelected = undefined;
+
+/**
  * Clase view que permite cntrolar las vistas
  */
 class View {
@@ -56,8 +61,8 @@ class Customer {
     constructor(id = 0, firstName, lastName = '', nit = '', phone = '', email = '', points = 0) {
         this.id = id;
         this.firstName = firstName;
-        this.lastName = lastName,
-            this.nit = nit;
+        this.lastName = lastName;
+        this.nit = nit;
         this.phone = phone;
         this.email = email;
         this.points = points;
@@ -78,7 +83,7 @@ class Customer {
         this.balance -= amount;
     }
 
-    toString(){
+    toString() {
         return this.firstName;
     }
 }
@@ -110,7 +115,8 @@ class Payment extends Transaction {
 //---------------------------------------------------------------------------------------------
 //                  LOADING SECTION
 //---------------------------------------------------------------------------------------------
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
+    await reloadCustomerList();
     viewController();
     newCustomerController();
     searchBoxController();
@@ -281,30 +287,44 @@ const viewController = () => {
     //Se muestra la vista guardada
     showView(localStorage.actualView);
 
+    //Se actualizan las tarjetas
+    updateCustomerCard(document.getElementById('newPaymentCustomer'));
+    updateCustomerCard(document.getElementById('newDebtCustomer'));
+    updateCustomerCard(document.getElementById('consultDebtsCustomer'));
+
     //El link que muestra el resumen
-    VIEWS.sumary.link.addEventListener('click', () => {
+    VIEWS.sumary.link.addEventListener('click', async () => {
         showView();
+        await reloadCustomerList();
     });
 
     //El link que muestra el formulario para nuevo clientes
-    VIEWS.newCustomer.link.addEventListener('click', () => {
+    VIEWS.newCustomer.link.addEventListener('click', async () => {
         showView('newCustomer');
+        await reloadCustomerList();
     })
 
-    VIEWS.newPayment.link.addEventListener('click', () => {
+    VIEWS.newPayment.link.addEventListener('click', async () => {
         showView('newPayment');
+        await reloadCustomerList();
+        updateCustomerCard(document.getElementById('newPaymentCustomer'));
     })
 
-    VIEWS.newDebt.link.addEventListener('click', () => {
+    VIEWS.newDebt.link.addEventListener('click', async () => {
         showView('newDebt');
+        await reloadCustomerList();
+        updateCustomerCard(document.getElementById('newDebtCustomer'));
     })
 
-    VIEWS.customerUpdate.link.addEventListener('click', () => {
+    VIEWS.customerUpdate.link.addEventListener('click', async () => {
         showView('customerUpdate');
+        await reloadCustomerList();
     })
 
-    VIEWS.consultDebts.link.addEventListener('click', () => {
+    VIEWS.consultDebts.link.addEventListener('click', async () => {
         showView('consultDebts');
+        await reloadCustomerList();
+        updateCustomerCard(document.getElementById('consultDebtsCustomer'));
     })
 }
 
@@ -400,13 +420,31 @@ const searchBoxController = () => {
             container.classList.remove('show');
             footer.removeAttribute('style');
         })
+
+        input.addEventListener('input', () => {
+            if (input.value) {
+                let result = customers.filter(c => textInclude(c.firstName, input.value));
+                printCustomerResult(container, result);
+                footer.innerText = `Clientes: ${result.length}`;
+            } else {
+                printCustomerResult(container, customers);
+                footer.innerText = `Clientes: ${customers.length}`;
+            }
+        })
+
+        printCustomerResult(container, customers);
+        footer.innerText = `Clientes: ${customers.length}`;
     });
 }
 
+/**
+ * Se encarga de hacer la peticion al servidor sobre los datos de los clientes
+ */
 const reloadCustomerList = async () => {
     await fetch('./api/all_customers.php')
         .then(res => res.json())
         .then(res => {
+            console.log('Procesando peticion');
             if (res.sessionActive) {
                 createCustomers(res.customers);
             } else {
@@ -415,6 +453,10 @@ const reloadCustomerList = async () => {
         });//Fin de fetch
 }//Fin del metodo
 
+/**
+ * Crear las instancias de Customer que luego son utilizadas por cada uno de los metodos
+ * @param {array} customersData Los datos de los clientes
+ */
 const createCustomers = customersData => {
     customers = [];
 
@@ -434,3 +476,98 @@ const createCustomers = customersData => {
         customers.push(customer);
     });
 }//Fin del metodo
+
+
+
+//---------------------------------------------------------------------------------------------
+//                  CODIGOS PARA PINTAR EN PANTALLA
+//---------------------------------------------------------------------------------------------
+/**
+ * Actualiza el elemento del DOM para que coincida con el parametro de busqueda
+ * @param {object} searchBoxResult Elemento del DOM en el que se van a agregar los resultados
+ * @param {array} result Arreglo con los clientes producto de la busqueda
+ */
+const printCustomerResult = (searchBoxResult, result) => {
+    let htmlCode = '';
+    result.forEach(customer => {
+        htmlCode += `
+        <div class="customer-card" customer_id = "${customer.id}">
+            <h3 class="customer-card__name">${customer.firstName}</h3>
+            <p class="customer-card__balance">${formatCurrencyLite(customer.balance, 0)}</p>
+            <div>
+              <p class="customer-card__debts">Creditos: ${customer.credits.length}</p>
+              <p class="customer-card__points">Puntos: ${customer.points}</p>
+            </div>
+        </div>`
+    });
+
+    searchBoxResult.innerHTML = htmlCode;
+
+    //Ahora a cada una de esas tarjeta se aagrega el evento para recuperar el id
+    let cards = searchBoxResult.querySelectorAll('.customer-card');
+    cards.forEach(card => {
+        card.addEventListener('click', e => {
+            //LLegado a este punto necesito recuperar el id del cliente asociado a la tarjeta
+            let element = e.target; //Recupero el elemento que disparó el evento
+            let counter = 0;
+            let maxLength = e.path.length;
+            // console.log(element)
+            while (!element.getAttribute('customer_id')) {
+                counter++;
+                element = element.parentNode;
+                if (counter === maxLength) {
+                    break;
+                }
+            }//Fin de while
+
+            customerSelected = parseInt(element.getAttribute('customer_id'));
+            // console.log(customerSelected);
+
+            updateAllCustomerCards();
+        });//Fin de addEventListener
+    });//Fin de forEach
+}//Fin del metodo
+
+/**
+ * Actualiza las tarjetas de cliente en los formularios de actualizacion o de
+ * visualizacion
+ * @param {object} card Nodo del DOM a Actualizar
+ */
+const updateCustomerCard = card => {
+    let htmlCode = '';
+    if (
+        customerSelected
+        && !isNaN(customerSelected)
+        && customerSelected > 0
+        && customers.some(c => c.id === customerSelected)) {
+        let customer = customers.filter(c => c.id === customerSelected)[0];
+        htmlCode = `
+        <h3 class="customer-card__name">${customer.firstName}</h3>
+        <p class="customer-card__balance">${formatCurrencyLite(customer.balance, 0)}</p>
+        <div>
+            <p class="customer-card__debts">Creditos: ${customer.credits.length}</p>
+            <p class="customer-card__points">Puntos: ${customer.points}</p>
+        </div>`;
+    } else {
+        htmlCode = `
+        <h3 class="customer-card__name">Selecciona un cliente</h3>
+        <p class="customer-card__balance">$ 0</p>
+        <div>
+            <p class="customer-card__debts">Creditos: x</p>
+            <p class="customer-card__points">Puntos: x</p>
+        </div>`;
+        customerSelected = undefined;
+    }
+
+    card.innerHTML = htmlCode;
+
+}
+
+/**
+ * Actualiza todas las tarjetas de clientes con los datos del cliente
+ */
+const updateAllCustomerCards = () => {
+    updateCustomerCard(document.getElementById('newPaymentCustomer'));
+    updateCustomerCard(document.getElementById('newDebtCustomer'));
+    updateCustomerCard(document.getElementById('consultDebtsCustomer'));
+}

@@ -230,7 +230,7 @@
 
       <form action="" class="form form--bg-light">
         <h2 class="form__title">Registrar Abono</h2>
-        <div class="customer-card">
+        <div class="customer-card" id="newPaymentCustomer">
           <h3 class="customer-card__name">Nombre del cliente</h3>
           <p class="customer-card__balance">$ 1.000.000</p>
           <div>
@@ -274,8 +274,8 @@
     <!-- SECCION PARA AGREGAR UNA NUEVA DEUDA -->
     <div class="customers-view__container" id="newDebt">
       <div class="search-box">
-        <input type="text" class="search-box__search" placeholder="Buscar por nombre">
-        <div class="search-box__result scroll">
+        <input type="text" class="search-box__search" id="newDebtSearchBox" placeholder="Buscar por nombre">
+        <div class="search-box__result scroll" id="newDebtSearchBoxResult">
           <div class="customer-card">
             <h3 class="customer-card__name">Nombre del cliente</h3>
             <p class="customer-card__balance">$ 1.000.000</p>
@@ -289,7 +289,7 @@
             <p class="customer-card__balance">$ 1.000.000</p>
             <div>
               <p class="customer-card__debts">Creditos: x</p>
-              <p class="customer-card__points">Puntos: x</p>
+              <p class="customer-card__points">Puntos: -15000</p>
             </div>
           </div>
           <div class="customer-card">
@@ -330,7 +330,7 @@
 
       <form action="" class="form form--bg-light">
         <h2 class="form__title">Registrar Credito</h2>
-        <div class="customer-card">
+        <div class="customer-card" id="newDebtCustomer">
           <h3 class="customer-card__name">Nombre del cliente</h3>
           <p class="customer-card__balance">$ 1.000.000</p>
           <div>
@@ -533,7 +533,7 @@
         <p class="search-box__count">6 Clientes</p>
       </div>
 
-      <div class="customer-card">
+      <div class="customer-card" id="consultDebtsCustomer">
         <h3 class="customer-card__name">Nombre del cliente</h3>
         <p class="customer-card__balance">$ 1.000.000</p>
         <div>
