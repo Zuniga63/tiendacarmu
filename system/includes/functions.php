@@ -9,10 +9,13 @@
  * La primera version fue escrita por Andrés Zuñiga el 20 de mayo de 2020
  */
 
+use function PHPSTORM_META\type;
+
 /*
  * Estas funciones solo están disponibles si existe una session activa
  * y ya que todas vistas requieren de este archivo entonces se inicía aquí
  */
+
 session_start();
 require 'config.php';
 
@@ -754,6 +757,142 @@ function create_new_customer($first_name, $last_name, $nit, $phone, $email)
 
     return $result;
 }
+
+function get_all_customers()
+{
+    $customers = [];
+    try {
+        $conn = get_connection();
+        $stmt = $conn->query('SELECT * FROM customer ORDER BY first_name');
+        while($row = $stmt->fetch()){
+            $customer_id = intval($row['customer_id']);
+            $first_name = htmlspecialchars_decode($row['first_name']);
+            $last_name = htmlspecialchars_decode($row['last_name'] === 'NULL' ? '' : $row['last_name']);
+            $nit = htmlspecialchars_decode($row['nit'] === 'NULL' ? '' : $row['nit']);
+            $phone = htmlspecialchars_decode($row['phone'] === 'NULL' ? '' : $row['phone']);
+            $email = htmlspecialchars_decode($row['email'] === 'NULL' ? '' : $row['email']);
+            $balance = 0;
+            //Se recuperan los creditos y los abono
+            $credits = get_customer_credits($customer_id);
+            $payments = get_customer_payments($customer_id);
+            if(isset($credits) && isset($payments)){
+                $balance = $credits['total_amount'] - $payments['total_amount'];
+                if($balance<0){
+                    write_error("Inconsistencia con el cliente $customer_id: Balance menor a cero");
+                }else{
+                    //Se saldan los creditos hasta agotar los pagos
+                    //TODO
+                }//Fin de if-else
+            }
+
+            $customers[] = [
+                'id' => $customer_id,
+                'firstName' => $first_name,
+                'lastName' => $last_name,
+                'nit' => $nit,
+                'phone' => $phone,
+                'email' => $email,
+                'balance' => $balance,
+                'credits' => $credits['credits'],
+                'payments' => $payments['payments']
+            ];
+        }
+    } catch (PDOException $e) {
+        $message = "Error al intentar consultar los datos de los cliente: {$e->getMessage()}";
+        write_error($message);
+    }//Fin de try-catch
+
+    return $customers;
+}
+
+/**
+ * Consulta los creditos del cliente y realiza una sumatoria de cada uno de los montos
+ */
+function get_customer_credits($customer_id)
+{
+    $result = null;
+    $credits = [];
+
+    if (isset($customer_id) && is_numeric($customer_id)) {
+        try {
+            $total_amount = 0;
+            $conn = get_connection();
+            $stmt = $conn->query("SELECT * FROM customer_credit WHERE customer_id = $customer_id ORDER BY credit_date ASC");
+
+            while ($row = $stmt->fetch()) {
+                $id = intval($row['customer_credit_id']);
+                $credit_date = $row['credit_date'];
+                $description = htmlspecialchars_decode($row['description']);
+                $amount = floatval($row['amount']);
+                $total_amount += $amount;
+
+                $credits[] = [
+                    'id' => $id,
+                    'creditDate' => $credit_date,
+                    'description' => $description,
+                    'amount' => $amount
+                ];
+            } //Fin de while
+
+            $result = [
+                'total_amount' => $total_amount,
+                'credits' => $credits
+            ];
+        } catch (PDOException $e) {
+            $message = "Error al intentar consultar los creditos del cliente: {$e->getMessage()}";
+            write_error($message);
+        } //Fin de try-catch
+    } //Fin de if
+
+
+    return $result;
+}
+
+/**
+ * Consulta en la base de datos los pagos realizados por el cliente y hace una sumatoria de todos 
+ * los importes para regresar un objeto con los datos de los pagos y el total. Si falla retorna null
+ */
+function get_customer_payments($customer_id)
+{
+    $result = null;
+    $payments = [];
+
+    if (isset($customer_id) && is_numeric($customer_id)) {
+        try {
+            $total_amount = 0;
+
+            $conn = get_connection();
+            $stmt = $conn->query("SELECT * FROM customer_payment WHERE customer_id = $customer_id ORDER BY payment_date ASC");
+
+            while ($row = $stmt->fetch()) {
+                $id = intval($row['customer_payment_id']);
+                $payment_date = $row['payment_date'];
+                $cash = $row['cash'] == '1' ? TRUE : FALSE;
+                $amount = floatval($row['amount']);
+
+                $total_amount += $amount;
+
+                $payments[] = [
+                    'id' => $id,
+                    'paymentDate' => $payment_date,
+                    'cash' => $cash,
+                    'amount' => $amount
+                ];
+            }
+
+            $result = [
+                'total_amount' => $total_amount,
+                'payments' => $payments
+            ];
+        } catch (PDOException $e) {
+            $message = "Error al intentar consultar los pagos del cliente: {$e->getMessage()}";
+            write_error($message);
+        } //Fin de try-catch
+    } //Fin de if
+
+
+    return $result;
+} //Fin del metodo
 
 
 
