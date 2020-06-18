@@ -764,7 +764,7 @@ function get_all_customers()
     try {
         $conn = get_connection();
         $stmt = $conn->query('SELECT * FROM customer ORDER BY first_name');
-        while($row = $stmt->fetch()){
+        while ($row = $stmt->fetch()) {
             $customer_id = intval($row['customer_id']);
             $first_name = htmlspecialchars_decode($row['first_name']);
             $last_name = htmlspecialchars_decode($row['last_name'] === 'NULL' ? '' : $row['last_name']);
@@ -775,14 +775,14 @@ function get_all_customers()
             //Se recuperan los creditos y los abono
             $credits = get_customer_credits($customer_id);
             $payments = get_customer_payments($customer_id);
-            if(isset($credits) && isset($payments)){
+            if (isset($credits) && isset($payments)) {
                 $balance = $credits['total_amount'] - $payments['total_amount'];
-                if($balance<0){
+                if ($balance < 0) {
                     write_error("Inconsistencia con el cliente $customer_id: Balance menor a cero");
-                }else{
+                } else {
                     //Se saldan los creditos hasta agotar los pagos
                     //TODO
-                }//Fin de if-else
+                } //Fin de if-else
             }
 
             $customers[] = [
@@ -801,10 +801,68 @@ function get_all_customers()
     } catch (PDOException $e) {
         $message = "Error al intentar consultar los datos de los cliente: {$e->getMessage()}";
         write_error($message);
-    }//Fin de try-catch
+    } //Fin de try-catch
 
     return $customers;
 }
+
+/**
+ * Recupera la informacion del cliente
+ */
+function get_customer($customer_id)
+{
+    $customer = null;
+    try {
+        $conn = get_connection();
+        $stmt = $conn->prepare("SELECT * FROM customer WHERE customer_id = :customer_id LIMIT 1");
+        if ($stmt) {
+            $stmt->bindParam(':customer_id', $customer_id, PDO::PARAM_INT);
+            $stmt->execute();
+
+            while ($row = $stmt->fetch()) {
+                $customer_id = intval($row['customer_id']);
+                $first_name = htmlspecialchars_decode($row['first_name']);
+                $last_name = htmlspecialchars_decode($row['last_name'] === 'NULL' ? '' : $row['last_name']);
+                $nit = htmlspecialchars_decode($row['nit'] === 'NULL' ? '' : $row['nit']);
+                $phone = htmlspecialchars_decode($row['phone'] === 'NULL' ? '' : $row['phone']);
+                $email = htmlspecialchars_decode($row['email'] === 'NULL' ? '' : $row['email']);
+                $balance = 0;
+                //Se recuperan los creditos y los abono
+                $credits = get_customer_credits($customer_id);
+                $payments = get_customer_payments($customer_id);
+                if (isset($credits) && isset($payments)) {
+                    $balance = $credits['total_amount'] - $payments['total_amount'];
+                    if ($balance < 0) {
+                        write_error("Inconsistencia con el cliente $customer_id: Balance menor a cero");
+                    } else {
+                        //Se saldan los creditos hasta agotar los pagos
+                        //TODO
+                    } //Fin de if-else
+                }
+
+                $customer = [
+                    'id' => $customer_id,
+                    'firstName' => $first_name,
+                    'lastName' => $last_name,
+                    'nit' => $nit,
+                    'phone' => $phone,
+                    'email' => $email,
+                    'balance' => $balance,
+                    'credits' => $credits['credits'],
+                    'payments' => $payments['payments'],
+                    'points' => 0
+                ];
+            } //Fin de while
+        } else {
+            write_error("No se preparó la consulta al caonsultar datos de un solo cliente");
+        }
+    } catch (PDOException $e) {
+        $message = "Error al intentar consultar los datos del cliente: {$e->getMessage()}";
+        write_error($message);
+    } //Fin de try-cath
+
+    return $customer;
+} //Fin del metodo
 
 /**
  * Consulta los creditos del cliente y realiza una sumatoria de cada uno de los montos
@@ -896,7 +954,55 @@ function get_customer_payments($customer_id)
     return $result;
 } //Fin del metodo
 
+function create_new_credit($customer_id, $description, $amount)
+{
+    $result = false;
+    
 
+    if (is_numeric($customer_id) && is_numeric($amount)) {
+        $customer_id = intval($customer_id);
+        $amount = floatval($amount);
+        $description = trim($description);
+
+        if (!empty($description) && $amount > 0) {
+            try {
+                $conn = get_connection();
+                $conn->beginTransaction();
+
+                $stmt = $conn->prepare("INSERT INTO customer_credit(customer_id, description, amount) VALUES (:customer_id, :description, :amount)");
+
+                if ($stmt) {
+                    $stmt->bindParam(':customer_id', $customer_id, PDO::PARAM_INT);
+                    $stmt->bindParam(':description', $description, PDO::PARAM_STR);
+                    $stmt->bindParam(':amount', $amount, PDo::PARAM_STR);
+                    $stmt->execute();
+
+                    //Se actualiza el registro
+                    $last_id = $conn->lastInsertId();
+                    $user_id = $_SESSION['user_id'];
+                    $conn->query("INSERT INTO user_log (user_id, log_description) VALUES ($user_id, 'Se creo un nuevo credito: customer: $customer_id; credit: $last_id')");
+
+                    $conn->commit();
+                    $result = true;
+                } else {
+                    write_error("No se pudo preparar la consulta para agregar credito");
+                    $conn->rollBack();
+                }
+            } catch (PDOException $e) {
+                $message = "Error al intentar crear un nuevo credito: {$e->getMessage()}";
+                write_error($message);
+            }
+        } else {
+            write_error('La descripcion está vacía o el saldo es inferior o igual a cero');
+        } //Fin de if-else
+    } else {
+        $validation = is_numeric(trim($amount));
+        $amount = trim($amount);
+        write_error("El id o el saldo no son numericos: $customer_id AND [$amount] => $validation");
+    } //Fin de if-else
+
+    return $result;
+} //Fin del metodo
 
 //---------------------------------------------------------------------------------------
 //                      UTILIDADES

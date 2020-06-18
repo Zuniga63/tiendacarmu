@@ -68,7 +68,7 @@ class Customer {
         this.points = points;
         this.credits = [];
         this.payments = [];
-        this.balance = 0
+        this.balance = 0;
     }
 
     addCredit(id, creditDate, amount, balance) {
@@ -81,6 +81,34 @@ class Customer {
         let payment = new Payment(id, paymentDate, amount, cash);
         this.payments.push(payment);
         this.balance -= amount;
+    }
+
+    /**
+     * Actualiza los datos del cliente despues de hacer modificaciones en la base de datos
+     * @param {JSON} customerData El el objeto devuelto cuando se modifican datos de un solo cliente 
+     */
+    update(customerData) {
+        this.credits = [];
+        this.payments = [];
+        this.balance = 0;
+
+        //Actualizo los datos basicos
+        this.id = customerData.id;
+        this.firstName = customerData.firstName;
+        this.lastName = customerData.lastName;
+        this.nit = customerData.nit;
+        this.phone = customerData.phone;
+        this.email = customerData.email;
+        this.points = customerData.points;
+
+        //Agrego los creditos y los abonos
+        customerData.credits.forEach(credit => {
+            this.addCredit(credit.id, credit.creditDate, credit.amount, credit.balance);
+        })
+
+        customerData.payments.forEach(payment => {
+            this.addPayment(payment.id, payment.paymentDate, payment.amount, payment.cash);
+        })
     }
 
     toString() {
@@ -119,6 +147,7 @@ window.addEventListener('load', async () => {
     await reloadCustomerList();
     viewController();
     newCustomerController();
+    newCreditController();
     searchBoxController();
 })
 
@@ -292,6 +321,8 @@ const viewController = () => {
     updateCustomerCard(document.getElementById('newDebtCustomer'));
     updateCustomerCard(document.getElementById('consultDebtsCustomer'));
 
+    const searchBoxs = document.querySelectorAll('.search-box');
+
     //El link que muestra el resumen
     VIEWS.sumary.link.addEventListener('click', async () => {
         showView();
@@ -307,31 +338,40 @@ const viewController = () => {
     VIEWS.newPayment.link.addEventListener('click', async () => {
         showView('newPayment');
         await reloadCustomerList();
+        let searchBox = VIEWS.newPayment.view.querySelector('.search-box');
+        updateSearchBoxResult(searchBox);
         updateCustomerCard(document.getElementById('newPaymentCustomer'));
     })
 
     VIEWS.newDebt.link.addEventListener('click', async () => {
         showView('newDebt');
         await reloadCustomerList();
+        let searchBox = VIEWS.newDebt.view.querySelector('.search-box');
+        updateSearchBoxResult(searchBox);
         updateCustomerCard(document.getElementById('newDebtCustomer'));
     })
 
     VIEWS.customerUpdate.link.addEventListener('click', async () => {
         showView('customerUpdate');
         await reloadCustomerList();
+        let searchBox = VIEWS.customerUpdate.view.querySelector('.search-box');
+        updateSearchBoxResult(searchBox);
     })
 
     VIEWS.consultDebts.link.addEventListener('click', async () => {
         showView('consultDebts');
         await reloadCustomerList();
+        let searchBox = VIEWS.consultDebts.view.querySelector('.search-box');
+        updateSearchBoxResult(searchBox);
         updateCustomerCard(document.getElementById('consultDebtsCustomer'));
     })
 }
 
 //---------------------------------------------------------------------------------------------
-//                  CODIGOS PARA CREAR NUEVOS CLIENTE
+//                  CODIGOS PARA MODIFICAR DATOS EN EL SERVIDOR
 //---------------------------------------------------------------------------------------------
 let newCustomerProcessEnd = true;
+let newCreditProcessEnd = true;
 
 const newCustomerController = () => {
     const newCustomerForm = document.getElementById('newCustomerForm');
@@ -399,6 +439,203 @@ const newCustomerController = () => {
     })
 }
 
+const newCreditController = () => {
+    //Recupero el el formulario
+    const newCreditForm = document.getElementById('newCreditForm');
+
+    /**
+     * Se agrega la funcionalidad a la caja de texto para la descripcion del credito:
+     * Que se seleccione el texto al obtener el foco
+     * Actualice la logitud disponible 
+     * Muestre una alerta cuando el campo queda vacío al perder el foco
+     */
+
+    const creditDescription = document.getElementById('creditDescription');
+    const creditDescriptionLength = document.getElementById('creditDescriptionLength');
+    const creditDescriptionAlert = document.getElementById('creditDescriptionAlert');
+    selectText(creditDescription);
+    creditDescription.addEventListener('input', () => {
+        // console.log(creditDescription.value);
+        let maxLength = 50;
+        let length = creditDescription.value.length;
+        let disponible = maxLength - length;
+
+        if (disponible >= 0) {
+            creditDescriptionLength.removeAttribute('style');
+            creditDescriptionAlert.classList.remove('show');
+            creditDescriptionLength.innerText = disponible;
+        } else {
+            creditDescriptionLength.style.color = 'red';
+            creditDescriptionLength.innerText = -disponible;
+            creditDescriptionAlert.classList.add('show');
+            creditDescriptionAlert.innerText = "Se supera el maximo permitido";
+        }
+    })
+
+    /**
+     * Se agrega la funcionalidad a la caja de moneda
+     * Que seleccione su contendio al obtener el foco
+     * Que formatee el texto conforme se va introduciendo
+     * 
+     */
+    const creditAmount = document.getElementById('creditAmount');
+    const creditAmountAlert = document.getElementById('creditAmountAlert');
+    selectText(creditAmount);
+    creditAmount.addEventListener('input', () => {
+        let originalValue = creditAmount.value;
+        //Elimino el signo moneda y el punto
+        value = deleteFormaterOfAmount(originalValue);
+        value = parseFloat(value);
+        if (!isNaN(value) && value >= 0) {
+            value = formatCurrencyLite(value, 0);
+            creditAmount.value = value;
+            creditAmountAlert.classList.remove('show');
+        } else {
+            creditAmount.value = originalValue;
+            creditAmountAlert.innerText = 'No tiene formato valido';
+            creditAmountAlert.classList.add('show');
+        }
+    });
+
+    newCreditForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        if (validateCredit() && newCreditProcessEnd) {
+            const newCreditBtn = document.getElementById('newCreditBtn');
+            const newCreditAlert = document.getElementById('newCreditAlert');
+            let message = `Se va registrar un credito por valor de ${creditAmount.value}`;
+
+            if (confirm(message)) {
+                newCreditProcessEnd = false;                //Se notifica que se inicia el proceso
+                newCreditBtn.value = "Procesando solicitud";
+
+                //Se recuperan los datos
+                let customerId = customerSelected;
+                let description = creditDescription.value.trim();
+                let amount = parseFloat(deleteFormaterOfAmount(creditAmount.value));
+                let data = new FormData();
+
+                //Ahora agrego la informacion al formulario
+                data.append('customer_id', customerId);
+                data.append('description', description);
+                data.append('amount', amount);
+                // console.log(`id:${customerId}||amount:${amount}`);
+
+                //Se realiza la peticion POST
+                fetch('./api/new_credit.php', {
+                    method: 'POST',
+                    body: data
+                })
+                    .then(res => res.json())
+                    .then(res => {
+                        //Si la sesion es inactiva recarga la página
+                        if (res.sessionActive) {
+
+                            if (res.request) {
+                                //Se notifica al usuario que todo fue correcto
+                                newCreditAlert.innerText = "Solicitud procesada saticfactoriamente";
+                                newCreditAlert.classList.add('alert--success');
+
+                                //Se actualizan los datos del cliente seleccionado
+                                updateCustomer(customerId, res.customer);
+                                newCreditForm.reset();
+                                updateAllCustomerCards();
+
+                                //Se actualiza tambien la caja de resultados para que sea consistente
+                                let searchBox = VIEWS.newDebt.view.querySelector('.search-box');
+                                updateSearchBoxResult(searchBox);
+                            } else {
+                                //S notifica al usuario que no se pudo crear el credito
+                                newCreditAlert.innerText = "No se pudo crear el credito";
+                                newCreditAlert.classList.add('alert--danger');
+                            }
+
+                            //Se restauran los parametros globales y se muestra la alerta
+                            newCreditProcessEnd = true;
+                            newCreditBtn.value = 'Registrar Credito';
+                            newCreditAlert.classList.add('show');
+
+                            //Pasado 5 segundo se oculta la alerta
+                            setTimeout(() => {
+                                newCreditAlert.classList.remove('show');
+                            }, 5000);
+                        } else {
+                            location.reload();
+                        }
+                    })//Fin de fetch
+            }//Fin de if
+
+        }//Fin de if
+    });//Fin de addEventListener
+}//Fin del metodo
+
+const validateCredit = () => {
+    const creditDescription = document.getElementById('creditDescription');
+    const creditDescriptionAlert = document.getElementById('creditDescriptionAlert');
+    const creditAmount = document.getElementById('creditAmount');
+    const creditAmountAlert = document.getElementById('creditAmountAlert');
+    const newCreditAlert = document.getElementById('newCreditAlert');
+
+    let descriptionIsCorrect = false;
+    let amountIsCorrect = false;
+    let customerIsCorrert = customers.some(c => c.id === customerSelected);
+
+    let description = creditDescription.value;
+    let amount = creditAmount.value;
+    let customer = null;
+
+    //Se recupera al cliente
+    if (!customerIsCorrert) {
+        newCreditAlert.innerText = "Se debe seleccionar un cliente";
+        newCreditAlert.classList.add('show');
+        newCreditAlert.classList.add('alert--danger');
+    } else {
+        newCreditAlert.classList.remove('show');
+    }
+
+    //Se valida la descripcion
+    if (typeof description === 'string') {
+        description = description.trim();
+        if (description.length > 0) {
+            descriptionIsCorrect = true;
+            creditDescriptionAlert.classList.remove('show');
+        } else {
+            creditDescriptionAlert.classList.add('show');
+            creditDescriptionAlert.innerText = "Este campo es obligatorio";
+        }
+    } else {
+        creditDescriptionAlert.classList.add('show');
+        creditDescriptionAlert.innerText = "El formato no es valido";
+    }
+
+    //Ahora se procede a validar el inporte
+    amount = deleteFormaterOfAmount(amount);
+    amount = parseFloat(amount);
+    if (!isNaN(amount)) {
+        if (amount > 0) {
+            amountIsCorrect = true;
+            creditAmountAlert.classList.remove('show');
+        } else {
+            creditAmountAlert.innerText = 'No puede ser menor o igual a cero';
+            creditAmountAlert.classList.add('show');
+        }
+    } else {
+        creditAmountAlert.innerText = 'No tiene el formato adecuado';
+        creditAmountAlert.classList.add('show');
+    }
+
+    return (customerIsCorrert && descriptionIsCorrect && amountIsCorrect);
+
+}
+
+const deleteFormaterOfAmount = text => {
+    let value = text.replace('$', '');
+    value = value.split(".");
+    value = value.join('');
+
+    return value;
+}//Fin del metodo
+
 //---------------------------------------------------------------------------------------------
 //                  CODIGO PARA CONTROLAR LA BUSQUEDA DE CLIENTES
 //---------------------------------------------------------------------------------------------
@@ -414,6 +651,7 @@ const searchBoxController = () => {
         input.addEventListener('focus', () => {
             container.classList.add('show');
             footer.style.display = 'block';
+            input.select();
         });
 
         input.addEventListener('blur', () => {
@@ -430,7 +668,9 @@ const searchBoxController = () => {
                 printCustomerResult(container, customers);
                 footer.innerText = `Clientes: ${customers.length}`;
             }
-        })
+        });
+
+
 
         printCustomerResult(container, customers);
         footer.innerText = `Clientes: ${customers.length}`;
@@ -452,6 +692,21 @@ const reloadCustomerList = async () => {
             }//Fin de if-else
         });//Fin de fetch
 }//Fin del metodo
+
+const updateSearchBoxResult = searchBox => {
+    let input = searchBox.querySelector('.search-box__search');
+    let container = searchBox.querySelector('.search-box__result');
+    let footer = searchBox.querySelector('.search-box__count');
+
+    if (input.value) {
+        let result = customers.filter(c => textInclude(c.firstName, input.value));
+        printCustomerResult(container, result);
+        footer.innerText = `Clientes: ${result.length}`;
+    } else {
+        printCustomerResult(container, customers);
+        footer.innerText = `Clientes: ${customers.length}`;
+    }
+}
 
 /**
  * Crear las instancias de Customer que luego son utilizadas por cada uno de los metodos
@@ -477,13 +732,18 @@ const createCustomers = customersData => {
     });
 }//Fin del metodo
 
-
+const updateCustomer = (customerId, customerData) => {
+    if (customers.some(c => c.id === customerId)) {
+        let customer = customers.filter(c => c.id === customerId)[0];
+        customer.update(customerData);
+    }
+}
 
 //---------------------------------------------------------------------------------------------
 //                  CODIGOS PARA PINTAR EN PANTALLA
 //---------------------------------------------------------------------------------------------
 /**
- * Actualiza el elemento del DOM para que coincida con el parametro de busqueda
+ * Actualiza la caja de resultados que aparece cuando la caja de busqueda obtiene el foco.
  * @param {object} searchBoxResult Elemento del DOM en el que se van a agregar los resultados
  * @param {array} result Arreglo con los clientes producto de la busqueda
  */
@@ -528,9 +788,10 @@ const printCustomerResult = (searchBoxResult, result) => {
     });//Fin de forEach
 }//Fin del metodo
 
+
 /**
  * Actualiza las tarjetas de cliente en los formularios de actualizacion o de
- * visualizacion
+ * visualizacion de creditos
  * @param {object} card Nodo del DOM a Actualizar
  */
 const updateCustomerCard = card => {
@@ -564,7 +825,8 @@ const updateCustomerCard = card => {
 }
 
 /**
- * Actualiza todas las tarjetas de clientes con los datos del cliente
+ * Actualiza las tarjeta con la informacion del cliente que aparece en los formularios
+ * para nuevo credito o abono y la tarjeta que aparece en consulta de creditos
  */
 const updateAllCustomerCards = () => {
     updateCustomerCard(document.getElementById('newPaymentCustomer'));

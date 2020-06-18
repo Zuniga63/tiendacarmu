@@ -281,6 +281,7 @@ body {
 /* Especifico para los campos de moneda */
 .form__input--money {
   text-align: right;
+  letter-spacing: 4px;
 }
 
 .form__input--money-big{

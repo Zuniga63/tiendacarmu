@@ -273,6 +273,7 @@
 
     <!-- SECCION PARA AGREGAR UNA NUEVA DEUDA -->
     <div class="customers-view__container" id="newDebt">
+      <!-- SECCION PARA SELECCIONAR CLIENTE -->
       <div class="search-box">
         <input type="text" class="search-box__search" id="newDebtSearchBox" placeholder="Buscar por nombre">
         <div class="search-box__result scroll" id="newDebtSearchBoxResult">
@@ -328,8 +329,10 @@
         <p class="search-box__count">6 Clientes</p>
       </div>
 
-      <form action="" class="form form--bg-light">
-        <h2 class="form__title">Registrar Credito</h2>
+      <!-- FORMULARIO DE DATOS -->
+      <form class="form form--bg-light" id="newCreditForm">
+        <h2 class="form__title">Registrar Crédito</h2>
+        <!-- CUSTOMER CARD -->
         <div class="customer-card" id="newDebtCustomer">
           <h3 class="customer-card__name">Nombre del cliente</h3>
           <p class="customer-card__balance">$ 1.000.000</p>
@@ -338,28 +341,33 @@
             <p class="customer-card__points">Puntos: x</p>
           </div>
         </div>
+
+        <!-- CAMPO PARA DETALLES DEL CREDITO -->
         <div class="form__group">
           <div class="form__group__body">
-            <label for="itemDescription" class="form__label form__label--center">Detalles del credito</label>
-            <textarea name="itemDescription" id="itemDescription" cols="30" rows="4" class="form__input" placeholder="Escribe los detalles aquí"></textarea>
+            <label for="creditDescription" class="form__label form__label--center">Detalles del credito</label>
+            <textarea name="credit_description" id="creditDescription" cols="30" rows="4" class="form__input" placeholder="Escribe los detalles aquí" required></textarea>
           </div>
           <div class="form__group__footer">
-            <span class="alert alert--danger" id="itemDescriptionAlert">Este campo es obligatorio</span>
-            <span class="form__input__length" id="itemDescriptionLength">255</span>
+            <span class="alert alert--danger" id="creditDescriptionAlert">Este campo es obligatorio</span>
+            <span class="form__input__length" id="creditDescriptionLength">255</span>
           </div>
         </div>
         <!--FIN DEL GRUPO-->
+
         <!-- IMPORTE A abonar -->
         <div class="form__group">
           <div class="form__group__body">
-            <label class="form__label" for="customerLastname">Importe</label>
-            <input class="form__input form__input--money form__input--money-big" type="text" name="customer_lastname" placeholder="$0">
+            <label class="form__label" for="creditAmount">Importe</label>
+            <input class="form__input form__input--money form__input--money-big" type="text" name="credit_amount" id="creditAmount" placeholder="$ 0" required>
           </div>
           <div class="form__group__footer">
-            <span class="alert alert--danger">Este codigo ya está en uso</span>
+            <span class="alert alert--danger" id="creditAmountAlert">Este codigo ya está en uso</span>
           </div>
         </div>
-        <input type="submit" value="Registrar Credito" class="btn btn--success">
+        <!-- ALERTA DE ERROR EN DATOS DE CREDITO -->
+        <P class="alert alert--big" id="newCreditAlert">El nombre del cliente es obligatorio</P>
+        <input type="submit" value="Registrar Credito" class="btn btn--success" id="newCreditBtn">
       </form>
     </div>
 
