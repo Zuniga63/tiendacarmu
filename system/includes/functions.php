@@ -957,7 +957,7 @@ function get_customer_payments($customer_id)
 function create_new_credit($customer_id, $description, $amount)
 {
     $result = false;
-    
+
 
     if (is_numeric($customer_id) && is_numeric($amount)) {
         $customer_id = intval($customer_id);
@@ -1000,6 +1000,72 @@ function create_new_credit($customer_id, $description, $amount)
         $amount = trim($amount);
         write_error("El id o el saldo no son numericos: $customer_id AND [$amount] => $validation");
     } //Fin de if-else
+
+    return $result;
+} //Fin del metodo
+
+/**
+ * Agrega un pago a la deuda del cliente
+ */
+function create_new_payment($customer_id, $cash, $amount)
+{
+    $result = false;
+
+    if (is_numeric($customer_id) && is_numeric($amount)) {
+        $customer_id = intval($customer_id);
+        $amount = floatval($amount);
+        $cash = $cash == 'true' ? 1 : 0;
+
+        try {
+            $conn = get_connection();
+            $conn->beginTransaction();
+
+            $customer_credits = 0;
+            $customer_payments = 0;
+            $customer_balance = 0;
+
+            //Se recupera el total de la deuda del cliente
+            $stmt = $conn->prepare("SELECT SUM(amount) AS total_amount FROM customer_credit WHERE customer_id = :customer_id");
+            $stmt->bindParam(':customer_id', $customer_id, PDO::PARAM_INT);
+            $stmt->execute();
+            if ($row = $stmt->fetch()) {
+                $customer_credits = empty($row['total_amount']) ? 0 : floatval($row['total_amount']);
+            }
+
+            //Se recupera el total abonado por el cliente
+            $stmt = $conn->prepare("SELECT SUM(amount) AS total_amount FROM customer_payment WHERE customer_id = :customer_id");
+            $stmt->bindParam(':customer_id', $customer_id, PDO::PARAM_INT);
+            $stmt->execute();
+            if ($row = $stmt->fetch()) {
+                $customer_payments = empty($row['total_amount']) ? 0 : floatval($row['total_amount']);
+            }
+
+            //Se calcula el saldo del cliente
+            $customer_balance = $customer_credits - $customer_payments;
+
+            if ($customer_balance > 0 && $amount <= $customer_balance) {
+                $stmt = $conn->prepare("INSERT INTO customer_payment(customer_id, cash, amount) VALUES (:customer_id, :cash, :amount)");
+                $stmt->bindParam(':customer_id', $customer_id, PDO::PARAM_INT);
+                $stmt->bindParam(':cash', $cash, PDO::PARAM_BOOL);
+                $stmt->bindParam(':amount', $amount, PDO::PARAM_STR);
+                $stmt->execute();
+
+                $last_id = $conn->lastInsertId();
+                $user_id = $_SESSION['user_id'];
+                $conn->query("INSERT INTO user_log (user_id, log_description) VALUES ($user_id, 'Se creo un nuevo abono: customer: $customer_id; payment_id: $last_id')");
+                $result = true;
+            } //Fin de if
+            $conn->commit();
+
+        } catch (PDOException $e) {
+            $message = "Error al intentar crear un nuevo pago: {$e->getMessage()}";
+            write_error($message);
+        } //Fin de try-cath
+    } else {
+        $validation = is_bool($cash);
+        $amount = trim($amount);
+        write_error("El id o el saldo no son numericos[payments]: $customer_id AND [$amount] AND [$cash]=> $validation");
+    }
 
     return $result;
 } //Fin del metodo

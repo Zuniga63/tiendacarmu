@@ -133,7 +133,7 @@ class Credit extends Transaction {
 
 class Payment extends Transaction {
     constructor(id, paymentDate, amount, cash) {
-        super(id, creditDate, amount);
+        super(id, paymentDate, amount);
         this.cash = cash;
     }
 }
@@ -148,6 +148,7 @@ window.addEventListener('load', async () => {
     viewController();
     newCustomerController();
     newCreditController();
+    newPaymentController();
     searchBoxController();
 })
 
@@ -372,6 +373,7 @@ const viewController = () => {
 //---------------------------------------------------------------------------------------------
 let newCustomerProcessEnd = true;
 let newCreditProcessEnd = true;
+let newPaymentProcessEnd = true;
 
 const newCustomerController = () => {
     const newCustomerForm = document.getElementById('newCustomerForm');
@@ -569,6 +571,99 @@ const newCreditController = () => {
     });//Fin de addEventListener
 }//Fin del metodo
 
+const newPaymentController = () => {
+    const paymentAmount = document.getElementById('newPaymentAmount');
+    const newPaymentForm = document.getElementById('newPaymentForm');
+
+    selectText(paymentAmount);
+    paymentAmount.addEventListener('input', () => {
+        let originalValue = paymentAmount.value;
+        //Elimino el signo moneda y el punto
+        value = deleteFormaterOfAmount(originalValue);
+        value = parseFloat(value);
+        if (!isNaN(value) && value >= 0) {
+            value = formatCurrencyLite(value, 0);
+            paymentAmount.value = value;
+        } else {
+            paymentAmount.value = 0;
+        }
+    });
+
+    newPaymentForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (validatePayment() && newPaymentProcessEnd) {
+            const newPaymentBtn = document.getElementById('newPaymentBtn');
+            const newPaymentAlert = document.getElementById('newPaymentAlert');
+            const newPaymentCashPayment = document.getElementById('newPaymentCashPayment');
+
+            let customer = customers.filter(c => c.id === customerSelected)[0];
+            let message = `Se va a realizar un abono al cliente ${customer.firstName} por valor de ${paymentAmount.value}`;
+
+            if (confirm(message)) {
+                //Se muestra en pantalla que el proceso inició
+                newPaymentProcessEnd = false;
+                newPaymentBtn.value = "Procesando Solicitud";
+
+                //Se recuperan los datos
+                let cashPayment = newPaymentCashPayment.checked;
+                let amount = parseFloat(deleteFormaterOfAmount(newPaymentAmount.value));
+                let customerId = customerSelected;
+                console.log(cashPayment);
+
+                //Se crea el cuerpo de la peticion
+                let data = new FormData();
+                data.append('customer_id', customerId);
+                data.append('amount', amount);
+                data.append('cash', cashPayment);
+
+                //Ahora se hace la peticion
+                fetch('./api/new_payment.php', {
+                    method: 'POST',
+                    body: data
+                })
+                    .then(res => res.json())
+                    .then(res => {
+                        if (res.sessionActive) {
+                            if (res.request) {
+                                //Se notifica al usuario que todo fue correcto
+                                newPaymentAlert.innerText = "El abono fue procesado correctamente";
+                                newPaymentAlert.classList.add('alert--success');
+                                newPaymentAlert.classList.remove('alert--danger');
+
+                                //Se actualiza al cliente en cuestion
+                                updateCustomer(customerId, res.customer);
+                                newPaymentForm.reset();
+                                updateAllCustomerCards();
+
+                                //Se actualiza tambien la caja de resultados para que sea consistente
+                                let searchBox = VIEWS.newPayment.view.querySelector('.search-box');
+                                updateSearchBoxResult(searchBox);
+                            } else {
+                                newPaymentAlert.innerText = "No se pudo procesar la solicitud";
+                                newPaymentAlert.classList.add('alert--danger');
+                                newPaymentAlert.classList.remove('alert--success');
+                            }
+
+                            //Se restauran los parametros globales y se muestra la alerta
+                            newPaymentProcessEnd = true;
+                            newPaymentBtn.value = 'Registrar Abono';
+                            newPaymentAlert.classList.add('show');
+
+                            //Pasado 5 segundo se oculta la alerta
+                            setTimeout(() => {
+                                newPaymentAlert.classList.remove('show');
+                            }, 5000);
+                        } else {
+                            location.reload();
+                        }
+                    });//Fin de la peticion
+
+                console.log(`${cashPayment} => ${amount} => ${customerId}`);
+            }//Fin de if
+        }//Fin de if
+    })//Fin de addEventListener
+}//Fin del metodo
+
 const validateCredit = () => {
     const creditDescription = document.getElementById('creditDescription');
     const creditDescriptionAlert = document.getElementById('creditDescriptionAlert');
@@ -626,6 +721,42 @@ const validateCredit = () => {
 
     return (customerIsCorrert && descriptionIsCorrect && amountIsCorrect);
 
+}
+
+const validatePayment = () => {
+    //Recupero los elemento del DOM involucrados
+    const newPaymentAmount = document.getElementById('newPaymentAmount');
+    const newPaymentAmountAlert = document.getElementById('newPaymentAmountAlert');
+    const newPaymentAlert = document.getElementById('newPaymentAlert');
+
+    let amountIsCorrect = false;
+    let customerIsCorrert = customers.some(c => c.id === customerSelected);
+
+    if (customerIsCorrert) {
+        newPaymentAlert.classList.remove('show');
+        let customer = customers.filter(c => c.id === customerSelected)[0];
+
+        let amount = deleteFormaterOfAmount(newPaymentAmount.value);
+        amount = parseFloat(amount);
+        if (!isNaN(amount) && amount > 0) {
+            newPaymentAmountAlert.classList.remove('show');
+            if (amount <= customer.balance) {
+                amountIsCorrect = true;
+            } else {
+                newPaymentAmountAlert.innerText = 'No puede ser mayor a la deuda';
+                newPaymentAmountAlert.classList.add('show');
+            }
+        } else {
+            newPaymentAmountAlert.innerText = 'Debe ser mayor que cero';
+            newPaymentAmountAlert.classList.add('show');
+        }
+    } else {
+        newPaymentAlert.innerText = 'Se debe seleccionar un cliente';
+        newPaymentAlert.classList.add('alert--danger');
+        newPaymentAlert.classList.add('show');
+    }
+
+    return customerIsCorrert && amountIsCorrect;
 }
 
 const deleteFormaterOfAmount = text => {

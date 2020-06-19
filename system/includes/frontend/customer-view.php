@@ -228,8 +228,9 @@
         <p class="search-box__count">6 Clientes</p>
       </div>
 
-      <form action="" class="form form--bg-light">
+      <form action="" class="form form--bg-light"  id="newPaymentForm">
         <h2 class="form__title">Registrar Abono</h2>
+        <!-- CUSTOMER CARD -->
         <div class="customer-card" id="newPaymentCustomer">
           <h3 class="customer-card__name">Nombre del cliente</h3>
           <p class="customer-card__balance">$ 1.000.000</p>
@@ -238,17 +239,18 @@
             <p class="customer-card__points">Puntos: x</p>
           </div>
         </div>
+        <!-- FORMULARIO -->
         <div class="form__group">
           <div class="form__group__body">
             <label class="form__label">Forma de pago</label>
 
             <div class="form__container-flex">
               <div class="form__group form__group--oneline-flex">
-                <input type="radio" name="payment_type" id="cashPayment" class="form__input form__input--check">
-                <label for="cashPayment" class="form__label">Efectivo</label>
+                <input type="radio" name="payment_type" id="newPaymentCashPayment" class="form__input form__input--check" checked>
+                <label for="newPaymentCashPayment" class="form__label">Efectivo</label>
               </div>
               <div class="form__group form__group--oneline-flex">
-                <input type="radio" name="payment_type" id="itemOutstanding" class="form__input form__input--check">
+                <input type="radio" name="payment_type" id="cardPayment" class="form__input form__input--check">
                 <label for="cardPayment" class="form__label">Tarjeta</label>
               </div>
             </div>
@@ -260,14 +262,15 @@
         <!-- IMPORTE A abonar -->
         <div class="form__group">
           <div class="form__group__body">
-            <label class="form__label" for="customerLastname">Importe</label>
-            <input class="form__input form__input--money form__input--money-big" type="text" name="customer_lastname" placeholder="$0">
+            <label class="form__label" for="newPaymentAmount">Importe</label>
+            <input class="form__input form__input--money form__input--money-big" type="text" name="payment_amount" placeholder="$0" id="newPaymentAmount" require>
           </div>
           <div class="form__group__footer">
-            <span class="alert alert--danger">Este codigo ya está en uso</span>
+            <span class="alert alert--danger" id="newPaymentAmountAlert">Este codigo ya está en uso</span>
           </div>
         </div>
-        <input type="submit" value="Registrar Abono" class="btn btn--success">
+        <P class="alert alert--big" id="newPaymentAlert">El nombre del cliente es obligatorio</P>
+        <input type="submit" value="Registrar Abono" class="btn btn--success" id="newPaymentBtn">
       </form>
     </div>
 
