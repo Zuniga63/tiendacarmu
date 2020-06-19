@@ -2,10 +2,12 @@
 
 /**
  * @Funciones utilizadas por las vistas a las que accede el usuario
- * @version 0.1
+ * @version 1.1
  * @author Andrés Zuñiga <andres.zuniga.063@gmail.com>
  * History
  * ---
+ * La modificó a la version 1.1 el 19 de junio de 2020
+ * La version 1.0 Se terminó de escribir el 01 de junio de 2020
  * La primera version fue escrita por Andrés Zuñiga el 20 de mayo de 2020
  */
 
@@ -780,8 +782,23 @@ function get_all_customers()
                 if ($balance < 0) {
                     write_error("Inconsistencia con el cliente $customer_id: Balance menor a cero");
                 } else {
-                    //Se saldan los creditos hasta agotar los pagos
-                    //TODO
+                    $buffer = $payments['total_amount'];
+                    $index = 0;
+                    $max_index = count($credits['credits']);
+                    while ($buffer > 0 && $index < $max_index) {
+                        $credit = &$credits['credits'][$index];
+                        if ($credit['amount'] >= $buffer) {
+                            $credit_balance = $credit['amount'] - $buffer;
+                            // unset($credit['balance']);
+                            $credit['balance'] = $credit_balance;
+                            $buffer = 0;
+                        } else {
+                            // unset($credit['balance']);
+                            $credit['balance'] = 0;
+                            $buffer -= $credit['amount'];
+                        }
+                        $index++;
+                    } //Fin de while
                 } //Fin de if-else
             }
 
@@ -835,8 +852,23 @@ function get_customer($customer_id)
                     if ($balance < 0) {
                         write_error("Inconsistencia con el cliente $customer_id: Balance menor a cero");
                     } else {
-                        //Se saldan los creditos hasta agotar los pagos
-                        //TODO
+                        $buffer = $payments['total_amount'];
+                        $index = 0;
+                        $max_index = count($credits['credits']);
+                        while ($buffer > 0 && $index < $max_index) {
+                            $credit = &$credits['credits'][$index];
+                            if ($credit['amount'] >= $buffer) {
+                                $credit_balance = $credit['amount'] - $buffer;
+                                // unset($credit['balance']);
+                                $credit['balance'] = $credit_balance;
+                                $buffer = 0;
+                            } else {
+                                // unset($credit['balance']);
+                                $credit['balance'] = 0;
+                                $buffer -= $credit['amount'];
+                            }
+                            $index++;
+                        } //Fin de while
                     } //Fin de if-else
                 }
 
@@ -890,7 +922,7 @@ function get_customer_credits($customer_id)
                     'creditDate' => $credit_date,
                     'description' => $description,
                     'amount' => $amount,
-                    'balance' => 0
+                    'balance' => $amount
                 ];
             } //Fin de while
 
@@ -1056,7 +1088,6 @@ function create_new_payment($customer_id, $cash, $amount)
                 $result = true;
             } //Fin de if
             $conn->commit();
-
         } catch (PDOException $e) {
             $message = "Error al intentar crear un nuevo pago: {$e->getMessage()}";
             write_error($message);

@@ -71,8 +71,8 @@ class Customer {
         this.balance = 0;
     }
 
-    addCredit(id, creditDate, amount, balance) {
-        let credit = new Credit(id, creditDate, amount, balance);
+    addCredit(id, creditDate, description, amount, balance) {
+        let credit = new Credit(id, creditDate, description, amount, balance);
         this.credits.push(credit);
         this.balance += amount;
     }
@@ -103,7 +103,7 @@ class Customer {
 
         //Agrego los creditos y los abonos
         customerData.credits.forEach(credit => {
-            this.addCredit(credit.id, credit.creditDate, credit.amount, credit.balance);
+            this.addCredit(credit.id, credit.creditDate, credit.description, credit.amount, credit.balance);
         })
 
         customerData.payments.forEach(payment => {
@@ -125,9 +125,10 @@ class Transaction {
 }
 
 class Credit extends Transaction {
-    constructor(id, creditDate, amount, balance) {
+    constructor(id, creditDate, description, amount, balance) {
         super(id, creditDate, amount);
         this.balance = balance;
+        this.description = description;
     }
 }
 
@@ -149,6 +150,7 @@ window.addEventListener('load', async () => {
     newCustomerController();
     newCreditController();
     newPaymentController();
+    consultDebtsController();
     searchBoxController();
 })
 
@@ -297,14 +299,23 @@ const showView = (viewName = 'sumary') => {
             VIEWS.consultDebts.show();
             systemLegend.innerText = 'Consultar Creditos';
             localStorage.actualView = viewName;
+
+            printCustomerHistory();
         } break;//Fin del caso 5
         default: {
-            VIEWS.sumary.show();
-            systemLegend.innerText = 'Resumen';
+            // VIEWS.sumary.show();
+            // systemLegend.innerText = 'Resumen';
 
-            //Se cargan los graficos
-            printCharts();
-            localStorage.actualView = 'sumary';
+            // //Se cargan los graficos
+            // printCharts();
+            // localStorage.actualView = 'sumary';
+
+            //lo siguiente es codigo temporal
+            VIEWS.consultDebts.show();
+            systemLegend.innerText = 'Consultar Creditos';
+            localStorage.actualView = viewName;
+
+            printCustomerHistory();
         } break;//Fin de default
     }//Fin de switch
 }//Fin de showView
@@ -326,8 +337,9 @@ const viewController = () => {
 
     //El link que muestra el resumen
     VIEWS.sumary.link.addEventListener('click', async () => {
-        showView();
-        await reloadCustomerList();
+        //Funcionalidad deshabilitada
+        // showView();
+        // await reloadCustomerList();
     });
 
     //El link que muestra el formulario para nuevo clientes
@@ -353,10 +365,11 @@ const viewController = () => {
     })
 
     VIEWS.customerUpdate.link.addEventListener('click', async () => {
-        showView('customerUpdate');
-        await reloadCustomerList();
-        let searchBox = VIEWS.customerUpdate.view.querySelector('.search-box');
-        updateSearchBoxResult(searchBox);
+        //Funcionalidad deshabilitada
+        // showView('customerUpdate');
+        // await reloadCustomerList();
+        // let searchBox = VIEWS.customerUpdate.view.querySelector('.search-box');
+        // updateSearchBoxResult(searchBox);
     })
 
     VIEWS.consultDebts.link.addEventListener('click', async () => {
@@ -664,6 +677,18 @@ const newPaymentController = () => {
     })//Fin de addEventListener
 }//Fin del metodo
 
+const consultDebtsController = () => {
+    document.getElementById('consultDebtsAll').addEventListener('click', ()=>{
+        updateDebtHistory();
+    });
+    document.getElementById('consultDebtsOutstanding').addEventListener('click', ()=>{
+        updateDebtHistory();
+    });
+    document.getElementById('consultDebtsPaid').addEventListener('click', ()=>{
+        updateDebtHistory();
+    });
+}
+
 const validateCredit = () => {
     const creditDescription = document.getElementById('creditDescription');
     const creditDescriptionAlert = document.getElementById('creditDescriptionAlert');
@@ -851,7 +876,7 @@ const createCustomers = customersData => {
 
         //Ahora agrego los creditos
         data.credits.forEach(credit => {
-            customer.addCredit(credit.id, credit.creditDate, credit.amount, credit.balance);
+            customer.addCredit(credit.id, credit.creditDate, credit.description, credit.amount, credit.balance);
         })
 
         //Ahora agrego los abonos
@@ -915,6 +940,7 @@ const printCustomerResult = (searchBoxResult, result) => {
             // console.log(customerSelected);
 
             updateAllCustomerCards();
+            printCustomerHistory();
         });//Fin de addEventListener
     });//Fin de forEach
 }//Fin del metodo
@@ -953,6 +979,103 @@ const updateCustomerCard = card => {
 
     card.innerHTML = htmlCode;
 
+}
+
+const printCustomerHistory = () => {
+    updateDebtHistory();   
+    updatePaymentsHistory();
+}
+
+const updateDebtHistory = ()=>{
+    const consultDebtsOutstanding = document.getElementById('consultDebtsOutstanding');
+    const consultDebtsPaid = document.getElementById('consultDebtsPaid');
+    const debtsHistory = document.getElementById('debtsHistory');
+    const debtSumary = document.getElementById('debtsSumary');
+    let htmlCode = '';
+    let creditSumary = '0 creditos | $ 0'
+
+    if(customerSelected && customers.some(c => c.id === customerSelected)){
+        let customer = customers.filter(c => c.id === customerSelected)[0];
+        let credits = [];
+        let totalAmount = 0;
+
+        if(consultDebtsOutstanding.checked){
+            customer.credits.forEach(credit =>{
+                if(credit.balance > 0){
+                    credits.push(credit);
+                    totalAmount += credit.amount;
+                }
+            });//Fin de forEach
+        }else if(consultDebtsPaid.checked){
+            customer.credits.forEach(credit => {
+                if(credit.balance === 0){
+                    credits.push(credit);
+                    totalAmount += credit.amount;
+                }
+            })//Fin de forEach
+        }else{
+            customer.credits.forEach(credit => {
+                credits.push(credit);
+                totalAmount += credit.amount;
+            });//Fin de forEach
+        }
+
+        if(credits.length > 0){
+            if(credits.length === 1){
+                creditSumary = `1 credito | ${formatCurrencyLite(totalAmount, 0)}`;
+            }else{
+                creditSumary = `${credits.length} creditos | ${formatCurrencyLite(totalAmount,0)}`;
+            }
+        }
+
+        credits.forEach(credit => {
+            htmlCode += `
+            <div class="debt-card">
+                <p class="debt-card__title">${credit.description}</p>
+                <p class="debt-card__date">${credit.date}</p>
+                <p class="debt-card__label">Valor Inicial</p>
+                <p class="debt-card__label">Saldo pendiente</p>
+                <p class="debt-card__money">${formatCurrencyLite(credit.amount, 0)}</p>
+                <p class="debt-card__money">${formatCurrencyLite(credit.balance, 0)}</p>
+            </div>`
+        })
+    }//Fin de if
+
+    debtsHistory.innerHTML = htmlCode;
+    debtSumary.innerText = creditSumary;
+}
+
+const updatePaymentsHistory = () => {
+    const paymentsHistory = document.getElementById('paymentsHistory');
+    const paymentsSumary = document.getElementById('paymentsSumary');
+    let htmlCode = '';
+    let sumary = '0 abonos | $ 0';
+
+    if(customerSelected && customers.some(c => c.id === customerSelected)){
+        let customer = customers.filter(c => c.id === customerSelected)[0];
+        let totalAmount = 0;
+
+        customer.payments.forEach(payment => {
+            htmlCode += `
+            <div class="payment-row">
+                <p class="paymen-row__date">${payment.date}</p>
+                <p class="payment-row__amount">${formatCurrencyLite(payment.amount, 0)}</p>
+            </div>`;
+
+            totalAmount += payment.amount;
+        });//Fin de forEach
+
+        if(totalAmount > 0){
+            if(customer.payments.length === 1){
+                sumary = `1 abono | ${formatCurrencyLite(totalAmount, 0)}`;
+            }else{
+                sumary = `${customer.payments.length} abonos | ${formatCurrencyLite(totalAmount, 0)}`;
+            }
+        }
+    }
+
+    paymentsHistory.innerHTML = htmlCode;
+    paymentsSumary.innerText = sumary;
 }
 
 /**

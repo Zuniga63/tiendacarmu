@@ -7,11 +7,11 @@
     <title>Sistema de Carmú</title>
 
     <!-- SE CARGAN LAS FUENTES DE LOS ICONOS -->
-    <link rel="stylesheet" href="../font/style.css" />
+    <link rel="stylesheet" href=<?= "../font/style.css?v=" . VERSION ?> />
 
     <!-- SE CARGAN LOS ESTILOS GENERALES -->
-    <link rel="stylesheet" href="../css/normalize.css">
-    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href=<?= "../css/normalize.css?v=" . VERSION ?> />
+    <link rel="stylesheet" href=<?= "../css/main.css" . VERSION ?> />
 
 </head>
 
@@ -41,7 +41,7 @@
             <input type="submit" value="Ingresar" class="btn btn--disabled" disabled>
         </form>
 
-        <script src="./js/login.js"></script>
+        <script src=<?= "./js/login.js?v=" . VERSION ?>></script>
 </body>
 
 </html>

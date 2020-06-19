@@ -7,13 +7,13 @@
   <title>Sistema Carmú - Home</title>
 
   <!-- SE CARGAN LAS FUENTES DE LOS ICONOS -->
-  <link rel="stylesheet" href="../font/style.css" />
+  <link rel="stylesheet" href=<?= "../font/style.css?v=" . VERSION ?> />
 
   <!-- SE CARGAN LOS ESTILOS GENERALES -->
-  <link rel="stylesheet" href="../css/normalize.css">
-  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href=<?= "../css/normalize.css?v=" . VERSION ?> />
+  <link rel="stylesheet" href=<?= "../css/main.css?v=" . VERSION ?> />
   <style>
-    .notification{
+    .notification {
       position: absolute;
       top: 50%;
       left: 50%;
@@ -25,6 +25,12 @@
       max-width: 300px;
       text-align: center;
       font-size: 1.5em;
+    }
+
+    @media (min-width: 1000px){
+      .notification{
+        display: none;
+      }
     }
   </style>
 </head>
@@ -349,9 +355,9 @@
     <p class="notification__info">Esta seccion no está disponible en version movil</p>
   </section>
 
-  <script src="../js/app.js"></script>
-  <script src="../js/objects.js"></script>
-  <script src="./js/home_controler.js"></script>
+  <script src=<?= "../js/app.js?v=" . VERSION ?>></script>
+  <script src=<?= "../js/objects.js?v=" . VERSION ?>></script>
+  <script src=<?= "./js/home_controler.js?v=" . VERSION ?>></script>
 </body>
 
 </html>

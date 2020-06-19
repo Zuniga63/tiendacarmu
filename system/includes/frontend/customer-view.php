@@ -6,11 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sistema de clientes</title>
   <!-- SE CARGAN LAS FUENTES DE LOS ICONOS -->
-  <link rel="stylesheet" href="../font/style.css" />
+  <link rel="stylesheet" href=<?= "../font/style.css?v=" . VERSION ?> />
 
   <!-- SE CARGAN LOS ESTILOS GENERALES -->
-  <link rel="stylesheet" href="../css/normalize.css" />
-  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href=<?= "../css/normalize.css?v=" . VERSION ?> />
+  <link rel="stylesheet" href=<?= "../css/main.css?v=" . VERSION ?> />
 </head>
 
 <body class="customers-view">
@@ -43,7 +43,7 @@
             <nav class="dropdown__nav">
               <ul class="dropdown__list">
                 <li class="dropdown__item">
-                  <a href="#" class="dropdown__link" id="sumaryLink">Resumen</a>
+                  <a href="#" class="dropdown__link dropdown__link--disabled" id="sumaryLink">Resumen</a>
                 </li>
                 <li class="dropdown__item">
                   <a href="#" class="dropdown__link" id="newCustomerLink">Nuevo Cliente</a>
@@ -55,7 +55,7 @@
                   <a href="#" class="dropdown__link" id="newDebtLink">Registrar Credito</a>
                 </li>
                 <li class="dropdown__item">
-                  <a href="#" class="dropdown__link" id="customerUpdateLink">Actualizar Cliente</a>
+                  <a href="#" class="dropdown__link dropdown__link--disabled" id="customerUpdateLink">Actualizar Cliente</a>
                 </li>
                 <li class="dropdown__item">
                   <a href="#" class="dropdown__link" id="consultDebtsLink">Consultar creditos</a>
@@ -228,7 +228,7 @@
         <p class="search-box__count">6 Clientes</p>
       </div>
 
-      <form action="" class="form form--bg-light"  id="newPaymentForm">
+      <form action="" class="form form--bg-light" id="newPaymentForm">
         <h2 class="form__title">Registrar Abono</h2>
         <!-- CUSTOMER CARD -->
         <div class="customer-card" id="newPaymentCustomer">
@@ -557,19 +557,19 @@
         <h3 class="customer-sumary__title">Historial de Creditos</h3>
         <div class="form__container-flex">
           <div class="form__group form__group--oneline-flex">
-            <input type="radio" name="payment_type" id="cashPayment" class="form__input form__input--check">
-            <label for="cashPayment" class="form__label">Todos</label>
+            <input type="radio" name="select" id="consultDebtsAll" class="form__input form__input--check">
+            <label for="consultDebtsAll" class="form__label">Todos</label>
           </div>
           <div class="form__group form__group--oneline-flex">
-            <input type="radio" name="payment_type" id="itemOutstanding" class="form__input form__input--check">
-            <label for="cardPayment" class="form__label">Pendientes</label>
+            <input type="radio" name="select" id="consultDebtsOutstanding" class="form__input form__input--check" checked>
+            <label for="consultDebtsOutstanding" class="form__label">Pendientes</label>
           </div>
           <div class="form__group form__group--oneline-flex">
-            <input type="radio" name="payment_type" id="itemOutstanding" class="form__input form__input--check">
-            <label for="cardPayment" class="form__label">Pagados</label>
+            <input type="radio" name="select" id="consultDebtsPaid" class="form__input form__input--check">
+            <label for="consultDebtsPaid" class="form__label">Pagados</label>
           </div>
         </div>
-        <div class="customer-sumary__box scroll">
+        <div class="customer-sumary__box scroll" id="debtsHistory">
           <div class="debt-card">
             <p class="debt-card__title">Es la descripcion del credito</p>
             <p class="debt-card__date">15 de feb de 2020</p>
@@ -587,12 +587,12 @@
             <p class="debt-card__money">$ 1.100.000</p>
           </div>
         </div>
-        <p class="search-box__count show">2 Creditos; $ 4.400.000</p>
+        <p class="search-box__count show" id="debtsSumary">2 Creditos; $ 4.400.000</p>
       </div>
 
       <div class="customer-sumary__container">
         <h3 class="customer-sumary__title">Historial de pagos</h3>
-        <div class="customer-sumary__box scroll">
+        <div class="customer-sumary__box scroll" id="paymentsHistory">
           <div class="payment-row">
             <p class="paymen-row__date">01-02-2020</p>
             <p class="payment-row__amount">$ 1.000.000</p>
@@ -602,7 +602,7 @@
             <p class="payment-row__amount">$ 300.000</p>
           </div>
         </div>
-        <p class="search-box__count show">2 Abonos; $ 1.300.000</p>
+        <p class="search-box__count show" id="paymentsSumary">2 Abonos; $ 1.300.000</p>
       </div>
     </div>
   </div>
@@ -611,8 +611,8 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
-  <script src="../js/app.js"></script>
-  <script src="./js/customers.js"></script>
+  <script src=<?= "../js/app.js?v=" . VERSION ?>></script>
+  <script src=<?= "./js/customers.js?v=" . VERSION ?>></script>
 </body>
 
 </html>

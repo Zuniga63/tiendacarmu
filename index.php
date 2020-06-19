@@ -69,7 +69,7 @@ $allItems = get_all_items();
                 <span class="main-navbar__link__body">Principal</span>
               </a>
             </li>
-            <li class="main-navbar__item dropdown">
+            <li class="main-navbar__item">
               <a href="#" class="main-navbar__link">
                 <i class="main-navbar__link__prepend icon-buy-bag"></i>
                 <span class="main-navbar__link__body">Productos</span>
