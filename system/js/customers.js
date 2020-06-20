@@ -23,15 +23,24 @@ let customers = [];
 let customerSelected = undefined;
 
 /**
- * Clase view que permite cntrolar las vistas
+ * Clase view que permite cntrolar si las vista se pueden mostrar
  */
 class View {
+    /**
+     * @constructor
+     * @param {string} id La clave con las que accedo a este objeto
+     * @param {string} link Es el id del link de la vista
+     * @param {string} view Es el id de la vista en el DOM
+     */
     constructor(id, link, view) {
         this.id = id,
             this.link = document.getElementById(link),
             this.view = document.getElementById(view)
     }
 
+    /**
+     * Agrega las clases ACTIVE_LINK y VIEW_SHOW
+     */
     show() {
         if ((this.link && this.link.classList) && (this.view && this.view.classList)) {
             this.link.classList.add(ACTIVE_LINK);
@@ -39,6 +48,9 @@ class View {
         }
     }
 
+    /**
+     * Elimina las clase que muestra la vista y la que marca al link de navegacion
+     */
     hidden() {
         if ((this.link && this.link.classList) && (this.view && this.view.classList)) {
             this.link.classList.remove(ACTIVE_LINK);
@@ -71,12 +83,29 @@ class Customer {
         this.balance = 0;
     }
 
+    /**
+     * Este metodo crea una instancia de Credito y lo agrega al arreglo de creditos,
+     * tambien aumenta el saldo del cliente
+     * @param {number} id Identificador del credito
+     * @param {string} creditDate La fecha del credito en formato fecha
+     * @param {string} description La descripcion del credito
+     * @param {number} amount Es el monto del credito
+     * @param {number} balance Es saldo del credito actual
+     */
     addCredit(id, creditDate, description, amount, balance) {
         let credit = new Credit(id, creditDate, description, amount, balance);
         this.credits.push(credit);
         this.balance += amount;
     }
 
+    /**
+     * Este metodo crea una instancia de Abono y lo agrega al arreglo de pagos,
+     * tambien modifica el saldo del cliente disminuyendolo.
+     * @param {number} id Identifcado de abono
+     * @param {string} paymentDate Es la fecha del abono en formato texto
+     * @param {float} amount Es el importe total del cliente
+     * @param {bool} cash Si el pago fue en efectivo
+     */
     addPayment(id, paymentDate, amount, cash) {
         let payment = new Payment(id, paymentDate, amount, cash);
         this.payments.push(payment);
@@ -84,7 +113,8 @@ class Customer {
     }
 
     /**
-     * Actualiza los datos del cliente despues de hacer modificaciones en la base de datos
+     * Este metodo modifica los datos del cliente que por lo general sucede al hacer un abono,
+     * un pago o se actualiza la tarjeta del cliente.
      * @param {JSON} customerData El el objeto devuelto cuando se modifican datos de un solo cliente 
      */
     update(customerData) {
@@ -116,7 +146,16 @@ class Customer {
     }
 }
 
+/**
+ * Una super clase para los creditos y abonos
+ */
 class Transaction {
+    /**
+     * @constructor
+     * @param {number} id Es el identificador de la transaccion
+     * @param {string} transactionDate La fecha de la transaccion en texto
+     * @param {number} amount El valor de la transaccion
+     */
     constructor(id, transactionDate, amount) {
         this.id = id;
         this.date = transactionDate;
@@ -124,7 +163,18 @@ class Transaction {
     }
 }
 
+/**
+ * Es un credito que un cliente contrae con la empresa
+ */
 class Credit extends Transaction {
+    /**
+     * @constructor
+     * @param {number} id Identificador unico
+     * @param {string} creditDate Fecha del credito en texto
+     * @param {string} description Descripcion del credito
+     * @param {number} amount Es el valor del credito
+     * @param {number} balance Es el saldo pendiente de este credito
+     */
     constructor(id, creditDate, description, amount, balance) {
         super(id, creditDate, amount);
         this.balance = balance;
@@ -132,7 +182,17 @@ class Credit extends Transaction {
     }
 }
 
+/**
+ * Un abono por parte del cliente
+ */
 class Payment extends Transaction {
+    /**
+     * @constructor
+     * @param {number} id Indentificador unico del pago
+     * @param {string} paymentDate Fecha del abono en formato texto
+     * @param {number} amount Valor del abono realizado
+     * @param {bool} cash Si el pago se realizó en efectivo
+     */
     constructor(id, paymentDate, amount, cash) {
         super(id, paymentDate, amount);
         this.cash = cash;
@@ -249,7 +309,9 @@ const printBarChart = (ctx) => {
 //                  CODIGO PARA CONTROLAR LAS VSITAS
 //---------------------------------------------------------------------------------------------
 
-
+/**
+ * Objeto con todas las vista disponible
+ */
 const VIEWS = {
     sumary: new View('sumary', 'sumaryLink', 'sumary'),
     newCustomer: new View('newCustomer', 'newCustomerLink', 'newCustomer'),
@@ -263,7 +325,7 @@ const VIEWS = {
 /**
  * Este metodo realiza todo lo requerido para mostrar una vista al clientes
  * cada vez que haga click en alguno de los enlaces
- * @param {string} viewName Nombre de la vista que se desea mostrar
+ * @param {string} viewName Nombre de la vista que se desea mostrar, por defecto muestra el resumen
  */
 const showView = (viewName = 'sumary') => {
     //Antes que nada se ocultan todas las vistas
@@ -280,21 +342,25 @@ const showView = (viewName = 'sumary') => {
             //Se actualiza el localStorages
             localStorage.actualView = viewName;
         } break;//Fin del caso 1
+
         case 'newPayment': {
             VIEWS.newPayment.show();
             systemLegend.innerText = 'Registrar Abono'
             localStorage.actualView = viewName;
         } break;//Fin del caso 2
+
         case 'newDebt': {
             VIEWS.newDebt.show();
             systemLegend.innerText = 'Registrar Credito'
             localStorage.actualView = viewName;
         } break;//Fin del caso 3
+
         case 'customerUpdate': {
             VIEWS.customerUpdate.show();
             systemLegend.innerText = 'Actulizar Clientes';
             localStorage.actualView = viewName;
         } break; //Fin del caso 4
+
         case 'consultDebts': {
             VIEWS.consultDebts.show();
             systemLegend.innerText = 'Consultar Creditos';
@@ -302,6 +368,7 @@ const showView = (viewName = 'sumary') => {
 
             printCustomerHistory();
         } break;//Fin del caso 5
+
         default: {
             // VIEWS.sumary.show();
             // systemLegend.innerText = 'Resumen';
@@ -388,21 +455,37 @@ let newCustomerProcessEnd = true;
 let newCreditProcessEnd = true;
 let newPaymentProcessEnd = true;
 
+/**
+ * Se encarga de agregar la funcionalidad de los elementos encargado de crear un
+ * nuevo cliente
+ */
 const newCustomerController = () => {
     const newCustomerForm = document.getElementById('newCustomerForm');
 
-    //Agrego la funcionalidad para seleccionar el texto en su interior
+    /**
+     * Los siguiente sirve para poder seleccionar el cuerpo de los
+     * formularios de maera automatica al obtener el foco
+     */
     selectText(document.getElementById('newCustomerFirstName'));
     selectText(document.getElementById('newCustomerLastName'));
     selectText(document.getElementById('newCustomerNit'));
     selectText(document.getElementById('newCustomerPhone'));
     selectText(document.getElementById('newCustomerEmail'));
 
-    //Ahora se agrega la funcionalidad al formulario
+    /**
+     * El siguiente codigo indica lo que se debe hacer 
+     * cuando se intenta enviar los datos del formulario
+     */
     newCustomerForm.addEventListener('submit', (e) => {
+        //Se evita que el formulario recargue la pagina
         e.preventDefault();
+
+        //Si el proceso anterior no ha terminado se evita hacer nuevas peticiones
         if (newCustomerProcessEnd) {
-            const data = new FormData(newCustomerForm);                 //Para el cuerpo de la peticion
+            //Se crea el objeto para el cuerpo de la peticion
+            const data = new FormData(newCustomerForm);
+
+            //Se recuperan los objetos que muestran los resultados al usuario
             const alert = document.getElementById('newCustomerAlert');  //Para mostrar el resultado
             const btn = document.getElementById('newCustomerBtn');      //Para hacer modificaciones al texto
 
@@ -411,7 +494,7 @@ const newCustomerController = () => {
              * no se encuentra en blanco
              */
             if (data.get('first_name').trim()) {
-                //Lo siguiente es para evitar que se hagan nuevas mientras se procesa
+                //Lo siguiente es para evitar que se hagan nuevas solicitudes mientras se procesa
                 btn.value = 'Procesando Solicitud';
                 newCustomerProcessEnd = false;
 
@@ -433,9 +516,11 @@ const newCustomerController = () => {
                         newCustomerProcessEnd = true;
 
                         if (res.request) {
+                            //Se notifica que todo ha ido correcto
                             writeAlert(alert, 'success', 'Cliente agregado satisfactoriamente');
                             newCustomerForm.reset();
                         } else {
+                            //Se notifica que no se ha podido procesar la peticion
                             writeAlert(alert, 'danger', 'No se ha podido crear el cliente');
                         }
 
@@ -454,6 +539,10 @@ const newCustomerController = () => {
     })
 }
 
+/**
+ * Se encarga de agregar la funcionalidad de los elementos encargados de crear un
+ * nuevo credito
+ */
 const newCreditController = () => {
     //Recupero el el formulario
     const newCreditForm = document.getElementById('newCreditForm');
@@ -462,13 +551,18 @@ const newCreditController = () => {
      * Se agrega la funcionalidad a la caja de texto para la descripcion del credito:
      * Que se seleccione el texto al obtener el foco
      * Actualice la logitud disponible 
-     * Muestre una alerta cuando el campo queda vacío al perder el foco
      */
 
+    //Recupero los elementos del formulario
     const creditDescription = document.getElementById('creditDescription');
     const creditDescriptionLength = document.getElementById('creditDescriptionLength');
     const creditDescriptionAlert = document.getElementById('creditDescriptionAlert');
+
+    //Se agrega la funcionalidad para seleccionar el texto
     selectText(creditDescription);
+
+    //Se agrega la funcionalidad que muestra la longitud disponible al cambiar
+    //el texto dentro del campo
     creditDescription.addEventListener('input', () => {
         // console.log(creditDescription.value);
         let maxLength = 50;
@@ -491,11 +585,16 @@ const newCreditController = () => {
      * Se agrega la funcionalidad a la caja de moneda
      * Que seleccione su contendio al obtener el foco
      * Que formatee el texto conforme se va introduciendo
-     * 
      */
+
+    //Se recuperan los elementos
     const creditAmount = document.getElementById('creditAmount');
     const creditAmountAlert = document.getElementById('creditAmountAlert');
+
+    //Se agrega la funcionalidad para seleccionar el texto
     selectText(creditAmount);
+
+    //Se agrega la funcionalidad para formaterar el texto
     creditAmount.addEventListener('input', () => {
         let originalValue = creditAmount.value;
         //Elimino el signo moneda y el punto
@@ -506,35 +605,42 @@ const newCreditController = () => {
             creditAmount.value = value;
             creditAmountAlert.classList.remove('show');
         } else {
-            creditAmount.value = originalValue;
+            creditAmount.value = 0;
             creditAmountAlert.innerText = 'No tiene formato valido';
             creditAmountAlert.classList.add('show');
         }
     });
 
+    //Se agregan las intrucciones cuando se intenta enviar el formulario
     newCreditForm.addEventListener('submit', (e) => {
+        //Se evita recargar la pagina
         e.preventDefault();
 
+        //Se validan los datos del formulario
         if (validateCredit() && newCreditProcessEnd) {
+            //Se recuperan los elementos que muestran el estado del proceso
             const newCreditBtn = document.getElementById('newCreditBtn');
             const newCreditAlert = document.getElementById('newCreditAlert');
-            let message = `Se va registrar un credito por valor de ${creditAmount.value}`;
+            let customer = customers.filter(c => c.id === customerSelected)[0];
+            let message = `Se va a registrar un crédito al cliente ${customer.firstName} `
+            message += `por valor de ${creditAmount.value}`;
 
+            //Se pide una confirmacion por parte del usuario
             if (confirm(message)) {
+                //Se bloquean nuevas peticiones
                 newCreditProcessEnd = false;                //Se notifica que se inicia el proceso
                 newCreditBtn.value = "Procesando solicitud";
 
-                //Se recuperan los datos
+                //Se recuperan los datos del formulario
                 let customerId = customerSelected;
                 let description = creditDescription.value.trim();
                 let amount = parseFloat(deleteFormaterOfAmount(creditAmount.value));
-                let data = new FormData();
 
-                //Ahora agrego la informacion al formulario
+                //Se crea el cuerpo de la peticion
+                let data = new FormData();
                 data.append('customer_id', customerId);
                 data.append('description', description);
                 data.append('amount', amount);
-                // console.log(`id:${customerId}||amount:${amount}`);
 
                 //Se realiza la peticion POST
                 fetch('./api/new_credit.php', {
@@ -545,23 +651,22 @@ const newCreditController = () => {
                     .then(res => {
                         //Si la sesion es inactiva recarga la página
                         if (res.sessionActive) {
-
                             if (res.request) {
                                 //Se notifica al usuario que todo fue correcto
-                                newCreditAlert.innerText = "Solicitud procesada saticfactoriamente";
+                                newCreditAlert.innerText = "Solicitud procesada satisfactoriamente";
                                 newCreditAlert.classList.add('alert--success');
 
                                 //Se actualizan los datos del cliente seleccionado
                                 updateCustomer(customerId, res.customer);
-                                newCreditForm.reset();
                                 updateAllCustomerCards();
-
-                                //Se actualiza tambien la caja de resultados para que sea consistente
                                 let searchBox = VIEWS.newDebt.view.querySelector('.search-box');
                                 updateSearchBoxResult(searchBox);
+
+                                //Se resetea el formulario
+                                newCreditForm.reset();
                             } else {
                                 //S notifica al usuario que no se pudo crear el credito
-                                newCreditAlert.innerText = "No se pudo crear el credito";
+                                newCreditAlert.innerText = "No se pudo crear el crédito";
                                 newCreditAlert.classList.add('alert--danger');
                             }
 
@@ -584,11 +689,18 @@ const newCreditController = () => {
     });//Fin de addEventListener
 }//Fin del metodo
 
+/**
+ * Se encarga de agregar la funcionalidad de los elementos encargados de crear un nuevo pago
+ */
 const newPaymentController = () => {
+    //Se recuperan los elementos involucrados 
     const paymentAmount = document.getElementById('newPaymentAmount');
     const newPaymentForm = document.getElementById('newPaymentForm');
 
+    //Se agrega la funcionalidad para seleccionar al obtener el foco
     selectText(paymentAmount);
+
+    //Se agrega la funcionalidad para formatear la caja de moneda
     paymentAmount.addEventListener('input', () => {
         let originalValue = paymentAmount.value;
         //Elimino el signo moneda y el punto
@@ -602,9 +714,14 @@ const newPaymentController = () => {
         }
     });
 
+    //Se agrega las instrucciones para agregar un nuevo abono
     newPaymentForm.addEventListener('submit', (e) => {
+        //Se evitar recargar la pagina
         e.preventDefault();
+
+        //Se validan los datos
         if (validatePayment() && newPaymentProcessEnd) {
+            //Se recuperan los elementos que muestran el estado de la solicitud
             const newPaymentBtn = document.getElementById('newPaymentBtn');
             const newPaymentAlert = document.getElementById('newPaymentAlert');
             const newPaymentCashPayment = document.getElementById('newPaymentCashPayment');
@@ -612,6 +729,7 @@ const newPaymentController = () => {
             let customer = customers.filter(c => c.id === customerSelected)[0];
             let message = `Se va a realizar un abono al cliente ${customer.firstName} por valor de ${paymentAmount.value}`;
 
+            //Se solicita la confirmacion al usuario
             if (confirm(message)) {
                 //Se muestra en pantalla que el proceso inició
                 newPaymentProcessEnd = false;
@@ -621,7 +739,6 @@ const newPaymentController = () => {
                 let cashPayment = newPaymentCashPayment.checked;
                 let amount = parseFloat(deleteFormaterOfAmount(newPaymentAmount.value));
                 let customerId = customerSelected;
-                console.log(cashPayment);
 
                 //Se crea el cuerpo de la peticion
                 let data = new FormData();
@@ -636,6 +753,7 @@ const newPaymentController = () => {
                 })
                     .then(res => res.json())
                     .then(res => {
+                        //Si la seccion no está activa se recarga la pagina
                         if (res.sessionActive) {
                             if (res.request) {
                                 //Se notifica al usuario que todo fue correcto
@@ -677,6 +795,10 @@ const newPaymentController = () => {
     })//Fin de addEventListener
 }//Fin del metodo
 
+/**
+ * Agrega la funcionalidad a los elementos contenidos en la vista
+ * que muestra los creditos y los pagos del cliente
+ */
 const consultDebtsController = () => {
     document.getElementById('consultDebtsAll').addEventListener('click', ()=>{
         updateDebtHistory();
@@ -689,6 +811,10 @@ const consultDebtsController = () => {
     });
 }
 
+/**
+ * Se encarga de validar los datos del formulario para un nuevo credito y de
+ * mostrar las alertas correspondientes para el usuario
+ */
 const validateCredit = () => {
     const creditDescription = document.getElementById('creditDescription');
     const creditDescriptionAlert = document.getElementById('creditDescriptionAlert');
@@ -748,6 +874,10 @@ const validateCredit = () => {
 
 }
 
+/**
+ * Se encarga de hacer las validaciones correspondientes alformulario
+ * para agregar un nuevo abono y de mostrar las alertas correspondientes
+ */
 const validatePayment = () => {
     //Recupero los elemento del DOM involucrados
     const newPaymentAmount = document.getElementById('newPaymentAmount');
@@ -784,6 +914,11 @@ const validatePayment = () => {
     return customerIsCorrert && amountIsCorrect;
 }
 
+/**
+ * Se encarga de eliminar el signo peso y los puntos puestos por el formateador de
+ * moneda
+ * @param {string} text Es un texto numerico con formato de moneda
+ */
 const deleteFormaterOfAmount = text => {
     let value = text.replace('$', '');
     value = value.split(".");
@@ -795,6 +930,9 @@ const deleteFormaterOfAmount = text => {
 //---------------------------------------------------------------------------------------------
 //                  CODIGO PARA CONTROLAR LA BUSQUEDA DE CLIENTES
 //---------------------------------------------------------------------------------------------
+/**
+ * Agrega la funcionalidad a todas las cajas de busqueda 
+ */
 const searchBoxController = () => {
     const searchBoxs = document.querySelectorAll('.search-box');
 
@@ -849,6 +987,11 @@ const reloadCustomerList = async () => {
         });//Fin de fetch
 }//Fin del metodo
 
+/**
+ * Este metodo actualiza la caja de resultado segun lo que está en en input de
+ * la seccion
+ * @param {JSON} searchBox Seccion para buscar y seleccionar cliente 
+ */
 const updateSearchBoxResult = searchBox => {
     let input = searchBox.querySelector('.search-box__search');
     let container = searchBox.querySelector('.search-box__result');
@@ -888,6 +1031,11 @@ const createCustomers = customersData => {
     });
 }//Fin del metodo
 
+/**
+ * Actualiza los datos del cliente que han sido actualizados en el servidor
+ * @param {number} customerId identificador del cliente a actualizar
+ * @param {JSON} customerData Datos obtenidos por el servidor
+ */
 const updateCustomer = (customerId, customerData) => {
     if (customers.some(c => c.id === customerId)) {
         let customer = customers.filter(c => c.id === customerId)[0];
@@ -919,7 +1067,7 @@ const printCustomerResult = (searchBoxResult, result) => {
 
     searchBoxResult.innerHTML = htmlCode;
 
-    //Ahora a cada una de esas tarjeta se aagrega el evento para recuperar el id
+    //Ahora a cada una de esas tarjeta se agrega el evento para recuperar el id
     let cards = searchBoxResult.querySelectorAll('.customer-card');
     cards.forEach(card => {
         card.addEventListener('click', e => {
@@ -981,11 +1129,19 @@ const updateCustomerCard = card => {
 
 }
 
+/**
+ * Metodo que se encarga de actualizar los datos del historial del cliente
+ * en la vista de customerConsult
+ */
 const printCustomerHistory = () => {
     updateDebtHistory();   
     updatePaymentsHistory();
 }
 
+/**
+ * Se encarga de mostrar las tarjetas de las deudas: si todas, si solo las
+ * pendientes o si solo las canceldas
+ */
 const updateDebtHistory = ()=>{
     const consultDebtsOutstanding = document.getElementById('consultDebtsOutstanding');
     const consultDebtsPaid = document.getElementById('consultDebtsPaid');
@@ -1045,6 +1201,9 @@ const updateDebtHistory = ()=>{
     debtSumary.innerText = creditSumary;
 }
 
+/**
+ * Se encarga de imprimir en pantalla el historial de pago del cliente
+ */
 const updatePaymentsHistory = () => {
     const paymentsHistory = document.getElementById('paymentsHistory');
     const paymentsSumary = document.getElementById('paymentsSumary');

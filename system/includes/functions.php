@@ -760,13 +760,19 @@ function create_new_customer($first_name, $last_name, $nit, $phone, $email)
     return $result;
 }
 
+/**
+ * Recupera la informacion de todos los clientes contenidos en la base de datos
+ * e ivluye las tablas de los creditos y los pagos realizados
+ */
 function get_all_customers()
 {
     $customers = [];
     try {
         $conn = get_connection();
         $stmt = $conn->query('SELECT * FROM customer ORDER BY first_name');
+
         while ($row = $stmt->fetch()) {
+            //Se recupera la informacion basica del cliente
             $customer_id = intval($row['customer_id']);
             $first_name = htmlspecialchars_decode($row['first_name']);
             $last_name = htmlspecialchars_decode($row['last_name'] === 'NULL' ? '' : $row['last_name']);
@@ -774,26 +780,36 @@ function get_all_customers()
             $phone = htmlspecialchars_decode($row['phone'] === 'NULL' ? '' : $row['phone']);
             $email = htmlspecialchars_decode($row['email'] === 'NULL' ? '' : $row['email']);
             $balance = 0;
-            //Se recuperan los creditos y los abono
+
+            //Para cada cliente se recuperan los creditos y los abonos
             $credits = get_customer_credits($customer_id);
             $payments = get_customer_payments($customer_id);
+
+            //Si las consultas son correctas los metodos anteriores retornar un array
             if (isset($credits) && isset($payments)) {
+                //Se calcula el saldo del cliente
                 $balance = $credits['total_amount'] - $payments['total_amount'];
+
                 if ($balance < 0) {
                     write_error("Inconsistencia con el cliente $customer_id: Balance menor a cero");
                 } else {
                     $buffer = $payments['total_amount'];
                     $index = 0;
                     $max_index = count($credits['credits']);
+                    /*
+                     * Se va a repetir el bucle hasta agotar el dinero delos pagos
+                     * o no hayan mas creditos a los cuales abonar.
+                     */
                     while ($buffer > 0 && $index < $max_index) {
+                        //Se recupera el credito actual en forma de referencia
+                        //para poder actualizar sus valores
                         $credit = &$credits['credits'][$index];
+
                         if ($credit['amount'] >= $buffer) {
                             $credit_balance = $credit['amount'] - $buffer;
-                            // unset($credit['balance']);
                             $credit['balance'] = $credit_balance;
                             $buffer = 0;
                         } else {
-                            // unset($credit['balance']);
                             $credit['balance'] = 0;
                             $buffer -= $credit['amount'];
                         }
@@ -802,6 +818,7 @@ function get_all_customers()
                 } //Fin de if-else
             }
 
+            //Finalmente se guardan los datos del cliente en el arreglo
             $customers[] = [
                 'id' => $customer_id,
                 'firstName' => $first_name,
@@ -824,7 +841,8 @@ function get_all_customers()
 }
 
 /**
- * Recupera la informacion del cliente
+ * Recupera los datos de un unico cliente si no encuentra ninguno retorna null
+ * @param {int} $customer_id Es el identificador del cliente
  */
 function get_customer($customer_id)
 {
@@ -837,6 +855,7 @@ function get_customer($customer_id)
             $stmt->execute();
 
             while ($row = $stmt->fetch()) {
+                //Se recupera la informacion basica del cliente
                 $customer_id = intval($row['customer_id']);
                 $first_name = htmlspecialchars_decode($row['first_name']);
                 $last_name = htmlspecialchars_decode($row['last_name'] === 'NULL' ? '' : $row['last_name']);
@@ -844,9 +863,12 @@ function get_customer($customer_id)
                 $phone = htmlspecialchars_decode($row['phone'] === 'NULL' ? '' : $row['phone']);
                 $email = htmlspecialchars_decode($row['email'] === 'NULL' ? '' : $row['email']);
                 $balance = 0;
-                //Se recuperan los creditos y los abono
+
+                //Se recuperan los creditos y los abono **POSIBLE CANDIDATO PARA ENCAPSULACION
                 $credits = get_customer_credits($customer_id);
                 $payments = get_customer_payments($customer_id);
+
+
                 if (isset($credits) && isset($payments)) {
                     $balance = $credits['total_amount'] - $payments['total_amount'];
                     if ($balance < 0) {
@@ -986,10 +1008,16 @@ function get_customer_payments($customer_id)
     return $result;
 } //Fin del metodo
 
+/**
+ * Le agrega al cliente una nueva deuda
+ * @param {int} $customer_id Identificador del cliente
+ * @param {string} $description Informacion del credito a agregar
+ * @param {float} $amount El valor total de la deuda.
+ * @return {bool} True si fue satisfactorio
+ */
 function create_new_credit($customer_id, $description, $amount)
 {
     $result = false;
-
 
     if (is_numeric($customer_id) && is_numeric($amount)) {
         $customer_id = intval($customer_id);
@@ -1038,6 +1066,9 @@ function create_new_credit($customer_id, $description, $amount)
 
 /**
  * Agrega un pago a la deuda del cliente
+ * @param {int} $customer_id El identificador del cliente
+ * @param {bool} $cash True cuando la transaccion fu en efectivo
+ * @param {float} $amount El valor del abono
  */
 function create_new_payment($customer_id, $cash, $amount)
 {
