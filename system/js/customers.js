@@ -206,6 +206,10 @@ class Payment extends Transaction {
 //---------------------------------------------------------------------------------------------
 window.addEventListener('load', async () => {
     await reloadCustomerList();
+    //Se configura la librería de moment
+    moment.locale('es-do');
+    moment().format('DD/MM/YYYY hh:mm a')
+
     viewController();
     newCustomerController();
     newCreditController();
@@ -1188,11 +1192,11 @@ const updateDebtHistory = ()=>{
             htmlCode += `
             <div class="debt-card">
                 <p class="debt-card__title">${credit.description}</p>
-                <p class="debt-card__date">${credit.date}</p>
+                <p class="debt-card__date">${moment(credit.date).calendar()} (${moment(credit.date).fromNow()})</p>
                 <p class="debt-card__label">Valor Inicial</p>
                 <p class="debt-card__label">Saldo pendiente</p>
                 <p class="debt-card__money">${formatCurrencyLite(credit.amount, 0)}</p>
-                <p class="debt-card__money">${formatCurrencyLite(credit.balance, 0)}</p>
+                <p class="debt-card__money debt-card__money--bold">${formatCurrencyLite(credit.balance, 0)}</p>
             </div>`
         })
     }//Fin de if
@@ -1217,7 +1221,7 @@ const updatePaymentsHistory = () => {
         customer.payments.forEach(payment => {
             htmlCode += `
             <div class="payment-row">
-                <p class="paymen-row__date">${payment.date}</p>
+                <p class="paymen-row__date">${moment(payment.date).calendar()}</p>
                 <p class="payment-row__amount">${formatCurrencyLite(payment.amount, 0)}</p>
             </div>`;
 

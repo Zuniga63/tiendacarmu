@@ -1561,6 +1561,10 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   font-size: 1.3em;
 }
 
+.debt-card__money--bold{
+  font-weight: 800;
+}
+
 .payment-row{
   display: grid;
   grid-template-columns: 1fr 1fr;
