@@ -804,13 +804,13 @@ const newPaymentController = () => {
  * que muestra los creditos y los pagos del cliente
  */
 const consultDebtsController = () => {
-    document.getElementById('consultDebtsAll').addEventListener('click', ()=>{
+    document.getElementById('consultDebtsAll').addEventListener('click', () => {
         updateDebtHistory();
     });
-    document.getElementById('consultDebtsOutstanding').addEventListener('click', ()=>{
+    document.getElementById('consultDebtsOutstanding').addEventListener('click', () => {
         updateDebtHistory();
     });
-    document.getElementById('consultDebtsPaid').addEventListener('click', ()=>{
+    document.getElementById('consultDebtsPaid').addEventListener('click', () => {
         updateDebtHistory();
     });
 }
@@ -1058,12 +1058,44 @@ const updateCustomer = (customerId, customerData) => {
 const printCustomerResult = (searchBoxResult, result) => {
     let htmlCode = '';
     result.forEach(customer => {
+        let state = '';
+        let lastPayment = '';
+        if (customer.balance > 0) {
+            let lastDate = null;
+
+            //Con el siguiente codigo defino la ultima fecha valida
+            if (customer.payments.length > 0) {
+                lastDate = customer.payments[customer.payments.length - 1].date;
+                lastPayment = moment(lastDate).fromNow();
+                lastPayment = `Ultimo pago: ${lastPayment}`;
+            } else {
+                lastDate = customer.credits.filter(c => c.balance > 0)[0].date;
+                lastPayment = `Tiempo: ${moment(lastDate).fromNow()}`;
+            }
+
+            //Ahora defino si está en mora
+            let now = moment();
+            lastDate = moment(lastDate);
+
+            let diff = now.diff(moment(lastDate), 'days');
+
+            if (diff > 30) {
+                state = "customer-card--late";
+            }
+        } else {
+            state = 'customer-card--inactive';
+        }
+
         htmlCode += `
-        <div class="customer-card" customer_id = "${customer.id}">
-            <h3 class="customer-card__name">${customer.firstName}</h3>
+        <div class="customer-card ${state}" customer_id = "${customer.id}">
+            <div class="customer-card__header">
+                <h3 class="customer-card__name">${customer.firstName}</h3>
+                <p class="customer-card__info">${lastPayment}</p>
+            </div>
             <p class="customer-card__balance">${formatCurrencyLite(customer.balance, 0)}</p>
             <div>
               <p class="customer-card__debts">Creditos: ${customer.credits.length}</p>
+              <p class="customer-card__points">Abonos: ${customer.payments.length}</p>
               <p class="customer-card__points">Puntos: ${customer.points}</p>
             </div>
         </div>`
@@ -1111,19 +1143,57 @@ const updateCustomerCard = card => {
         && customerSelected > 0
         && customers.some(c => c.id === customerSelected)) {
         let customer = customers.filter(c => c.id === customerSelected)[0];
+
+        let state = '';
+        let lastPayment = '';
+        if (customer.balance > 0) {
+            let lastDate = null;
+
+            //Con el siguiente codigo defino la ultima fecha valida
+            if (customer.payments.length > 0) {
+                lastDate = customer.payments[customer.payments.length - 1].date;
+                lastPayment = moment(lastDate).fromNow();
+                lastPayment = `Ultimo pago: ${lastPayment}`;
+            } else {
+                lastDate = customer.credits.filter(c => c.balance > 0)[0].date;
+                lastPayment = `Tiempo: ${moment(lastDate).fromNow()}`;
+            }
+
+            //Ahora defino si está en mora
+            let now = moment();
+            lastDate = moment(lastDate);
+
+            let diff = now.diff(moment(lastDate), 'days');
+
+            if (diff > 30) {
+                state = "customer-card--late";
+            }
+        } else {
+            state = 'customer-card--inactive';
+        }
+
+
         htmlCode = `
-        <h3 class="customer-card__name">${customer.firstName}</h3>
+        <div class="customer-card__header">
+            <h3 class="customer-card__name">${customer.firstName}</h3>
+            <p class="customer-card__info">${lastPayment}</p>
+        </div>
         <p class="customer-card__balance">${formatCurrencyLite(customer.balance, 0)}</p>
         <div>
             <p class="customer-card__debts">Creditos: ${customer.credits.length}</p>
+            <p class="customer-card__points">Abonos: ${customer.payments.length}</p>
             <p class="customer-card__points">Puntos: ${customer.points}</p>
         </div>`;
     } else {
         htmlCode = `
-        <h3 class="customer-card__name">Selecciona un cliente</h3>
+        <div class="customer-card__header">
+            <h3 class="customer-card__name">Selecciona un cliente</h3>
+            <p class="customer-card__info"></p>
+        </div>
         <p class="customer-card__balance">$ 0</p>
         <div>
             <p class="customer-card__debts">Creditos: x</p>
+            <p class="customer-card__points">Abonos: x</p>
             <p class="customer-card__points">Puntos: x</p>
         </div>`;
         customerSelected = undefined;
@@ -1138,7 +1208,7 @@ const updateCustomerCard = card => {
  * en la vista de customerConsult
  */
 const printCustomerHistory = () => {
-    updateDebtHistory();   
+    updateDebtHistory();
     updatePaymentsHistory();
 }
 
@@ -1146,7 +1216,7 @@ const printCustomerHistory = () => {
  * Se encarga de mostrar las tarjetas de las deudas: si todas, si solo las
  * pendientes o si solo las canceldas
  */
-const updateDebtHistory = ()=>{
+const updateDebtHistory = () => {
     const consultDebtsOutstanding = document.getElementById('consultDebtsOutstanding');
     const consultDebtsPaid = document.getElementById('consultDebtsPaid');
     const debtsHistory = document.getElementById('debtsHistory');
@@ -1154,37 +1224,37 @@ const updateDebtHistory = ()=>{
     let htmlCode = '';
     let creditSumary = '0 creditos | $ 0'
 
-    if(customerSelected && customers.some(c => c.id === customerSelected)){
+    if (customerSelected && customers.some(c => c.id === customerSelected)) {
         let customer = customers.filter(c => c.id === customerSelected)[0];
         let credits = [];
         let totalAmount = 0;
 
-        if(consultDebtsOutstanding.checked){
-            customer.credits.forEach(credit =>{
-                if(credit.balance > 0){
+        if (consultDebtsOutstanding.checked) {
+            customer.credits.forEach(credit => {
+                if (credit.balance > 0) {
                     credits.push(credit);
                     totalAmount += credit.amount;
                 }
             });//Fin de forEach
-        }else if(consultDebtsPaid.checked){
+        } else if (consultDebtsPaid.checked) {
             customer.credits.forEach(credit => {
-                if(credit.balance === 0){
+                if (credit.balance === 0) {
                     credits.push(credit);
                     totalAmount += credit.amount;
                 }
             })//Fin de forEach
-        }else{
+        } else {
             customer.credits.forEach(credit => {
                 credits.push(credit);
                 totalAmount += credit.amount;
             });//Fin de forEach
         }
 
-        if(credits.length > 0){
-            if(credits.length === 1){
+        if (credits.length > 0) {
+            if (credits.length === 1) {
                 creditSumary = `1 credito | ${formatCurrencyLite(totalAmount, 0)}`;
-            }else{
-                creditSumary = `${credits.length} creditos | ${formatCurrencyLite(totalAmount,0)}`;
+            } else {
+                creditSumary = `${credits.length} creditos | ${formatCurrencyLite(totalAmount, 0)}`;
             }
         }
 
@@ -1214,7 +1284,7 @@ const updatePaymentsHistory = () => {
     let htmlCode = '';
     let sumary = '0 abonos | $ 0';
 
-    if(customerSelected && customers.some(c => c.id === customerSelected)){
+    if (customerSelected && customers.some(c => c.id === customerSelected)) {
         let customer = customers.filter(c => c.id === customerSelected)[0];
         let totalAmount = 0;
 
@@ -1228,10 +1298,10 @@ const updatePaymentsHistory = () => {
             totalAmount += payment.amount;
         });//Fin de forEach
 
-        if(totalAmount > 0){
-            if(customer.payments.length === 1){
+        if (totalAmount > 0) {
+            if (customer.payments.length === 1) {
                 sumary = `1 abono | ${formatCurrencyLite(totalAmount, 0)}`;
-            }else{
+            } else {
                 sumary = `${customer.payments.length} abonos | ${formatCurrencyLite(totalAmount, 0)}`;
             }
         }

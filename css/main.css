@@ -1462,15 +1462,33 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   background-color: #dc354534;
 }
 
-.customer-card__name{
-  text-align: center;
-  font-family: var(--title_font);
-  font-style: italic;
-  font-size: 1em;
-  text-transform: uppercase;
+.customer-card--inactive{
+  border-color: var(--secondary);
+  background-color: #6c757d34;
+}
+
+.customer-card__header{
   margin-bottom: 0.5rem;
   border-bottom: 2px solid black;
   grid-column: 1/-1;
+}
+
+.customer-card__name,
+.customer-card__info{
+  text-align: center;
+  font-family: var(--title_font);
+  font-style: italic;
+}
+.customer-card__name{
+  font-size: 1em;
+  text-transform: uppercase;
+  /* margin-bottom: 0.5rem;
+  border-bottom: 2px solid black;
+  grid-column: 1/-1; */
+}
+
+.customer-card__info{
+  font-size: 0.9em;
 }
 
 .customer-card__balance{
