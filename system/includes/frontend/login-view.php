@@ -11,7 +11,7 @@
 
     <!-- SE CARGAN LOS ESTILOS GENERALES -->
     <link rel="stylesheet" href=<?= "../css/normalize.css?v=" . VERSION ?> />
-    <link rel="stylesheet" href=<?= "../css/main.css" . VERSION ?> />
+    <link rel="stylesheet" href=<?= "../css/main.css?v=" . VERSION ?> />
 
 </head>
 
