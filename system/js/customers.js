@@ -1137,6 +1137,7 @@ const printCustomerResult = (searchBoxResult, result) => {
  */
 const updateCustomerCard = card => {
     let htmlCode = '';
+    let state = '';
     if (
         customerSelected
         && !isNaN(customerSelected)
@@ -1144,7 +1145,6 @@ const updateCustomerCard = card => {
         && customers.some(c => c.id === customerSelected)) {
         let customer = customers.filter(c => c.id === customerSelected)[0];
 
-        let state = '';
         let lastPayment = '';
         if (customer.balance > 0) {
             let lastDate = null;
@@ -1200,6 +1200,11 @@ const updateCustomerCard = card => {
     }
 
     card.innerHTML = htmlCode;
+    if(state){
+        card.removeAttribute('class');
+        card.classList.add('customer-card');
+        card.classList.add(state);
+    }
 
 }
 
