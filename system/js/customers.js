@@ -81,6 +81,9 @@ class Customer {
         this.credits = [];
         this.payments = [];
         this.balance = 0;
+        this.state = '';
+        this.inactive = false;
+        this.deliquentBalance = false;
     }
 
     /**
@@ -139,7 +142,119 @@ class Customer {
         customerData.payments.forEach(payment => {
             this.addPayment(payment.id, payment.paymentDate, payment.amount, payment.cash);
         })
+
+        //Se actualiza el estado del cliente
+        this.defineState();
     }
+
+    /**
+     * Define si el cliente tiene saldo en mora o si esta inactivo y escribe un estado para
+     * mostrar en patalla basandose en el hsitorial de pago y de credito
+     */
+    defineState() {
+        //Se resetean las propiedades criticas
+        this.inactive = false;
+        this.deliquentBalance = false;
+        this.state = '';
+
+        //Se inicializan las variables temporales
+        let lastDate = '';
+        let lastDateIsAPayment = false;
+        let balance = 0;
+
+        //Si el cliente no tiene creditos automaticamente se define como inactivo
+        if (this.credits.length > 0) {
+            //La fecha de partida es la fecha del primer credito
+            lastDate = this.credits[0].date;
+
+            //Se inicializan los indices para recorrer las listas
+            let indexCredit = 0;
+            let indexPayment = 0;
+
+            do {
+                //Se recupera el credito y el abono del indice actual
+                let credit = indexCredit < this.credits.length
+                    ? this.credits[indexCredit]
+                    : null;
+
+                let payment = indexPayment < this.payments.length
+                    ? this.payments[indexPayment]
+                    : null;
+
+                /**
+                 * Con las siguientes instrucciones se va actualizando la lastDate
+                 * y segun sea el saldo se va defininiendo si esa fecha es de un pago o
+                 * de un credito para tenerlo en cuenta al escribir el estado
+                 */
+                if (credit && payment) {
+                    if (credit.date <= payment.date) {
+                        if (balance === 0) {
+                            lastDate = credit.date;
+                            lastDateIsAPayment = false;
+                        }//Fin de if
+
+                        balance += credit.amount;
+                        indexCredit++;
+                    } else {
+                        lastDate = payment.date;
+                        lastDateIsAPayment = true;
+                        balance -= payment.amount;
+                        indexPayment++;
+                    }//Fin de if else
+                } else {
+                    if (credit) {
+                        if (balance === 0) {
+                            lastDate = credit.date;
+                            lastDateIsAPayment = false;
+                        }//Fin de if
+
+                        balance += credit.amount;
+                        indexCredit++;
+                    } else {
+                        lastDate = payment.date;
+                        lastDateIsAPayment = true;
+                        balance -= payment.amount;
+                        indexPayment++;
+                    }
+                }//Fin de if-else
+
+                //El proceso debe terminar cuando no hayan mas creditos o abonos
+            } while (indexCredit < this.credits.length || indexPayment < this.payments.length);
+
+            //Se utiliza la librería moment.js para convertir la fecha y poder manipularla
+            lastDate = moment(lastDate);
+            
+            if (balance > 0) {
+                //Se recupera la hora actual para poder definir si está en mora
+                let now = moment();
+                //Todos los clientes con saldo están activos
+                this.inactive = false;
+
+                //Sdependiendo de esta variable se cambia la legenda del estado
+                if (lastDateIsAPayment) {
+                    this.state = `Ultimo abono ${lastDate.fromNow()}`;
+                } else {
+                    this.state = `Con un saldo ${lastDate.fromNow()}`;
+                }
+
+                //Se define si el cliente está en mora
+                let diff = now.diff(moment(lastDate), 'days');
+                if (diff > 30) {
+                    this.deliquentBalance = true;
+                }
+            } else {
+                this.inactive = true;
+                this.state = `Cliente inactivo ${lastDate.fromNow()}`;
+                this.deliquentBalance = false;
+            }
+
+        } else {
+            this.inactive = true;
+            this.deliquentBalance = false;
+            this.state = 'Cliente inactivo desde el origen de los tiempos';
+        }//Fin de if else
+
+    }//Fin del metodo
 
     toString() {
         return this.firstName;
@@ -205,10 +320,11 @@ class Payment extends Transaction {
 //                  LOADING SECTION
 //---------------------------------------------------------------------------------------------
 window.addEventListener('load', async () => {
-    await reloadCustomerList();
     //Se configura la librería de moment
     moment.locale('es-do');
-    moment().format('DD/MM/YYYY hh:mm a')
+    moment().format('DD/MM/YYYY hh:mm a');
+    
+    await reloadCustomerList();
 
     viewController();
     newCustomerController();
@@ -1030,7 +1146,7 @@ const createCustomers = customersData => {
         data.payments.forEach(payment => {
             customer.addPayment(payment.id, payment.paymentDate, payment.amount, payment.cash);
         })
-
+        customer.defineState();
         customers.push(customer);
     });
 }//Fin del metodo
@@ -1200,12 +1316,54 @@ const updateCustomerCard = card => {
     }
 
     card.innerHTML = htmlCode;
-    if(state){
-        card.removeAttribute('class');
-        card.classList.add('customer-card');
+    card.removeAttribute('class');
+    card.classList.add('customer-card');
+
+    if (state) {
         card.classList.add(state);
     }
 
+}
+
+const defineTime = (credits, payments) => {
+    let lastDate = '';
+    let state = '';
+    let time = '';
+
+    //En este punto se define la fecha anterior
+    if (credits.length > 0) {
+        lastDate = credits[0].date;
+        if (payments.length > 0) {
+            let indexCredit = 0;
+            let indexPayment = 0;
+            let balance = 0;
+            do {
+                let credit = credits[indexCredit];
+                let payment = payments[indexPayment];
+                if (credit.date <= payment.date) {
+                    balance += credits.amount;
+                } else {
+                    balance -= payment.amount;
+                    indexPayment++;
+                    if (balance === 0) {
+                        lastDate = credit.date;
+                    } else {
+                        lastDate = payment.date;
+                    }
+                }//Fin de if else
+
+                indexCredit++;
+            } while (indexCredit < credits.length && indexPayment < payments.length);
+        }//Fin de if
+    }//Fin de if
+
+    if (lastDate) {
+
+    } else {
+        state = 'customer-card--inactive';
+    }
+
+    return lastDate;
 }
 
 /**
