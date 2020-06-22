@@ -43,7 +43,7 @@
             <nav class="dropdown__nav">
               <ul class="dropdown__list">
                 <li class="dropdown__item">
-                  <a href="#" class="dropdown__link dropdown__link--disabled" id="sumaryLink">Resumen</a>
+                  <a href="#" class="dropdown__link" id="sumaryLink">Resumen</a>
                 </li>
                 <li class="dropdown__item">
                   <a href="#" class="dropdown__link" id="newCustomerLink">Nuevo Cliente</a>
@@ -82,9 +82,9 @@
       <section class="chart-section">
         <h2 class="chart-section__title">Clientes Activos e Inactivos</h2>
         <figure class="chart-section__chart">
-          <canvas id="myChart"></canvas>
+          <canvas id="customerSumary"></canvas>
         </figure>
-        <p class="chart-section__info">Este grafico muestra el numero clientes activos de los últimos tres meses.</p>
+        <p class="chart-section__info">El grafico anterior muestra la proporción de clientes activos (poseen saldo pendiente) e inactivos del sistema.</p>
       </section>
 
       <section class="chart-section">
@@ -280,56 +280,8 @@
       <div class="search-box">
         <input type="text" class="search-box__search" id="newDebtSearchBox" placeholder="Buscar por nombre">
         <div class="search-box__result scroll" id="newDebtSearchBoxResult">
-          <div class="customer-card">
-            <h3 class="customer-card__name">Nombre del cliente</h3>
-            <p class="customer-card__balance">$ 1.000.000</p>
-            <div>
-              <p class="customer-card__debts">Creditos: x</p>
-              <p class="customer-card__points">Puntos: x</p>
-            </div>
-          </div>
-          <div class="customer-card customer-card--late">
-            <h3 class="customer-card__name">Nombre del cliente</h3>
-            <p class="customer-card__balance">$ 1.000.000</p>
-            <div>
-              <p class="customer-card__debts">Creditos: x</p>
-              <p class="customer-card__points">Puntos: -15000</p>
-            </div>
-          </div>
-          <div class="customer-card">
-            <h3 class="customer-card__name">Nombre del cliente</h3>
-            <p class="customer-card__balance">$ 0</p>
-            <div>
-              <p class="customer-card__debts">Creditos: x</p>
-              <p class="customer-card__points">Puntos: x</p>
-            </div>
-          </div>
-          <div class="customer-card customer-card--late">
-            <h3 class="customer-card__name">Nombre del cliente</h3>
-            <p class="customer-card__balance">$ 1.000.000</p>
-            <div>
-              <p class="customer-card__debts">Creditos: x</p>
-              <p class="customer-card__points">Puntos: x</p>
-            </div>
-          </div>
-          <div class="customer-card">
-            <h3 class="customer-card__name">Nombre del cliente</h3>
-            <p class="customer-card__balance">$ 1.000.000</p>
-            <div>
-              <p class="customer-card__debts">Creditos: x</p>
-              <p class="customer-card__points">Puntos: x</p>
-            </div>
-          </div>
-          <div class="customer-card customer-card--late">
-            <h3 class="customer-card__name">Nombre del cliente</h3>
-            <p class="customer-card__balance">$ 1.000.000</p>
-            <div>
-              <p class="customer-card__debts">Creditos: x</p>
-              <p class="customer-card__points">Puntos: x</p>
-            </div>
-          </div>
         </div>
-        <p class="search-box__count">6 Clientes</p>
+        <p class="search-box__count"></p>
       </div>
 
       <!-- FORMULARIO DE DATOS -->
@@ -379,7 +331,7 @@
       <div class="search-box">
         <input type="text" class="search-box__search" placeholder="Buscar por nombre">
         <div class="search-box__result scroll">
-          <div class="customer-card">
+          <!-- <div class="customer-card">
             <h3 class="customer-card__name">Nombre del cliente</h3>
             <p class="customer-card__balance">$ 1.000.000</p>
             <div>
@@ -426,9 +378,9 @@
               <p class="customer-card__debts">Creditos: x</p>
               <p class="customer-card__points">Puntos: x</p>
             </div>
-          </div>
+          </div> -->
         </div>
-        <p class="search-box__count">6 Clientes</p>
+        <p class="search-box__count"></p>
       </div>
 
       <form action="" class="form form--bg-light">
@@ -492,7 +444,7 @@
       <div class="search-box">
         <input type="text" class="search-box__search" placeholder="Buscar por nombre">
         <div class="search-box__result scroll">
-          <div class="customer-card">
+          <!-- <div class="customer-card">
             <h3 class="customer-card__name">Nombre del cliente</h3>
             <p class="customer-card__balance">$ 1.000.000</p>
             <div>
@@ -539,9 +491,9 @@
               <p class="customer-card__debts">Creditos: x</p>
               <p class="customer-card__points">Puntos: x</p>
             </div>
-          </div>
+          </div> -->
         </div>
-        <p class="search-box__count">6 Clientes</p>
+        <p class="search-box__count"></p>
       </div>
 
       <div class="customer-card" id="consultDebtsCustomer">
@@ -570,7 +522,7 @@
           </div>
         </div>
         <div class="customer-sumary__box scroll" id="debtsHistory">
-          <div class="debt-card">
+          <!-- <div class="debt-card">
             <p class="debt-card__title">Es la descripcion del credito</p>
             <p class="debt-card__date">15 de feb de 2020</p>
             <p class="debt-card__label">Valor Inicial</p>
@@ -585,7 +537,7 @@
             <p class="debt-card__label">Saldo pendiente</p>
             <p class="debt-card__money">$ 2.400.000</p>
             <p class="debt-card__money">$ 1.100.000</p>
-          </div>
+          </div> -->
         </div>
         <p class="search-box__count show" id="debtsSumary">2 Creditos; $ 4.400.000</p>
       </div>
@@ -593,14 +545,14 @@
       <div class="customer-sumary__container">
         <h3 class="customer-sumary__title">Historial de pagos</h3>
         <div class="customer-sumary__box scroll" id="paymentsHistory">
-          <div class="payment-row">
+          <!-- <div class="payment-row">
             <p class="paymen-row__date">01-02-2020</p>
             <p class="payment-row__amount">$ 1.000.000</p>
           </div>
           <div class="payment-row">
             <p class="paymen-row__date">01-03-2020</p>
             <p class="payment-row__amount">$ 300.000</p>
-          </div>
+          </div> -->
         </div>
         <p class="search-box__count show" id="paymentsSumary">2 Abonos; $ 1.300.000</p>
       </div>
