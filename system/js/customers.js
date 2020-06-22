@@ -244,14 +244,14 @@ class Customer {
                 }
             } else {
                 this.inactive = true;
-                this.state = `Cliente inactivo ${lastDate.fromNow()}`;
+                this.state = `Ultima operacion ${lastDate.fromNow()}`;
                 this.deliquentBalance = false;
             }
 
         } else {
             this.inactive = true;
             this.deliquentBalance = false;
-            this.state = 'Cliente inactivo desde el origen de los tiempos';
+            this.state = 'Desde el origen de los tiempos';
         }//Fin de if else
 
     }//Fin del metodo
@@ -323,7 +323,7 @@ window.addEventListener('load', async () => {
     //Se configura la librería de moment
     moment.locale('es-do');
     moment().format('DD/MM/YYYY hh:mm a');
-    
+
     await reloadCustomerList();
 
     viewController();
@@ -1174,39 +1174,20 @@ const updateCustomer = (customerId, customerData) => {
 const printCustomerResult = (searchBoxResult, result) => {
     let htmlCode = '';
     result.forEach(customer => {
-        let state = '';
-        let lastPayment = '';
-        if (customer.balance > 0) {
-            let lastDate = null;
-
-            //Con el siguiente codigo defino la ultima fecha valida
-            if (customer.payments.length > 0) {
-                lastDate = customer.payments[customer.payments.length - 1].date;
-                lastPayment = moment(lastDate).fromNow();
-                lastPayment = `Ultimo pago: ${lastPayment}`;
-            } else {
-                lastDate = customer.credits.filter(c => c.balance > 0)[0].date;
-                lastPayment = `Tiempo: ${moment(lastDate).fromNow()}`;
-            }
-
-            //Ahora defino si está en mora
-            let now = moment();
-            lastDate = moment(lastDate);
-
-            let diff = now.diff(moment(lastDate), 'days');
-
-            if (diff > 30) {
-                state = "customer-card--late";
-            }
-        } else {
-            state = 'customer-card--inactive';
+        
+        let cardState = '';
+        if(customer.inactive){
+            cardState = 'customer-card--inactive';
+        }else if(customer.deliquentBalance){
+            cardState = 'customer-card--late';
         }
 
+
         htmlCode += `
-        <div class="customer-card ${state}" customer_id = "${customer.id}">
+        <div class="customer-card ${cardState}" customer_id = "${customer.id}">
             <div class="customer-card__header">
                 <h3 class="customer-card__name">${customer.firstName}</h3>
-                <p class="customer-card__info">${lastPayment}</p>
+                <p class="customer-card__info">${customer.state}</p>
             </div>
             <p class="customer-card__balance">${formatCurrencyLite(customer.balance, 0)}</p>
             <div>
@@ -1253,7 +1234,7 @@ const printCustomerResult = (searchBoxResult, result) => {
  */
 const updateCustomerCard = card => {
     let htmlCode = '';
-    let state = '';
+    let cardState = '';
     if (
         customerSelected
         && !isNaN(customerSelected)
@@ -1261,38 +1242,16 @@ const updateCustomerCard = card => {
         && customers.some(c => c.id === customerSelected)) {
         let customer = customers.filter(c => c.id === customerSelected)[0];
 
-        let lastPayment = '';
-        if (customer.balance > 0) {
-            let lastDate = null;
-
-            //Con el siguiente codigo defino la ultima fecha valida
-            if (customer.payments.length > 0) {
-                lastDate = customer.payments[customer.payments.length - 1].date;
-                lastPayment = moment(lastDate).fromNow();
-                lastPayment = `Ultimo pago: ${lastPayment}`;
-            } else {
-                lastDate = customer.credits.filter(c => c.balance > 0)[0].date;
-                lastPayment = `Tiempo: ${moment(lastDate).fromNow()}`;
-            }
-
-            //Ahora defino si está en mora
-            let now = moment();
-            lastDate = moment(lastDate);
-
-            let diff = now.diff(moment(lastDate), 'days');
-
-            if (diff > 30) {
-                state = "customer-card--late";
-            }
-        } else {
-            state = 'customer-card--inactive';
+        if(customer.inactive){
+            cardState = 'customer-card--inactive';
+        }else if(customer.deliquentBalance){
+            cardState = 'customer-card--late';
         }
-
 
         htmlCode = `
         <div class="customer-card__header">
             <h3 class="customer-card__name">${customer.firstName}</h3>
-            <p class="customer-card__info">${lastPayment}</p>
+            <p class="customer-card__info">${customer.state}</p>
         </div>
         <p class="customer-card__balance">${formatCurrencyLite(customer.balance, 0)}</p>
         <div>
@@ -1319,8 +1278,8 @@ const updateCustomerCard = card => {
     card.removeAttribute('class');
     card.classList.add('customer-card');
 
-    if (state) {
-        card.classList.add(state);
+    if (cardState) {
+        card.classList.add(cardState);
     }
 
 }
