@@ -261,12 +261,12 @@ class Customer {
     setScore() {
         const utility = 0.1;
         let iea = utility * (55.0 / 20.0);
-        let iep = Math.pow((1+iea), (1/365)) -1;
+        let iep = Math.pow((1 + iea), (1 / 365)) - 1;
         let creditVpn = 0;
         let paymentVpn = 0;
         let now = moment();
 
-        if(this.credits.length > 0){
+        if (this.credits.length > 0) {
             //Se calcula el vpn de los creditos
             this.credits.forEach(credit => {
                 let capital = credit.amount / (1 + utility);
@@ -533,6 +533,12 @@ const showView = (viewName = 'sumary') => {
             printCustomerHistory();
         } break;//Fin de default
     }//Fin de switch
+
+    //Se oculta el menú
+    const navbarCollapse = document.getElementById('navbar-collapse');
+    if(navbarCollapse.classList.contains('show')){
+        showMenu(navbarCollapse);
+    }
 }//Fin de showView
 
 /**
@@ -561,10 +567,13 @@ const viewController = () => {
     VIEWS.newCustomer.link.addEventListener('click', async () => {
         showView('newCustomer');
         await reloadCustomerList();
+
+
     })
 
     VIEWS.newPayment.link.addEventListener('click', async () => {
         showView('newPayment');
+
         await reloadCustomerList();
         let searchBox = VIEWS.newPayment.view.querySelector('.search-box');
         updateSearchBoxResult(searchBox);
@@ -1103,7 +1112,7 @@ const searchBoxController = () => {
 
         input.addEventListener('input', () => {
             if (input.value) {
-                let result = customers.filter(c => textInclude(c.firstName, input.value));
+                let result = customers.filter(c => textInclude(`${c.firstName} ${c.lastName}`, input.value));
                 printCustomerResult(container, result);
                 footer.innerText = `Clientes: ${result.length}`;
             } else {
@@ -1215,7 +1224,7 @@ const printCustomerResult = (searchBoxResult, result) => {
         htmlCode += `
         <div class="customer-card ${cardState}" customer_id = "${customer.id}">
             <div class="customer-card__header">
-                <h3 class="customer-card__name">${customer.firstName}</h3>
+                <h3 class="customer-card__name">${customer.firstName}  ${customer.lastName}</h3>
                 <p class="customer-card__info">${customer.state}</p>
             </div>
             <p class="customer-card__balance">${formatCurrencyLite(customer.balance, 0)}</p>
@@ -1280,7 +1289,7 @@ const updateCustomerCard = card => {
         let colorPoint = customer.points < 0 ? 'style="color: red;"' : '';
         htmlCode = `
         <div class="customer-card__header">
-            <h3 class="customer-card__name">${customer.firstName}</h3>
+            <h3 class="customer-card__name">${customer.firstName} ${customer.lastName}</h3>
             <p class="customer-card__info">${customer.state}</p>
         </div>
         <p class="customer-card__balance">${formatCurrencyLite(customer.balance, 0)}</p>
