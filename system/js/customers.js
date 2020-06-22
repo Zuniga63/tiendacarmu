@@ -223,7 +223,7 @@ class Customer {
 
             //Se utiliza la librería moment.js para convertir la fecha y poder manipularla
             lastDate = moment(lastDate);
-            
+
             if (balance > 0) {
                 //Se recupera la hora actual para poder definir si está en mora
                 let now = moment();
@@ -254,7 +254,35 @@ class Customer {
             this.state = 'Desde el origen de los tiempos';
         }//Fin de if else
 
+        this.setScore();
+
     }//Fin del metodo
+
+    setScore() {
+        const utility = 0.1;
+        let iea = utility * (55.0 / 20.0);
+        let iep = Math.pow((1+iea), (1/365)) -1;
+        let creditVpn = 0;
+        let paymentVpn = 0;
+        let now = moment();
+
+        if(this.credits.length > 0){
+            //Se calcula el vpn de los creditos
+            this.credits.forEach(credit => {
+                let capital = credit.amount / (1 + utility);
+                let days = now.diff(moment(credit.date), 'days');
+                creditVpn += capital * Math.pow((1 + iep), days);
+            });
+
+            //Se calcula el vpn de los pagos
+            this.payments.forEach(payment => {
+                let days = now.diff(moment(payment.date), 'days');
+                paymentVpn += payment.amount * Math.pow((1 + iep), days);
+            })
+        }
+
+        this.points = Math.round((this.balance + paymentVpn - creditVpn) / 1000);
+    }
 
     toString() {
         return this.firstName;
@@ -1174,14 +1202,15 @@ const updateCustomer = (customerId, customerData) => {
 const printCustomerResult = (searchBoxResult, result) => {
     let htmlCode = '';
     result.forEach(customer => {
-        
+
         let cardState = '';
-        if(customer.inactive){
+        if (customer.inactive) {
             cardState = 'customer-card--inactive';
-        }else if(customer.deliquentBalance){
+        } else if (customer.deliquentBalance) {
             cardState = 'customer-card--late';
         }
 
+        let colorPoint = customer.points < 0 ? 'style="color: red;"' : '';
 
         htmlCode += `
         <div class="customer-card ${cardState}" customer_id = "${customer.id}">
@@ -1193,7 +1222,7 @@ const printCustomerResult = (searchBoxResult, result) => {
             <div>
               <p class="customer-card__debts">Creditos: ${customer.credits.length}</p>
               <p class="customer-card__points">Abonos: ${customer.payments.length}</p>
-              <p class="customer-card__points">Puntos: ${customer.points}</p>
+              <p class="customer-card__points" ${colorPoint}>Puntos: ${customer.points}</p>
             </div>
         </div>`
     });
@@ -1242,12 +1271,13 @@ const updateCustomerCard = card => {
         && customers.some(c => c.id === customerSelected)) {
         let customer = customers.filter(c => c.id === customerSelected)[0];
 
-        if(customer.inactive){
+        if (customer.inactive) {
             cardState = 'customer-card--inactive';
-        }else if(customer.deliquentBalance){
+        } else if (customer.deliquentBalance) {
             cardState = 'customer-card--late';
         }
 
+        let colorPoint = customer.points < 0 ? 'style="color: red;"' : '';
         htmlCode = `
         <div class="customer-card__header">
             <h3 class="customer-card__name">${customer.firstName}</h3>
@@ -1257,7 +1287,7 @@ const updateCustomerCard = card => {
         <div>
             <p class="customer-card__debts">Creditos: ${customer.credits.length}</p>
             <p class="customer-card__points">Abonos: ${customer.payments.length}</p>
-            <p class="customer-card__points">Puntos: ${customer.points}</p>
+            <p class="customer-card__points" ${colorPoint}>Puntos: ${customer.points}</p>
         </div>`;
     } else {
         htmlCode = `
