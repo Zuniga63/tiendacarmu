@@ -4,7 +4,8 @@ require '../includes/functions.php';
 if (session_active()) {
     $result = [
         'sessionActive' => true,
-        'customers' => get_all_customers()
+        'customers' => get_all_customers(),
+        'reports' => get_credit_cash_flow_report()
     ];
 
     echo json_encode($result);

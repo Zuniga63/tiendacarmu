@@ -1132,6 +1132,106 @@ function create_new_payment($customer_id, $cash, $amount)
     return $result;
 } //Fin del metodo
 
+function get_credit_cash_flow_report()
+{
+    $max_month = getdate()['mon'];
+    $year = getdate()['year'];
+    $day = getdate()['mday'];
+
+    $months = [
+        1 => 'january',
+        'february',
+        'march',
+        'april',
+        'may',
+        'june',
+        'july',
+        'august',
+        'september',
+        'october',
+        'november',
+        'december'
+    ];
+
+    $reports = [];
+
+    try {
+        $conn1 = get_connection();
+        $conn2 = get_connection();
+
+        $stmt1 = $conn1->prepare("SELECT SUM(amount) AS total_amount FROM customer_credit WHERE credit_date >= :since AND credit_date < :until");
+
+        $stmt2 = $conn2->prepare("SELECT SUM(amount) AS total_amount FROM customer_payment WHERE payment_date >= :since AND payment_date < :until");
+
+        for ($month = 1; $month <= $max_month; $month++) {
+            $since = "$year-$month-01";
+            $until = "$year-$month-16";
+
+            $credit_amount = 0;
+            $payment_amount = 0;
+
+            $stmt1->bindParam(':since', $since, PDO::PARAM_STR);
+            $stmt1->bindParam(':until', $until, PDO::PARAM_STR);
+            $stmt1->execute();
+            if($row = $stmt1->fetch()){
+                $credit_amount = empty($row['total_amount']) ? 0 : floatval($row['total_amount']);
+            }
+
+            $stmt2->bindParam(':since', $since, PDO::PARAM_STR);
+            $stmt2->bindParam(':until', $until, PDO::PARAM_STR);
+            $stmt2->execute();
+
+            if ($row = $stmt2->fetch()) {
+                $payment_amount = empty($row['total_amount']) ? 0 : floatval($row['total_amount']);
+            }
+
+            $reports[] = [
+                'since' => $since,
+                'until' => $until,
+                'creditAmount' => $credit_amount,
+                'paymentAmount' => $payment_amount
+            ];
+
+            $since = $until;
+            $month_name = $months[$month];
+            $until = new DateTime("last day of $month_name $year + 24 hour");
+            $until = $until->format('Y-m-d');
+
+            if ($month == $max_month && $day < 15) {
+                break;
+            }
+
+            $credit_amount = 0;
+            $payment_amount = 0;
+
+            $stmt1->bindParam(':since', $since, PDO::PARAM_STR);
+            $stmt1->bindParam(':until', $until, PDO::PARAM_STR);
+            $stmt1->execute();
+
+            $stmt2->bindParam(':since', $since, PDO::PARAM_STR);
+            $stmt2->bindParam(':until', $until, PDO::PARAM_STR);
+            $stmt2->execute();
+
+            if ($row1 = $stmt1->fetch() && $row2 = $stmt2->fetch()) {
+                $credit_amount = empty($row1['total_amount']) ? 0 : floatval($row1['total_amount']);
+                $payment_amount = empty($row2['total_amount']) ? 0 : floatval($row2['total_amount']);
+            }
+
+            $reports[] = [
+                'since' => $since,
+                'until' => $until,
+                'creditAmount' => $credit_amount,
+                'paymentAmount' => $payment_amount
+            ];
+        }
+
+        return $reports;
+    } catch (PDOException $e) {
+        $message = "Error al consultar el reporte anual: {$e->getMessage()}";
+        write_error($message);
+    }
+}
+
 //---------------------------------------------------------------------------------------
 //                      UTILIDADES
 //---------------------------------------------------------------------------------------
