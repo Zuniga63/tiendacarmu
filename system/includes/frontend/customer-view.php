@@ -90,17 +90,17 @@
       <section class="chart-section">
         <h2 class="chart-section__title">Morosidad de clientes activos</h2>
         <figure class="chart-section__chart">
-          <canvas id="myChart2"></canvas>
+          <canvas id="delinquentCustomers"></canvas>
         </figure>
         <p class="chart-section__info">Este grafico muestra el numero clientes que están al día y los clientes morosos del conjunto de clientes activos</p>
       </section>
 
       <section class="chart-section">
-        <h2 class="chart-section__title">Clientes Inactivos</h2>
+        <h2 class="chart-section__title">Dificultad de cobro</h2>
         <figure class="chart-section__chart">
-          <canvas id="myChart3"></canvas>
+          <canvas id="collectionDificulty"></canvas>
         </figure>
-        <p class="chart-section__info">Este grafico muestra cuantos de los clientes que están inactivos presentan deudas y cuales están al día.</p>
+        <p class="chart-section__info">Este grafico muestra la cantidad de clientes según su frecuencia de pago, los clientes en verde presentan una frecuencia de pago menor a 30 días mientras que los que están en rojo superan los 90 días entre pago y pago.</p>
       </section>
 
       <section class="chart-section">

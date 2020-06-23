@@ -84,6 +84,7 @@ class Customer {
         this.state = '';
         this.inactive = false;
         this.deliquentBalance = false;
+        this.paymentFrecuency = 0;
     }
 
     /**
@@ -196,6 +197,8 @@ class Customer {
                         balance += credit.amount;
                         indexCredit++;
                     } else {
+                        //Se va actualizando la frecuencia de pago
+                        this.paymentFrecuency += moment(payment.date).diff(moment(lastDate), 'days');
                         lastDate = payment.date;
                         lastDateIsAPayment = true;
                         balance -= payment.amount;
@@ -211,6 +214,7 @@ class Customer {
                         balance += credit.amount;
                         indexCredit++;
                     } else {
+                        this.paymentFrecuency += moment(payment.date).diff(moment(lastDate), 'days');
                         lastDate = payment.date;
                         lastDateIsAPayment = true;
                         balance -= payment.amount;
@@ -242,10 +246,18 @@ class Customer {
                 if (diff > 30) {
                     this.deliquentBalance = true;
                 }
+
+                this.paymentFrecuency += diff;
+                if(this.payments.length > 0){
+                    this.paymentFrecuency = this.paymentFrecuency / (this.payments.length +1);
+                }
             } else {
                 this.inactive = true;
                 this.state = `Ultima operacion ${lastDate.fromNow()}`;
                 this.deliquentBalance = false;
+                if(this.payments.length > 0){
+                    this.paymentFrecuency = this.paymentFrecuency / this.payments.length;
+                }
             }
 
         } else {
@@ -1453,19 +1465,32 @@ const printCharts = () => {
 }
 
 const updateCharts = () => {
-    let activerCustomers = 0;
-    let inactiveCustomers = 0;
-    customers.forEach(customer => {
-        if (customer.inactive) {
-            inactiveCustomers++;
-        } else {
-            activerCustomers++;
-        }
-    })
+    updateCustomerSumary();
+}
 
+/**
+ * Este metodo actualiza los datos de los dos primeros graficos
+ */
+const updateCustomerSumary = () => {
     const customerSumary = document.getElementById('customerSumary');
-    let data = [activerCustomers, inactiveCustomers];
-    let labels = ['Activos', 'Inactivos'];
+    const delinquentCustomers = document.getElementById('delinquentCustomers');
+    const collectionDificulty = document.getElementById('collectionDificulty');
+
+    let bgBlue = 'rgba(54, 162, 235, 0.2)';
+    let borderBlue = 'rgba(54, 162, 235, 1)';
+
+    let bgRed = 'rgba(255, 99, 132, 0.2)';
+    let borderRed = 'rgba(255, 99, 132, 1)';
+
+    let bgGreen = 'rgba(46, 204, 113,0.2)';
+    let borderGreen = 'rgba(46, 204, 113,1)';
+
+    let bgYellow = 'rgba(241, 196, 15,0.2)';
+    let borderYellow = 'rgba(241, 196, 15,1.0)';
+
+    let bgOrange = 'rgba(211, 84, 0, 0.2)'
+    let borderOrange = 'rgba(211, 84, 0, 1)'
+
     let bgColors = [
         'rgba(54, 162, 235, 0.2)',
         'rgba(255, 99, 132, 0.2)'
@@ -1476,10 +1501,52 @@ const updateCharts = () => {
         'rgba(255, 99, 132, 1)'
     ];
 
-    printDoughnutChart(customerSumary, '', data, labels, bgColors, borderColor);
+    let activeCustomers = 0;
+    let inactiveCustomers = 0;
+    let delinquentCustomersCount = 0;
+    let correctCustomers = 0;
+    let easyCollect = 0;
+    let moderateCollect = 0;
+    let dificultCollect = 0;
+    let veryDificultColllect = 0;
+
+    customers.forEach(customer => {
+        if (customer.inactive) {
+            inactiveCustomers++;
+        } else {
+            activeCustomers++;
+            if(customer.deliquentBalance){
+                delinquentCustomersCount++;
+            }else{
+                correctCustomers++;
+            }
+
+            if(customer.paymentFrecuency < 30){
+                easyCollect++;
+            }else if(customer.paymentFrecuency < 60){
+                moderateCollect++;
+            }else if(customer.paymentFrecuency < 90){
+                dificultCollect++;
+            }else{
+                veryDificultColllect++;
+            }
+        }
+    })//Fin de forEach
+
+    printDoughnutChart(customerSumary, '', [activeCustomers, inactiveCustomers], ['Activos', 'Inactivos'], bgColors, borderColor);
+
+    printDoughnutChart(delinquentCustomers, '', [correctCustomers, delinquentCustomersCount], ['Al día', 'Morosos'], [bgGreen, bgRed], [borderGreen, borderRed]);
+
+    printDoughnutChart(collectionDificulty, '', [easyCollect, moderateCollect, dificultCollect, veryDificultColllect], ['Facil', 'Moderado', 'Dificil', 'Muy dificil'], [bgGreen, bgYellow, bgOrange, bgRed], [borderGreen, borderYellow, borderOrange, borderRed]);
+
+
 }
 
 const printDoughnutChart = (ctx, title, data, labels, bgColors, borderColor) => {
+    let displayTitle = false;
+    if(title){
+        displayTitle = true;
+    }
     myChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -1494,7 +1561,7 @@ const printDoughnutChart = (ctx, title, data, labels, bgColors, borderColor) => 
         options: {
             resposive: true,
             title: {
-                display: true,
+                display: displayTitle,
                 text: title
             }
         }//Fin de option
