@@ -383,12 +383,12 @@
         <p class="search-box__count"></p>
       </div>
 
-      <form class="form form--bg-light">
+      <form class="form form--bg-light" id="customerUpdateForm">
         <h2 class="form__title">Formulario de Actualización</h2>
         <div class="form__group">
           <div class="form__group__body">
             <label class="form__label" for="customerName">Nombre del cliente</label>
-            <input class="form__input" type="text" name="name" id="updateName" placeholder="Ingresar nombres aquí" required>
+            <input class="form__input" type="text" name="first_name" id="updateName" placeholder="Ingresar nombres aquí" required>
           </div>
           <div class="form__group__footer">
             <span class="alert alert--danger">Este codigo ya está en uso</span>
@@ -398,7 +398,7 @@
         <div class="form__group">
           <div class="form__group__body">
             <label class="form__label" for="customerLastname">Apellido del cliente</label>
-            <input class="form__input" type="text" name="lastname" id="updateLastname" placeholder="Ingresar el apellido aquí">
+            <input class="form__input" type="text" name="last_name" id="updateLastname" placeholder="Ingresar el apellido aquí">
           </div>
           <div class="form__group__footer">
             <span class="alert alert--danger">Este codigo ya está en uso</span>
@@ -434,7 +434,8 @@
             <span class="alert alert--danger">Este codigo ya está en uso</span>
           </div>
         </div>
-
+        <!-- ALERTA DE ERROR EN DATOS DE CREDITO -->
+        <P class="alert alert--big" id="customerUpdateAlert">El nombre del cliente es obligatorio</P>
         <input type="submit" value="Actualizar Cliente" class="btn btn--success" id="updateBtn">
       </form>
     </div>

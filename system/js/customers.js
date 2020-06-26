@@ -368,6 +368,7 @@ window.addEventListener('load', async () => {
 
     viewController();
     newCustomerController();
+    updateCustomerController();
     newCreditController();
     newPaymentController();
     consultDebtsController();
@@ -559,7 +560,7 @@ const viewController = () => {
 let newCustomerProcessEnd = true;
 let newCreditProcessEnd = true;
 let newPaymentProcessEnd = true;
-
+let updateCustomerProcessEnd = true;
 /**
  * Se encarga de agregar la funcionalidad de los elementos encargado de crear un
  * nuevo cliente
@@ -641,6 +642,85 @@ const newCustomerController = () => {
                 btn.blur();
             }//Fin de else
         }//Fin de if        
+    })
+}
+
+const updateCustomerController = () => {
+    const customerUpdateForm = document.getElementById('customerUpdateForm');
+    const updateName = document.getElementById('updateName');
+    const updateLastname = document.getElementById('updateLastname');
+    const updateNit = document.getElementById('updateNit');
+    const updatePhone = document.getElementById('updatePhone');
+    const updateEmail = document.getElementById('updateEmail');
+    const customerUpdateAlert = document.getElementById('customerUpdateAlert');
+    const updateBtn = document.getElementById('updateBtn');
+
+    //Se agrega la funcionalidad para seleccionar su contenido
+    //al obtener el foco
+    selectText(updateName);
+    selectText(updateLastname);
+    selectText(updateNit);
+    selectText(updatePhone);
+    selectText(updateEmail);
+
+    customerUpdateForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        let customerIsCorrert = customers.some(c => c.id === customerSelected);
+
+        if (updateCustomerProcessEnd && customerIsCorrert && updateName.value.trim()) {
+            //Se bloquean nuevas peticiones
+            updateCustomerProcessEnd = false;
+
+            //Se cambia el valor del boton
+            updateBtn.value = 'Procesando Solicitud';
+
+            //Se crea el cuerpo del de la peticion
+            let data = new FormData(customerUpdateForm);
+            data.append('customer_id', customerSelected);
+
+            //Se realiza la peticion
+            fetch('./api/update_customer.php', {
+                method: 'POST',
+                body: data
+            })
+                .then(res => res.json())
+                .then(res => {
+                    //Si la session no está activa entonces se reinicia la pag
+                    if (res.sessionActive) {
+                        if (res.request) {
+                            //Se actualiza la alerta
+                            customerUpdateAlert.innerText = "Se actualizaron los datos";
+                            customerUpdateAlert.classList.remove('alert--danger');
+                            customerUpdateAlert.classList.add('alert--success');
+
+                            //Se actualizan los datos del cliente seleccionado
+                            updateCustomer(customerSelected, res.customer);
+                            updateAllCustomerCards();
+                            let searchBox = VIEWS.customerUpdate.view.querySelector('.search-box');
+                            updateSearchBoxResult(searchBox);
+
+                            //Se resetea el formulario
+                            customerUpdateForm.reset();
+                        } else {
+                            customerUpdateAlert.innerText = "No se actualizaron los datos del cliente";
+                            customerUpdateAlert.classList.add('alert--danger');
+                        }
+
+                        //Se restauran los parametros globales y se muestra la alerta
+                        updateCustomerProcessEnd = true;
+                        updateBtn.value = 'Actualizar Cliente';
+                        customerUpdateAlert.classList.add('show');
+
+                        //Pasado 5 segundo se oculta la alerta
+                        setTimeout(() => {
+                            customerUpdateAlert.classList.remove('show');
+                        }, 5000);
+                    } else {
+                        location.reload();
+                    }
+                });
+
+        }
     })
 }
 
@@ -1229,12 +1309,12 @@ const loadCustomer = () => {
         && !isNaN(customerSelected)
         && customerSelected > 0
         && customers.some(c => c.id === customerSelected)) {
-            let customer = customers.filter(c => c.id === customerSelected)[0];
-            updateName.value = customer.firstName;
-            updateLastname.value = customer.lastName;
-            updateNit.value = customer.nit;
-            updatePhone.value = customer.phone;
-            updateEmail.value = customer.email;
+        let customer = customers.filter(c => c.id === customerSelected)[0];
+        updateName.value = customer.firstName;
+        updateLastname.value = customer.lastName;
+        updateNit.value = customer.nit;
+        updatePhone.value = customer.phone;
+        updateEmail.value = customer.email;
     }
 }
 
