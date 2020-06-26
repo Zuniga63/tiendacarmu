@@ -383,12 +383,12 @@
         <p class="search-box__count"></p>
       </div>
 
-      <form action="" class="form form--bg-light">
+      <form class="form form--bg-light">
         <h2 class="form__title">Formulario de Actualización</h2>
         <div class="form__group">
           <div class="form__group__body">
             <label class="form__label" for="customerName">Nombre del cliente</label>
-            <input class="form__input" type="text" name="customer_name" id="customerName" placeholder="Ingresar nombres aquí">
+            <input class="form__input" type="text" name="name" id="updateName" placeholder="Ingresar nombres aquí" required>
           </div>
           <div class="form__group__footer">
             <span class="alert alert--danger">Este codigo ya está en uso</span>
@@ -398,7 +398,7 @@
         <div class="form__group">
           <div class="form__group__body">
             <label class="form__label" for="customerLastname">Apellido del cliente</label>
-            <input class="form__input" type="text" name="customer_lastname" placeholder="Ingresar el apellido aquí">
+            <input class="form__input" type="text" name="lastname" id="updateLastname" placeholder="Ingresar el apellido aquí">
           </div>
           <div class="form__group__footer">
             <span class="alert alert--danger">Este codigo ya está en uso</span>
@@ -408,7 +408,7 @@
         <div class="form__group">
           <div class="form__group__body">
             <label class="form__label" for="customerNit">Nit o CC</label>
-            <input class="form__input" type="text" name="customer_nit" id="customerNit" placeholder="Ingresar Nit o C.C">
+            <input class="form__input" type="text" name="nit" id="updateNit" placeholder="Ingresar Nit o C.C">
           </div>
           <div class="form__group__footer">
             <span class="alert alert--danger">Este codigo ya está en uso</span>
@@ -418,7 +418,7 @@
         <div class="form__group">
           <div class="form__group__body">
             <label class="form__label" for="customerPhone">Numero de Telefono</label>
-            <input class="form__input" type="text" name="customer_phone" id="customerPhone" placeholder="Ingresar telefono">
+            <input class="form__input" type="text" name="phone" id="updatePhone" placeholder="Ingresar telefono">
           </div>
           <div class="form__group__footer">
             <span class="alert alert--danger">Este codigo ya está en uso</span>
@@ -428,14 +428,14 @@
         <div class="form__group">
           <div class="form__group__body">
             <label class="form__label" for="customerEmail">Correo</label>
-            <input class="form__input" type="email" name="customer_phone" id="customerEmail" placeholder="Ingresar correo">
+            <input class="form__input" type="email" name="email" id="updateEmail" placeholder="Ingresar correo">
           </div>
           <div class="form__group__footer">
             <span class="alert alert--danger">Este codigo ya está en uso</span>
           </div>
         </div>
 
-        <input type="submit" value="Actualizar Cliente" class="btn btn--success">
+        <input type="submit" value="Actualizar Cliente" class="btn btn--success" id="updateBtn">
       </form>
     </div>
 
