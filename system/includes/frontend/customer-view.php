@@ -55,7 +55,7 @@
                   <a href="#" class="dropdown__link" id="newDebtLink">Registrar Credito</a>
                 </li>
                 <li class="dropdown__item">
-                  <a href="#" class="dropdown__link dropdown__link--disabled" id="customerUpdateLink">Actualizar Cliente</a>
+                  <a href="#" class="dropdown__link" id="customerUpdateLink">Actualizar Cliente</a>
                 </li>
                 <li class="dropdown__item">
                   <a href="#" class="dropdown__link" id="consultDebtsLink">Consultar creditos</a>

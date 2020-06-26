@@ -455,6 +455,9 @@ const showView = async (viewName = 'sumary') => {
             localStorage.actualView = viewName;
             //Se hace la peticion de datos
             await reloadCustomerList();
+
+            let searchBox = VIEWS.customerUpdate.view.querySelector('.search-box');
+            updateSearchBoxResult(searchBox);
         } break; //Fin del caso 4
 
         case 'consultDebts': {
@@ -534,7 +537,7 @@ const viewController = () => {
 
     VIEWS.customerUpdate.link.addEventListener('click', async () => {
         //Funcionalidad deshabilitada
-        // showView('customerUpdate');
+        showView('customerUpdate');
         // await reloadCustomerList();
         // let searchBox = VIEWS.customerUpdate.view.querySelector('.search-box');
         // updateSearchBoxResult(searchBox);
