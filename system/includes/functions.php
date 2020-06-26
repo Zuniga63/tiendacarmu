@@ -760,6 +760,62 @@ function create_new_customer($first_name, $last_name, $nit, $phone, $email)
     return $result;
 }
 
+function update_customer($customer_id, $first_name, $last_name, $nit, $phone, $email)
+{
+    $result = false;
+    //Se comprueva que el nombre del cliente no esté vacío
+    $first_name = trim($first_name);
+
+    if (is_numeric($customer_id) && !empty($first_name)) {
+        $customer_id = intval($customer_id);
+        $last_name = empty(trim($last_name)) ? 'NULL' : trim($last_name);
+        $nit = empty(trim($nit)) ? 'NULL' : trim($nit);
+        $phone = empty(trim($phone)) ? 'NULL' : trim($phone);
+        $email = empty(trim($email)) ? 'NULL' : trim($email);
+
+        try {
+            $conn = get_connection();
+            $conn->beginTransaction();
+            $stmt = $conn->prepare("UPDATE customer SET 
+                                    first_name = :first_name, 
+                                    last_name = :last_name, 
+                                    nit = :nit, 
+                                    phone = :phone, 
+                                    email = :email 
+                                    WHERE customer_id = :customer_id");
+            if ($stmt) {
+                $stmt->bindParam(':first_name', $first_name, PDO::PARAM_STR);
+                $stmt->bindParam(':last_name', $last_name, PDO::PARAM_STR);
+                $stmt->bindParam(':nit', $nit, PDO::PARAM_STR);
+                $stmt->bindParam(':phone', $phone, PDO::PARAM_STR);
+                $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+                $stmt->bindParam(':customer_id', $customer_id, PDO::PARAM_INT);
+
+                $stmt->execute();
+
+                //Ahora se procede a actualizar el registro de usuario
+                $user_id = $_SESSION['user_id'];
+                $conn->query("INSERT INTO user_log (user_id, log_description) VALUES ($user_id, 'Se actualizó al cliente $first_name')");
+
+                $conn->commit();
+                $result = true;
+            } else {
+                $message = "No se preparo la sentencia de actualizacion";
+                write_error($message);
+            }
+        } catch (PDOException $e) {
+            $message = "Error al intentar actualizar cliente: {$e->getMessage()}";
+            write_error($message);
+            return false;
+        } //Fin de try-catch
+    } else {
+        $message = "Se intente actualizar un cliente con nombre en blanco";
+        write_error($message);
+    } //Fin de if-else
+
+    return $result;
+}
+
 /**
  * Recupera la informacion de todos los clientes contenidos en la base de datos
  * e ivluye las tablas de los creditos y los pagos realizados
@@ -1173,7 +1229,7 @@ function get_credit_cash_flow_report()
             $stmt1->bindParam(':since', $since, PDO::PARAM_STR);
             $stmt1->bindParam(':until', $until, PDO::PARAM_STR);
             $stmt1->execute();
-            if($row = $stmt1->fetch()){
+            if ($row = $stmt1->fetch()) {
                 $credit_amount = empty($row['total_amount']) ? 0 : floatval($row['total_amount']);
             }
 
