@@ -22,6 +22,8 @@ let customers = [];
  */
 let customerSelected = undefined;
 
+let reports = null;
+
 /**
  * Clase view que permite cntrolar si las vista se pueden mostrar
  */
@@ -1166,6 +1168,7 @@ const reloadCustomerList = async () => {
             console.log('Procesando peticion');
             if (res.sessionActive) {
                 createCustomers(res.customers);
+                reports = res.reports;
             } else {
                 location.reload();
             }//Fin de if-else
@@ -1649,6 +1652,57 @@ const updateCustomerSumary = () => {
     printDoughnutChart(collectionDificulty, '', [easyCollect, moderateCollect, dificultCollect, veryDificultColllect], ['Facil', 'Moderado', 'Dificil', 'Muy dificil'], [bgGreen, bgYellow, bgOrange, bgRed], [borderGreen, borderYellow, borderOrange, borderRed]);
 
 
+    //Ahora se actualiza el diagrama de barras
+    let reportLength = reports.length;
+    let labels = [];
+    let credits = [];
+    let payments = [];
+
+    let lastReports = [reports[reportLength -4], reports[reportLength -3], reports[reportLength -2], reports[reportLength -1]];
+
+    lastReports.forEach(r => {
+        let since = moment(r.since, 'YYYY-M-DD');
+        let until = moment(r.until).subtract(1, 'days');
+        let label = `${since.format('DD-MM')} => ${until.format('DD-MM')}`;
+
+        labels.push(label);
+        credits.push(r.creditAmount);
+        payments.push(r.paymentAmount);
+    })
+
+    // labels.push(moment(lastReports[0].until).format('DD-MM-YY'));
+    // labels.push(moment(lastReports[1].until).format('DD-MM-YY'));
+    // labels.push(moment(lastReports[2].until).format('DD-MM-YY'));
+    // labels.push(moment(lastReports[2].until).format('DD-MM-YY'));
+
+    // credits.push(lastReports[0].creditAmount);
+    // credits.push(lastReports[1].creditAmount);
+    // credits.push(lastReports[2].creditAmount);
+    // credits.push(lastReports[3].creditAmount);
+
+    // payments.push(lastReports[0].paymentAmount);
+    // payments.push(lastReports[1].paymentAmount);
+    // payments.push(lastReports[2].paymentAmount);
+    // payments.push(lastReports[3].paymentAmount);
+
+    let barCharData = {
+        labels,
+        datasets: [{
+            label: 'Abonos',
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1,
+            data: payments
+        }, {
+            label: 'Creditos',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1,
+            data: credits
+        }]
+    }
+
+    printBarChart(document.getElementById('myChart4'), barCharData);
 }
 
 const printDoughnutChart = (ctx, title, data, labels, bgColors, borderColor) => {
@@ -1677,28 +1731,8 @@ const printDoughnutChart = (ctx, title, data, labels, bgColors, borderColor) => 
     });//Fin de Chart
 }
 
-const printBarChart = (ctx) => {
-    let labels = ['Enero', 'Febrero', 'Marzo'];
-    let data1 = [1100000, 1200000, 3000000];
-    let data2 = [900000, 500000, 3400000];
-
-    let barCharData = {
-        labels,
-        datasets: [{
-            label: 'Recaudos',
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-            borderColor: 'rgba(54, 162, 235, 1)',
-            borderWidth: 1,
-            data: data1
-        }, {
-            label: 'Otorgados',
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderColor: 'rgba(255, 99, 132, 1)',
-            borderWidth: 1,
-            data: data2
-        }]
-    }
-
+const printBarChart = (ctx, barCharData) => {
+    
     let myBar = new Chart(ctx, {
         type: 'bar',
         data: barCharData,
@@ -1711,9 +1745,24 @@ const printBarChart = (ctx) => {
                 display: true,
                 text: 'Flujo de efectivo'
             },
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        var label = data.datasets[tooltipItem.datasetIndex].label || '';
+    
+                        if (label) {
+                            label += ': ';
+                        }
+                        // label += Math.round(tooltipItem.yLabel * 100) / 100;
+                        label += formatCurrencyLite(tooltipItem.yLabel);
+                        return label;
+                    }
+                }
+            },
             scales: {
                 yAxes: [{
                     ticks: {
+                        beginAtZero: true,
                         // Include a dollar sign in the ticks
                         callback: function (value, index, values) {
                             return formatCurrencyLite(value, 0);
