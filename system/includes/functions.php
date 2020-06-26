@@ -1264,14 +1264,18 @@ function get_credit_cash_flow_report()
             $stmt1->bindParam(':until', $until, PDO::PARAM_STR);
             $stmt1->execute();
 
+            if ($row = $stmt1->fetch()) {
+                $credit_amount = empty($row['total_amount']) ? 0 : floatval($row['total_amount']);
+            }
+
             $stmt2->bindParam(':since', $since, PDO::PARAM_STR);
             $stmt2->bindParam(':until', $until, PDO::PARAM_STR);
             $stmt2->execute();
 
-            if ($row1 = $stmt1->fetch() && $row2 = $stmt2->fetch()) {
-                $credit_amount = empty($row1['total_amount']) ? 0 : floatval($row1['total_amount']);
-                $payment_amount = empty($row2['total_amount']) ? 0 : floatval($row2['total_amount']);
+            if ($row = $stmt2->fetch()) {
+                $payment_amount = empty($row['total_amount']) ? 0 : floatval($row['total_amount']);
             }
+
 
             $reports[] = [
                 'since' => $since,
