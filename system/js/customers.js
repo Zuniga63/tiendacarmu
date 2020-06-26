@@ -248,14 +248,14 @@ class Customer {
                 }
 
                 this.paymentFrecuency += diff;
-                if(this.payments.length > 0){
-                    this.paymentFrecuency = this.paymentFrecuency / (this.payments.length +1);
+                if (this.payments.length > 0) {
+                    this.paymentFrecuency = this.paymentFrecuency / (this.payments.length + 1);
                 }
             } else {
                 this.inactive = true;
                 this.state = `Ultima operacion ${lastDate.fromNow()}`;
                 this.deliquentBalance = false;
-                if(this.payments.length > 0){
+                if (this.payments.length > 0) {
                     this.paymentFrecuency = this.paymentFrecuency / this.payments.length;
                 }
             }
@@ -458,6 +458,7 @@ const showView = async (viewName = 'sumary') => {
 
             let searchBox = VIEWS.customerUpdate.view.querySelector('.search-box');
             updateSearchBoxResult(searchBox);
+            loadCustomer();
         } break; //Fin del caso 4
 
         case 'consultDebts': {
@@ -1205,12 +1206,37 @@ const printCustomerResult = (searchBoxResult, result) => {
             customerSelected = parseInt(element.getAttribute('customer_id'));
             // console.log(customerSelected);
 
+            loadCustomer();
             updateAllCustomerCards();
             printCustomerHistory();
         });//Fin de addEventListener
     });//Fin de forEach
 }//Fin del metodo
 
+/**
+ * Este metodo lo que hace es montar los datos del cliente en la vista 
+ * para actualizar los datos
+ */
+const loadCustomer = () => {
+    const updateName = document.getElementById('updateName');
+    const updateLastname = document.getElementById('updateLastname');
+    const updateNit = document.getElementById('updateNit');
+    const updatePhone = document.getElementById('updatePhone');
+    const updateEmail = document.getElementById('updateEmail');
+
+    if (
+        customerSelected
+        && !isNaN(customerSelected)
+        && customerSelected > 0
+        && customers.some(c => c.id === customerSelected)) {
+            let customer = customers.filter(c => c.id === customerSelected)[0];
+            updateName.value = customer.firstName;
+            updateLastname.value = customer.lastName;
+            updateNit.value = customer.nit;
+            updatePhone.value = customer.phone;
+            updateEmail.value = customer.email;
+    }
+}
 
 /**
  * Actualiza las tarjetas de cliente en los formularios de actualizacion o de
@@ -1518,19 +1544,19 @@ const updateCustomerSumary = () => {
             inactiveCustomers++;
         } else {
             activeCustomers++;
-            if(customer.deliquentBalance){
+            if (customer.deliquentBalance) {
                 delinquentCustomersCount++;
-            }else{
+            } else {
                 correctCustomers++;
             }
 
-            if(customer.paymentFrecuency < 30){
+            if (customer.paymentFrecuency < 30) {
                 easyCollect++;
-            }else if(customer.paymentFrecuency < 60){
+            } else if (customer.paymentFrecuency < 60) {
                 moderateCollect++;
-            }else if(customer.paymentFrecuency < 90){
+            } else if (customer.paymentFrecuency < 90) {
                 dificultCollect++;
-            }else{
+            } else {
                 veryDificultColllect++;
             }
         }
@@ -1547,7 +1573,7 @@ const updateCustomerSumary = () => {
 
 const printDoughnutChart = (ctx, title, data, labels, bgColors, borderColor) => {
     let displayTitle = false;
-    if(title){
+    if (title) {
         displayTitle = true;
     }
     myChart = new Chart(ctx, {
