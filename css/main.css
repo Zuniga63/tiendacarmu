@@ -1675,7 +1675,8 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 	background-color: var(--light);
 	border: 2px solid rgb(78, 76, 76);
 	padding-top: 0.8rem;
-	margin-top: 0.8rem;
+  margin-top: 0.8rem;
+  min-height: 40vh;
 	max-height: 80vh;
 }
 

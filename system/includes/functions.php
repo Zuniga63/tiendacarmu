@@ -1307,6 +1307,71 @@ function get_credit_cash_flow_report()
     }
 }
 
+/**
+ * Obtiene los datos almacenados en la tabla de historial y los cruza con las
+ * tablas de usuario y clientes para obtene todos los datos
+ */
+function get_customer_history()
+{
+    $history = [];
+    $query = "SELECT ";
+    $query .= "t1.first_name AS user_first, t1.last_name AS user_last, ";
+    $query .= "t2.first_name AS customer_first, t2.last_name as customer_last, ";
+    $query .= "t3.history_date, t3.new_customer, ";
+    $query .= "t3.update_data, t3.update_credit, t3.update_payment, ";
+    $query .= "t3.new_payment, t3.new_credit, t3.amount ";
+    $query .= "FROM customer_history AS t3 ";
+    $query .= "LEFT JOIN (user as t1, customer as t2) ";
+    $query .= "ON t3.user_id = t1.user_id ";
+    $query .= "and t3.customer_id = t2.customer_id ";
+    $query .= "ORDER BY t3.history_date DESC";
+    try{
+        $conn = get_connection();
+        $stmt = $conn->query($query);
+
+        while($row = $stmt->fetch()){
+            $user_first_name = htmlspecialchars_decode($row['user_first']);
+            $user_last_name = $row['user_last'] === 'NULL' 
+                            ? '' 
+                            : htmlspecialchars_decode($row['user_last']);
+
+            $customer_first_name = htmlspecialchars_decode($row['customer_first']);
+            $customer_last_name = $row['customer_last'] 
+                                ? '' 
+                                : htmlspecialchars_decode($row['customer_last']);
+        
+            $history_date = $row['history_date'];
+            $new_customer = $row['new_customer'] === '1' ? true : false;
+            $update_data = $row['update_data'] === '1' ? true : false;
+            $update_credit = $row['update_credit'] === '1' ? true : false;
+            $update_payment = $row['update_payment'] === '1' ? true : false;
+            $new_payment = $row['new_payment'] === '1' ? true : false;
+            $new_credit = $row['new_credit'] === '1' ? true : false;
+            $amount = $row['amount'] === 'NULL' ? 0 : floatval($row['amount']);
+
+            $user = $user_first_name . " " . $user_last_name;
+            $customer = $customer_first_name . " " . $customer_last_name;
+
+            $history[] = [
+                'author' => $user,
+                'customer' => $customer,
+                'historyDate' => $history_date,
+                'newCustomer' => $new_customer,
+                'updateData' => $update_data,
+                'updateCredit' => $update_credit,
+                'updatePayment' => $update_payment,
+                'newPayment' => $new_payment,
+                'newCredit' => $new_credit,
+                'amount' => $amount
+            ];
+        }//Fin de while
+    }catch(PDOException $e){
+        $message = "Error al consultar el reporte anual: {$e->getMessage()}";
+        write_error($message);
+    }//Fin de try-catch
+    return $history;
+}//Fin del metodo
+
 //---------------------------------------------------------------------------------------
 //                      UTILIDADES
 //---------------------------------------------------------------------------------------

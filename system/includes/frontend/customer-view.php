@@ -585,8 +585,8 @@
 
       <div class="history__container">
         <p class="history__legend">Resultados</p>
-        <div class="history__cards scroll">
-          <div class="history__card history__card--recently">
+        <div class="history__cards scroll" id="historyBox">
+          <!-- <div class="history__card history__card--recently">
             <p class="history__card__title">Nombre del cliente</p>
             <p class="history__card__date">Ayer</p>
             <p class="history__card__info">Se registró un credito por valor de <span class="history__card__bold">$1.200.000</span></p>
@@ -615,7 +615,7 @@
             <p class="history__card__date">La semana pasada</p>
             <p class="history__card__info">Se registró un credito por valor de <span class="history__card__bold">$1.200.000</span></p>
             <p class="history__card__author">Responsable: <span class="history__card__bold">Julanito de Tal</span></p>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
