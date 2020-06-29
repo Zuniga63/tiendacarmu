@@ -43,7 +43,7 @@
             <nav class="dropdown__nav">
               <ul class="dropdown__list">
                 <li class="dropdown__item">
-                  <a href="#" class="dropdown__link" id="sumaryLink">Resumen</a>
+                  <a href="#" class="dropdown__link" id="sumaryLink">Resumen <span class="dropdown__link__new">New</span></a>
                 </li>
                 <li class="dropdown__item">
                   <a href="#" class="dropdown__link" id="newCustomerLink">Nuevo Cliente</a>
@@ -59,6 +59,9 @@
                 </li>
                 <li class="dropdown__item">
                   <a href="#" class="dropdown__link" id="consultDebtsLink">Consultar creditos</a>
+                </li>
+                <li class="dropdown__item">
+                  <a href="#" class="dropdown__link" id="customerHistoryLink">Historial <span class="dropdown__link__new">New</span></a>
                 </li>
               </ul>
             </nav>
@@ -556,6 +559,64 @@
           </div> -->
         </div>
         <p class="search-box__count show" id="paymentsSumary">2 Abonos; $ 1.300.000</p>
+      </div>
+    </div>
+
+    <div class="customers-view__container" id="customerHistory">
+      <div class="history__options">
+        <p class="history__legend">Tipo de historial</p>
+        <div class="history__option">
+          <input type="radio" name="historyType" id="historyNews" class="history__input">
+          <label for="historyNews" class="history__label">Nuevos</label>
+        </div>
+        <div class="history__option">
+          <input type="radio" name="historyType" id="historyUpdates" class="history__input">
+          <label for="historyUpdates" class="history__label">Actualizaciones</label>
+        </div>
+        <div class="history__option">
+          <input type="radio" name="historyType" id="creditHistory" class="history__input">
+          <label for="creditHistory" class="history__label">Creditos</label>
+        </div>
+        <div class="history__option">
+          <input type="radio" name="historyType" id="paymentHistory" class="history__input">
+          <label for="paymentHistory" class="history__label">Abonos</label>
+        </div>
+      </div>
+
+      <div class="history__container">
+        <p class="history__legend">Resultados</p>
+        <div class="history__cards scroll">
+          <div class="history__card history__card--recently">
+            <p class="history__card__title">Nombre del cliente</p>
+            <p class="history__card__date">Ayer</p>
+            <p class="history__card__info">Se registró un credito por valor de <span class="history__card__bold">$1.200.000</span></p>
+            <p class="history__card__author">Responsable: <span class="history__card__bold">Julanito de Tal</span></p>
+          </div>
+          <div class="history__card">
+            <p class="history__card__title">Nombre del cliente</p>
+            <p class="history__card__date">La semana pasada</p>
+            <p class="history__card__info">Se registró un credito por valor de <span class="history__card__bold">$1.200.000</span></p>
+            <p class="history__card__author">Responsable: <span class="history__card__bold">Julanito de Tal</span></p>
+          </div>
+          <div class="history__card">
+            <p class="history__card__title">Nombre del cliente</p>
+            <p class="history__card__date">La semana pasada</p>
+            <p class="history__card__info">Se registró un credito por valor de <span class="history__card__bold">$1.200.000</span></p>
+            <p class="history__card__author">Responsable: <span class="history__card__bold">Julanito de Tal</span></p>
+          </div>
+          <div class="history__card">
+            <p class="history__card__title">Nombre del cliente</p>
+            <p class="history__card__date">La semana pasada</p>
+            <p class="history__card__info">Se registró un credito por valor de <span class="history__card__bold">$1.200.000</span></p>
+            <p class="history__card__author">Responsable: <span class="history__card__bold">Julanito de Tal</span></p>
+          </div>
+          <div class="history__card">
+            <p class="history__card__title">Nombre del cliente</p>
+            <p class="history__card__date">La semana pasada</p>
+            <p class="history__card__info">Se registró un credito por valor de <span class="history__card__bold">$1.200.000</span></p>
+            <p class="history__card__author">Responsable: <span class="history__card__bold">Julanito de Tal</span></p>
+          </div>
+        </div>
       </div>
     </div>
   </div>

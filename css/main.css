@@ -573,6 +573,10 @@ body {
   margin-bottom: 1rem;
 }
 
+.main-navbar__item{
+  margin-bottom: 0.2rem;
+}
+
 .main-navbar__link {
   color: rgba(255, 255, 255, 0.5);
   text-decoration: none;
@@ -623,6 +627,10 @@ body {
   color: #212529;
 }
 
+.dropdown__item{
+  margin-bottom: 0.2rem;
+}
+
 .dropdown__link {
   color: inherit;
   text-decoration: none;
@@ -632,6 +640,12 @@ body {
   margin-left: auto;
   padding: 0.25rem 1rem;
   border-radius: 5px;
+}
+
+.dropdown__link__new{
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 2px;
 }
 
 .dropdown__link--active {
@@ -1416,34 +1430,6 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   display: block;
 }
 
-
-/* .customers-view__search-box{
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  background-color: #bdc3c7ad;
-  border: 2px solid #7f8c8d;
-  border-radius: 10px;
-}
-
-.customers-view__search-box__container{
-  height: 0;
-  transition: all 0.5s ease-in-out;
-}
-
-.customers-view__search-box__container.show{
-  border: 2px solid var(--asbestos);
-  background-color: var(--light);
-  height: 300px;
-  margin-bottom: 0.8rem;
-  padding-top: 0.8rem;
-}
-
-.customers-view__search-box__footer{
-  text-align: right;
-  font-size: 0.8em;
-  display: none;
-} */
-
 .customer-card{
   width: 95%;
   margin-left: auto;
@@ -1639,6 +1625,108 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 .scroll::-webkit-scrollbar-track:active {
   background: #d4d4d4;
 }
+
+/******************************************************************************************/
+/*                      estilos del historial							                                */
+/******************************************************************************************/
+.history__options{
+	color: white;
+	padding: 0.5rem;
+	margin-right: auto;
+	margin-left: auto;
+	margin-bottom: 1rem;
+	border: 2px solid #444;
+	border-radius: 5px;
+	background-image: url(../img/background-board.jpg);
+	background-size: cover;
+	background-repeat: no-repeat;
+	box-shadow: 5px 10px 10px -2px rgba(46,45,46,1);
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 0.5rem;
+}
+
+.history__legend{
+	grid-column: 1/-1;
+	text-align: center;
+	font-size: 1.2em;
+}
+
+.history__label{
+	font-size: 1em;
+}
+
+.history__container{
+	padding: 0.5rem 0 1rem;
+	background-color: rgba(207, 204, 204, 0.281);
+	border: 2px solid rgb(172, 170, 170);
+	border-radius: 10px;
+}
+
+.history__cards,
+.history__card{
+	border-radius: 5px;
+	width: 95%;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.history__cards{
+	background-color: var(--light);
+	border: 2px solid rgb(78, 76, 76);
+	padding-top: 0.8rem;
+	margin-top: 0.8rem;
+	max-height: 80vh;
+}
+
+.history__card{
+	border: 1px solid var(--secondary);
+	background-color: rgba(51, 53, 50, 0.301);
+	margin-bottom: 1rem;
+	padding: 0.5rem;
+	box-shadow: 5px 10px 10px -2px rgba(46,45,46,1);
+}
+
+.history__card--recently{
+	background-color: #07ff6ed7;
+	border-color: var(--success);
+	border-width: 3px;
+}
+
+.history__card__title{
+	text-align: center;
+	text-transform: uppercase;
+	font-family: var(--title_font);
+	font-weight: 700;
+	font-style: italic;
+	font-size: 1em;
+	color: var(--dark);
+}
+
+.history__card__date{
+	font-size: 0.9em;
+	color: #444;
+	text-align: center;
+	margin-bottom: 0.5rem;
+	font-weight: bold;
+}
+
+.history__card__info{
+	font-size: 0.8em;
+	color: var(--dark);
+	line-height: 1.15;
+	margin-bottom: 0.4rem;
+}
+
+.history__card__author{
+	font-size: 0.6em;
+	color: var(--dark);
+}
+
+.history__card__bold{
+	font-weight: 800;
+}
+
 
 @media (max-width:999px){
   .home-body{

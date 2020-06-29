@@ -390,7 +390,8 @@ const VIEWS = {
     newPayment: new View('newPayment', 'newPaymentLink', 'newPayment'),
     newDebt: new View('newDebt', 'newDebtLink', 'newDebt'),
     customerUpdate: new View('customerUpdate', 'customerUpdateLink', 'customerUpdate'),
-    consultDebts: new View('consultDebts', 'consultDebtsLink', 'consultDebts')
+    consultDebts: new View('consultDebts', 'consultDebtsLink', 'consultDebts'),
+    customerHistory: new View('customerHistory', 'customerHistoryLink', 'customerHistory')
 
 };
 
@@ -479,6 +480,13 @@ const showView = async (viewName = 'sumary') => {
 
         } break;//Fin del caso 5
 
+        case 'customerHistory': {
+            VIEWS.customerHistory.show();
+            systemLegend.innerText = 'Historial';
+            localStorage.actualView = viewName;
+
+        } break;//Fin del caso 6
+
         default: {
             VIEWS.sumary.show();
             systemLegend.innerText = 'Resumen';
@@ -554,6 +562,10 @@ const viewController = () => {
         // updateSearchBoxResult(searchBox);
         // updateCustomerCard(document.getElementById('consultDebtsCustomer'));
     })
+
+    VIEWS.customerHistory.link.addEventListener('click', () => {
+        showView('customerHistory');
+    });
 }
 
 //---------------------------------------------------------------------------------------------
@@ -1658,7 +1670,7 @@ const updateCustomerSumary = () => {
     let credits = [];
     let payments = [];
 
-    let lastReports = [reports[reportLength -4], reports[reportLength -3], reports[reportLength -2], reports[reportLength -1]];
+    let lastReports = [reports[reportLength - 4], reports[reportLength - 3], reports[reportLength - 2], reports[reportLength - 1]];
 
     lastReports.forEach(r => {
         let since = moment(r.since, 'YYYY-M-DD');
@@ -1732,7 +1744,7 @@ const printDoughnutChart = (ctx, title, data, labels, bgColors, borderColor) => 
 }
 
 const printBarChart = (ctx, barCharData) => {
-    
+
     let myBar = new Chart(ctx, {
         type: 'bar',
         data: barCharData,
@@ -1747,9 +1759,9 @@ const printBarChart = (ctx, barCharData) => {
             },
             tooltips: {
                 callbacks: {
-                    label: function(tooltipItem, data) {
+                    label: function (tooltipItem, data) {
                         var label = data.datasets[tooltipItem.datasetIndex].label || '';
-    
+
                         if (label) {
                             label += ': ';
                         }
