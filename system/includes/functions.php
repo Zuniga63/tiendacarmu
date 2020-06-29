@@ -734,9 +734,14 @@ function create_new_customer($first_name, $last_name, $nit, $phone, $email)
 
                 $stmt->execute();
 
+                $customer_id = $conn->lastInsertId();
+
                 //Ahora se procede a actualizar el registro de usuario
                 $user_id = $_SESSION['user_id'];
                 $conn->query("INSERT INTO user_log (user_id, log_description) VALUES ($user_id, 'Creó al cliente $first_name')");
+
+                //Se agrega inicializa el hsitorial del cliente
+                $conn->query("INSERT INTO customer_history(customer_id, user_id, new_customer) VALUES ($customer_id, $user_id, 1)");
 
                 $conn->commit();
                 $result = true;
@@ -797,6 +802,9 @@ function update_customer($customer_id, $first_name, $last_name, $nit, $phone, $e
                 $user_id = $_SESSION['user_id'];
                 $conn->query("INSERT INTO user_log (user_id, log_description) VALUES ($user_id, 'Se actualizó al cliente $first_name')");
 
+                //Se agrega inicializa el hsitorial del cliente
+                $conn->query("INSERT INTO customer_history(customer_id, user_id, update_data)
+                              VALUES ($customer_id, $user_id, 1)");
                 $conn->commit();
                 $result = true;
             } else {
@@ -1098,6 +1106,9 @@ function create_new_credit($customer_id, $description, $amount)
                     $user_id = $_SESSION['user_id'];
                     $conn->query("INSERT INTO user_log (user_id, log_description) VALUES ($user_id, 'Se creo un nuevo credito: customer: $customer_id; credit: $last_id')");
 
+                    //Se agrega al historial que se creo un uevo credito
+                    $conn->query("INSERT INTO customer_history(customer_id, user_id, new_credit, amount) VALUES ($customer_id, $user_id, 1, $amount)");
+
                     $conn->commit();
                     $result = true;
                 } else {
@@ -1172,6 +1183,10 @@ function create_new_payment($customer_id, $cash, $amount)
                 $last_id = $conn->lastInsertId();
                 $user_id = $_SESSION['user_id'];
                 $conn->query("INSERT INTO user_log (user_id, log_description) VALUES ($user_id, 'Se creo un nuevo abono: customer: $customer_id; payment_id: $last_id')");
+
+                //Se agrega al historial que se creo un uevo credito
+                $conn->query("INSERT INTO customer_history(customer_id, user_id, new_payment, amount) VALUES ($customer_id, $user_id, 1, $amount)");
+
                 $result = true;
             } //Fin de if
             $conn->commit();
