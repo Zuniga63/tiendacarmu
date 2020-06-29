@@ -1266,7 +1266,7 @@ function get_credit_cash_flow_report()
             $since = $until;
             $month_name = $months[$month];
             $until = new DateTime("last day of $month_name $year + 24 hour");
-            $until = $until->format('Y-m-d');
+            $until = $until->format('Y-n-d');
 
             if ($month == $max_month && $day < 15) {
                 break;

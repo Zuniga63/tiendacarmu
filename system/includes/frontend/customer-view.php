@@ -87,7 +87,7 @@
         <figure class="chart-section__chart">
           <canvas id="customerSumary"></canvas>
         </figure>
-        <p class="chart-section__info">El grafico anterior muestra la proporción de clientes activos (poseen saldo pendiente) e inactivos del sistema.</p>
+        <p class="chart-section__info" id="customerSumaryInfo"></p>
       </section>
 
       <section class="chart-section">
@@ -95,7 +95,7 @@
         <figure class="chart-section__chart">
           <canvas id="delinquentCustomers"></canvas>
         </figure>
-        <p class="chart-section__info">Este grafico muestra el numero clientes que están al día y los clientes morosos del conjunto de clientes activos</p>
+        <p class="chart-section__info" id="delinquentCustomersInfo"></p>
       </section>
 
       <section class="chart-section">
@@ -103,15 +103,15 @@
         <figure class="chart-section__chart">
           <canvas id="collectionDificulty"></canvas>
         </figure>
-        <p class="chart-section__info">Este grafico muestra la cantidad de clientes según su frecuencia de pago, los clientes en verde presentan una frecuencia de pago menor a 30 días mientras que los que están en rojo superan los 90 días entre pago y pago.</p>
+        <p class="chart-section__info" id="collectionDificultyInfo"></p>
       </section>
 
       <section class="chart-section">
         <h2 class="chart-section__title">Flujo de efectivo</h2>
         <figure class="chart-section__chart">
-          <canvas id="myChart4"></canvas>
+          <canvas id="cashFlowQuinquenal"></canvas>
         </figure>
-        <p class="chart-section__info">Este grafico muestra cuantos de los clientes que están inactivos presentan deudas y cuales están al día.</p>
+        <p class="chart-section__info">El grafico de barras anterior muestra los flujos de dinero en relación a los créditos de las últimas cuatro quincenas.</p>
       </section>
     </div>
 
@@ -562,6 +562,7 @@
       </div>
     </div>
 
+    <!-- SECCION PARA CONSULTAR EL HISTORIAL -->
     <div class="customers-view__container" id="customerHistory">
       <div class="history__options">
         <p class="history__legend">Tipo de historial</p>
