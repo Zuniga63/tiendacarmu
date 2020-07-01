@@ -23,8 +23,8 @@ const showMenu = (menu, fatherMenu = undefined) => {
         /**
          * Si es un dropdown dentro de otro menú deslegable antes de
          * remover el atributo style del menú se modifica el alto del menú padre
-         */ 
-        if(fatherMenu){
+         */
+        if (fatherMenu) {
             let fatherHeight = elementHeight(fatherMenu) - height;
             fatherMenu.style.height = `${fatherHeight}px`;
             // console.log(fatherMenu);
@@ -39,7 +39,7 @@ const showMenu = (menu, fatherMenu = undefined) => {
          * Se modifica el alto del menú padre en el caso de que sea un 
          * dropdown dentro de otro panel de navegacion
          */
-        if(fatherMenu){
+        if (fatherMenu) {
             let fatherHeight = height + elementHeight(fatherMenu);
             fatherMenu.style.height = `${fatherHeight}px`;
             // console.log(fatherMenu);
@@ -97,9 +97,9 @@ const mainMenuController = () => {
             //Se selecciona el menu
             let dropdownMenu = dropdown.querySelector('.dropdown__nav');
             if (dropdownMenu) {
-                if(dropdownMenu.classList.contains('show')){
+                if (dropdownMenu.classList.contains('show')) {
                     dropdownIcon.classList.remove('rotate');
-                }else{
+                } else {
                     dropdownIcon.classList.add('rotate');
                 }
 
@@ -132,6 +132,9 @@ const sliderController = () => {
         const btnPrev = slider.querySelector('.slider__btn-prev');
         const items = sliderContainer.querySelectorAll('.slider__item');
         let id = slider.getAttribute('id');
+        let width = 0;
+        let step = 100;
+
 
         if (items && items.length > 0) {
             //Se ajusta el ancho del contenedor
@@ -144,12 +147,12 @@ const sliderController = () => {
             //Si el slider tiene botones se agrega la funcionalidad
             if (btnNext && btnPrev) {
                 btnNext.addEventListener('click', (e) => {
-                    sliderNext(id, 700);
+                    sliderNext(id, 500);
                     sliderAutoplayStop(searchSliderRoot(e.target));
                 })
 
                 btnPrev.addEventListener('click', (e) => {
-                    sliderPrev(id, 700);
+                    sliderPrev(id, 500);
                     sliderAutoplayStop(searchSliderRoot(e.target));
                 })
             }//Fin de if
@@ -167,10 +170,15 @@ const sliderController = () => {
  */
 const sliderNext = (sliderId, duration = 700) => {
     let slider = sliderParam(sliderId);
+    let step = 100;
 
-    slider.container.animate({ marginLeft: '-200%' }, duration, () => {
+    if (screen.width >= 768 && sliderId !== 'textHeader') {
+        step = screen.width >= 1000 ? 100 / 3 : 50;
+    }
+
+    slider.container.animate({ marginLeft: `-${step * 2}%` }, duration, () => {
         $(slider.firstItem).insertAfter(slider.lastItem);
-        slider.container[0].style.marginLeft = '-100%';
+        slider.container[0].style.marginLeft = `-${step}%`;
     })
 }
 
@@ -182,10 +190,15 @@ const sliderNext = (sliderId, duration = 700) => {
  */
 const sliderPrev = (sliderId, duration = 700) => {
     let slider = sliderParam(sliderId);
+    let step = 100;
+
+    if (screen.width >= 768 && sliderId !== 'textHeader') {
+        step = screen.width >= 1000 ? 100/3 : 50;
+    }
 
     slider.container.animate({ marginLeft: '0' }, duration, () => {
         $(slider.lastItem).insertBefore(slider.firstItem);
-        slider.container[0].style.marginLeft = '-100%';
+        slider.container[0].style.marginLeft = `-${step}%`;
     })
 }
 
@@ -340,7 +353,7 @@ function formatCurrencyLite(number, fractionDigits) {
  * @param {DOM} object Input del DOM al que se desea agregar el evento
  */
 const selectText = object => {
-    object.addEventListener('focus', ()=>{
+    object.addEventListener('focus', () => {
         object.select();
     })
     object.select();
