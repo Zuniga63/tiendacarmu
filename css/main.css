@@ -894,7 +894,13 @@ body {
   margin: 0;
   padding: 10px;
   text-align: center;
+  width: 100%;
   font-size: 0.9em;
+  /* Para evitar que haga saltos de linea
+      o desbordamientos */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .text-header__info--red {
@@ -976,7 +982,8 @@ body {
 }
 
 .slider__item {
-  width: 100%;
+  width: calc(100% / 3);
+  flex: 1;
 }
 
 .slider__btn-prev,
@@ -1194,6 +1201,7 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 
 .card__img {
   width: 100%;
+  display: block;
 }
 
 .disabled {
