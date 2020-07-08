@@ -123,6 +123,10 @@ window.addEventListener('load', () => {
  */
 let sliderIntervals = [];
 const sliderController = () => {
+    //Se modifica la regla css para los productos destacados
+    const itemsFeature = document.getElementById('featureProductsSlider').querySelectorAll('.slider__item').length;
+    console.log(itemsFeature);
+    document.documentElement.style.setProperty('--feature-products', itemsFeature);
     //Se recuperan todos los sliders del docuemento
     const sliders = document.querySelectorAll('.slider');
     sliders.forEach(slider => {
@@ -138,11 +142,20 @@ const sliderController = () => {
 
         if (items && items.length > 0) {
             //Se ajusta el ancho del contenedor
-            sliderContainer.style.width = `${items.length * 100}%`;
+            
+            // sliderContainer.style.width = `${items.length * 100}%`;
             //Se mueve el ultimo elemento al inicio
             sliderContainer.insertBefore(items[items.length - 1], items[0]);
+            let step = 100;
+            if(document.documentElement.clientWidth >= 1000){
+                step /= 3;
+            } else if(document.documentElement.clientWidth >= 768){
+                step /= 2;
+            }
+
             //Se mueve el margen un 100% a la izquierda
-            sliderContainer.style.marginLeft = '-100%';
+            sliderContainer.style.marginLeft = `${step}%`;
+            sliderPrev(id, 500);
 
             //Si el slider tiene botones se agrega la funcionalidad
             if (btnNext && btnPrev) {
@@ -172,8 +185,8 @@ const sliderNext = (sliderId, duration = 700) => {
     let slider = sliderParam(sliderId);
     let step = 100;
 
-    if (screen.width >= 768 && sliderId !== 'textHeader') {
-        step = screen.width >= 1000 ? 100 / 3 : 50;
+    if (document.documentElement.clientWidth >= 768 && sliderId !== 'textHeader') {
+        step = document.documentElement.clientWidth >= 1000 ? 100 / 3 : 50;
     }
 
     slider.container.animate({ marginLeft: `-${step * 2}%` }, duration, () => {
@@ -192,8 +205,8 @@ const sliderPrev = (sliderId, duration = 700) => {
     let slider = sliderParam(sliderId);
     let step = 100;
 
-    if (screen.width >= 768 && sliderId !== 'textHeader') {
-        step = screen.width >= 1000 ? 100/3 : 50;
+    if (document.documentElement.clientWidth >= 768 && sliderId !== 'textHeader') {
+        step = document.documentElement.clientWidth >= 1000 ? 100/3 : 50;
     }
 
     slider.container.animate({ marginLeft: '0' }, duration, () => {
