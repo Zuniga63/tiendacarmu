@@ -172,7 +172,7 @@ const sliderController = () => {
         }//Fin de if
     })//Fin de forEach
 
-    sliderAutoplay('textHeader', 1000, 2500);
+    sliderAutoplay('textHeader', 1000, 3000);
 }
 
 /**
