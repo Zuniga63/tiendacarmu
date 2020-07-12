@@ -67,6 +67,117 @@ body {
   justify-content: space-between;
 }
 
+.container {
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 0.8rem;
+}
+
+.container__header {
+  font-family: var(--title_font);
+  text-align: center;
+  background-color: #17a3b859;
+  padding: 0.5rem;
+  width: 100%;
+  border: 2px solid var(--belizehole);
+  border-color: var(--belizehole);
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+.container__title {
+  margin: 0;
+  font-size: 1.5em;
+}
+
+.container__subtitle {
+  font-size: 1.2em;
+  font-weight: 700;
+  font-family: var(--body_font);
+}
+
+.sumary {
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+  background-color: #bdc3c7ad;
+  border: 2px solid #7f8c8d;
+  border-radius: 10px;
+}
+
+.sumary__title {
+  grid-column: 1/-1;
+  text-align: center;
+}
+
+.sumary__box {
+  height: 300px;
+  border: 2px solid var(--asbestos);
+  background-color: var(--light);
+  margin-bottom: 0.8rem;
+  padding-top: 0.8rem;
+}
+
+.sumary__count {
+  text-align: right;
+  font-size: 0.8em;
+}
+
+.category-card {
+  background-color: #28a74634;
+  padding: 5px;
+  width: 95%;
+  border: 2px solid var(--success);
+  border-radius: 5px;
+  margin-right: auto;
+  margin-bottom: 0.8rem;
+  margin-left: auto;
+}
+
+.category-card:nth-child(even) {
+  background-color: #a7282834;
+  border-color: var(--red);
+}
+
+.category-card__header {
+  margin-bottom: 0.5rem;
+  border-bottom: 2px solid black;
+}
+
+.category-card__name,
+.category-card__amount {
+  text-align: center;
+  font-style: italic;
+}
+
+.category-card__name {
+  font-family: var(--title_font);
+  font-size: 1em;
+  text-transform: uppercase;
+}
+
+.category-card__amount {
+  font-size: 0.9em;
+}
+
+.category-card__average {
+  align-self: center;
+  text-align: center;
+  font-weight: 600;
+  padding-right: 5px;
+  border-right: 1px dashed rgba(0, 0, 0, 0.4);
+  font-size: 1.5em;
+  color: #5b6464;
+}
+
+.category-card__info {
+  font-size: 0.7em;
+  padding-left: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  line-height: 1.5;
+}
+
 /********************************************************************************************/
 /*                            ESTILOS DE LOS BOTONES                                        */
 /********************************************************************************************/

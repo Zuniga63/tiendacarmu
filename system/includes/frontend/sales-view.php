@@ -102,8 +102,81 @@
     </header>
     <!--Fin de la barra de navegacion-->
 
-    <div id="categories">
-      
+    <div id="categories" class="container">
+
+      <div class="container__header">
+        <h1 class="container__title">{{title}}</h1>
+        <p class="container__subtitle">{{subtitle}}</p>
+      </div>
+
+      <div class="container__content">
+        <!-- Cada item corresponde a un elemento del panel de navegacion -->
+        <div class="container__item">
+          <form class="form form--bg-light">
+            <h2 class="form__title">Nueva categoría</h2>
+
+            <!-- Campo para agregar el nombre -->
+            <div class="form__group">
+
+              <!-- Cuerpo del formulario -->
+              <div class="form__group__body">
+                <label for="newCategoryName" class="form__label">Nombre</label>
+                <input type="text" name="category-name" id="newCategoryName" class="form__input" placeholder="Ingresa la nueva categoría">
+              </div>
+
+              <!-- Seccion para mostrar alertas e informacion adicional -->
+              <div class="form__group__footer">
+                <span class="alert alert--danger show">Nombre repetido</span>
+                <span class="form__input__length">45</span>
+              </div>
+
+            </div>
+            <!-- Fin del campo -->
+
+            <p class="alert alert--big alert--success show">Proceso correcto</p>
+            <input type="submit" value="Crear categoría" class="btn btn--success">
+
+          </form>
+          <!-- Fin del formulario -->
+
+          <div class="sumary">
+            <h3 class="sumary__title">Listado de categorías</h2>
+              <div class="sumary__box">
+                <div class="category-card">
+                  <header class="category-card__header">
+                    <h3 class="category-card__name">
+                      Nombre de la categoría
+                    </h3>
+                    <p class="category-card__amount">$12.000.000</p>
+                  </header>
+
+                  <div class="category-card__average">$250.000</div>
+                  <p class="category-card__info">Ventas: 48</p>
+                </div>
+
+                <div class="category-card">
+                  <header class="category-card__header">
+                    <h3 class="category-card__name">
+                      Nombre de la categoría
+                    </h3>
+                    <p class="category-card__amount">$12.000.000</p>
+                  </header>
+
+                  <div class="category-card__average">$250.000</div>
+                  <p class="category-card__info">Ventas: 48</p>
+                </div>
+
+              </div>
+              <p class="sumary__count">0 categorías</p>
+          </div>
+          <!-- Fin de sumary -->
+        </div>
+      </div>
+
+      <footer class="container__footer">
+
+      </footer>
+
     </div>
 
   </div>
