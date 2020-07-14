@@ -376,6 +376,25 @@ body {
   padding: 0 3px;
 }
 
+.form__radio-content{
+  background-color: var(--concrete);
+  padding: 5px;
+  border: 1px solid var(--asbestos);
+  border-radius: 10px;
+  margin-bottom: 0.5em;
+}
+
+.form__radio,
+.form__label-inline,
+.form__input-inline{
+  align-content: center;
+  display: inline-block;
+}
+
+.form__input-inline{
+  width: 100%;
+}
+
 .form__input:focus,
 .form__option:focus {
   outline-color: var(--primary);

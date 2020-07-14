@@ -56,7 +56,7 @@
                 <ul class="dropdown__list">
 
                   <li class="dropdown__item">
-                    <a href="#" class="dropdown__link" id="sumaryLink">Categorías <span class="dropdown__link__new">New</span></a>
+                    <a href="#" :class="['dropdown__link', {'dropdown__link--active' : views.newCategory.visible}]" id="sumaryLink">Categorías <span class="dropdown__link__new">New</span></a>
                   </li>
 
                   <li class="dropdown__item">
@@ -121,13 +121,19 @@
               <!-- Cuerpo del formulario -->
               <div class="form__group__body">
                 <label for="newCategoryName" class="form__label">Nombre</label>
-                <input type="text" name="category-name" id="newCategoryName" class="form__input" placeholder="Ingresa la nueva categoría">
+                <input 
+                type="text" 
+                name="category-name" 
+                id="newCategoryName" 
+                :class="['form__input', {error : views.newCategory.categoryNameError}]" 
+                placeholder="Ingresa la nueva categoría" 
+                v-model="views.newCategory.categoryName">
               </div>
 
               <!-- Seccion para mostrar alertas e informacion adicional -->
               <div class="form__group__footer">
-                <span class="alert alert--danger show">Nombre repetido</span>
-                <span class="form__input__length">45</span>
+                <span :class="['alert', 'alert--danger', {show: views.newCategory.categoryNameError}]">Nombre repetido</span>
+                <span class="form__input__length">{{newCategoryNameLength}}</span>
               </div>
 
             </div>
@@ -139,6 +145,7 @@
           </form>
           <!-- Fin del formulario -->
 
+          <!-- Contenedor con las categorías -->
           <div class="sumary">
             <h3 class="sumary__title">Listado de categorías</h2>
               <div class="sumary__box">
@@ -170,6 +177,70 @@
               <p class="sumary__count">0 categorías</p>
           </div>
           <!-- Fin de sumary -->
+        </div>
+        <!-- Fin de neva categoria -->
+
+        <div class="container__item">
+          <form class="form form--bg-light">
+            <h2 class="form__title">Registrar Venta</h2>
+            <div class="form__group">
+
+              <div class="form__body">
+                <label for="newSaleDate" class="form__label">Fecha</label>
+                <div class="form__radio-content">
+                  <input type="radio" name="newSaleDate" id="newSaleNow" class="form__radio">
+                  <label for="newSaleNow" class="form__label-inline">En este momento</label>
+                </div>
+
+                <div class="form__radio-content">
+                  <input type="radio" name="newSaleDate" id="newSaleDateOther" class="form__radio">
+                  <label for="newSaleDateOther" class="form__label-inline">En una fecha diferente</label>
+                  <!-- <input type="date" name="" id="" placeholder="Selecciona una fecha" class="form__input-inline"> -->
+                </div>
+              </div>
+
+            </div>
+
+            <div class="form__group">
+              <label for="newSaleCategory" class="form__label">Categoría</label>
+              <select name="newSaleCategory" id="newSaleCategory" class="form__input">
+                <option value="" disabled selected>Selecciona una</option>
+              </select>
+            </div>
+
+            <div class="form__group">
+
+              <div class="form__group__body">
+
+                <label for="newSaleDescription" class="form__label form__label--center">Nombre del articulo</label>
+
+                <textarea name="credit_description" id="newSaleDescription" cols="30" rows="1" class="form__input" placeholder="Escribelo aquí" required=""></textarea>
+
+              </div>
+
+              <div class="form__group__footer">
+
+                <span class="alert alert--danger show" id="newSaleDescriptionAlert">Este campo es obligatorio</span>
+
+                <span class="form__input__length" id="newSaleDescriptionLength">45</span>
+
+              </div>
+            </div>
+
+            <div class="form__group">
+              <div class="form__group__body">
+                <label class="form__label" for="creditAmount">Importe</label>
+                <input class="form__input form__input--money form__input--money-big" type="text" name="credit_amount" id="creditAmount" placeholder="$ 0" required="">
+              </div>
+              <div class="form__group__footer">
+                <span class="alert alert--danger" id="creditAmountAlert">Este codigo ya está en uso</span>
+              </div>
+            </div>
+
+            <p class="alert alert--big alert--danger show" id="newCreditAlert">El nombre del cliente es obligatorio</p>
+
+            <input type="submit" value="Registrar Credito" class="btn btn--success" id="newCreditBtn">
+          </form>
         </div>
       </div>
 
