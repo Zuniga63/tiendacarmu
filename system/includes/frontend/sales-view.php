@@ -127,12 +127,14 @@
                 id="newCategoryName" 
                 :class="['form__input', {error : views.newCategory.categoryNameError}]" 
                 placeholder="Ingresa la nueva categoría" 
-                v-model="views.newCategory.categoryName">
+                v-model="views.newCategory.categoryName"
+                @focus="$event.target.select()"
+                @blur="validateCategoryName">
               </div>
 
               <!-- Seccion para mostrar alertas e informacion adicional -->
               <div class="form__group__footer">
-                <span :class="['alert', 'alert--danger', {show: views.newCategory.categoryNameError}]">Nombre repetido</span>
+                <span :class="['alert', 'alert--danger', {show: views.newCategory.categoryNameError}]">{{views.newCategory.errorMessage}}</span>
                 <span class="form__input__length">{{newCategoryNameLength}}</span>
               </div>
 
@@ -148,29 +150,18 @@
           <!-- Contenedor con las categorías -->
           <div class="sumary">
             <h3 class="sumary__title">Listado de categorías</h2>
-              <div class="sumary__box">
-                <div class="category-card">
+              <div class="sumary__box scroll">
+
+                <div class="category-card" v-for="category in categories" :key="category.id">
                   <header class="category-card__header">
                     <h3 class="category-card__name">
-                      Nombre de la categoría
+                      {{category.name}}
                     </h3>
                     <p class="category-card__amount">$12.000.000</p>
                   </header>
 
                   <div class="category-card__average">$250.000</div>
-                  <p class="category-card__info">Ventas: 48</p>
-                </div>
-
-                <div class="category-card">
-                  <header class="category-card__header">
-                    <h3 class="category-card__name">
-                      Nombre de la categoría
-                    </h3>
-                    <p class="category-card__amount">$12.000.000</p>
-                  </header>
-
-                  <div class="category-card__average">$250.000</div>
-                  <p class="category-card__info">Ventas: 48</p>
+                  <p class="category-card__info">Ventas: {{category.sales.length}}</p>
                 </div>
 
               </div>
