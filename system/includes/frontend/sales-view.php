@@ -112,7 +112,7 @@
       <div class="container__content">
         <!-- Cada item corresponde a un elemento del panel de navegacion -->
         <div class="container__item">
-          <form class="form form--bg-light">
+          <form class="form form--bg-light" @submit.prevent="onNewCategorySudmit">
             <h2 class="form__title">Nueva categoría</h2>
 
             <!-- Campo para agregar el nombre -->
@@ -121,15 +121,7 @@
               <!-- Cuerpo del formulario -->
               <div class="form__group__body">
                 <label for="newCategoryName" class="form__label">Nombre</label>
-                <input 
-                type="text" 
-                name="category-name" 
-                id="newCategoryName" 
-                :class="['form__input', {error : views.newCategory.categoryNameError}]" 
-                placeholder="Ingresa la nueva categoría" 
-                v-model="views.newCategory.categoryName"
-                @focus="$event.target.select()"
-                @blur="validateCategoryName">
+                <input type="text" name="category-name" id="newCategoryName" :class="['form__input', {error : views.newCategory.categoryNameError}]" placeholder="Ingresa la nueva categoría" v-model="views.newCategory.categoryName" @focus="$event.target.select()" @blur="validateCategoryName" required>
               </div>
 
               <!-- Seccion para mostrar alertas e informacion adicional -->
@@ -141,8 +133,8 @@
             </div>
             <!-- Fin del campo -->
 
-            <p class="alert alert--big alert--success show">Proceso correcto</p>
-            <input type="submit" value="Crear categoría" class="btn btn--success">
+            <p :class="['alert', 'alert--big', {'alert--success' : views.newCategory.response, 'alert--danger' : !views.newCategory.response, show : views.newCategory.responseMessageShow}]">{{views.newCategory.responseMessage}}</p>
+            <input type="submit" v-model="views.newCategory.buttomMessage" :disabled="views.newCategory.requestStart" class="btn btn--success">
 
           </form>
           <!-- Fin del formulario -->
@@ -157,10 +149,10 @@
                     <h3 class="category-card__name">
                       {{category.name}}
                     </h3>
-                    <p class="category-card__amount">$12.000.000</p>
+                    <p class="category-card__amount">{{formatCurrency(category.totalAmount, 0)}}</p>
                   </header>
 
-                  <div class="category-card__average">$250.000</div>
+                  <div class="category-card__average">{{formatCurrency(category.averageSale, 2)}}</div>
                   <p class="category-card__info">Ventas: {{category.sales.length}}</p>
                 </div>
 

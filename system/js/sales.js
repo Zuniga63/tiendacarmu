@@ -8,6 +8,8 @@ const vm = new Vue({
       {
         id: 1,
         name: "Categoría 1",
+        totalAmount: 1345200,
+        averageSale: 123546.34,
         sales: [
           {
             id: 1,
@@ -32,6 +34,8 @@ const vm = new Vue({
       {
         id: 2,
         name: "Categoría 2",
+        totalAmount: 1345200,
+        averageSale: 123546.34,
         sales: [
           {
             id: 1,
@@ -60,6 +64,11 @@ const vm = new Vue({
         categoryName: "",
         categoryNameError: false,
         errorMessage: "",
+        requestStart: false,
+        response: true,
+        responseMessage: "",
+        responseMessageShow: false,
+        buttomMessage : "Registrar categoría"
       }, //Fin de newCategory
     }, //Fin de views
   }, //Fin de data
@@ -83,9 +92,9 @@ const vm = new Vue({
         } else {
           //Entrar aquí significa que el campo está vacio
           view.categoryNameError = true;
-          if(name.length > 45){
+          if (name.length > 45) {
             view.errorMessage = "Supera el maximo permitido";
-          }else{
+          } else {
             view.errorMessage = "Nombre demasiado corto";
           }
         } //Fin de if-else
@@ -96,7 +105,27 @@ const vm = new Vue({
       } //Fin de if-else
 
       return false;
-    }, //Fin del metodo validateCategoryname
+    }, //Fin del metodo validateCategoryname,
+    formatCurrency: formatCurrencyLite,
+    onNewCategorySudmit() {
+      let view = this.views.newCategory;
+      if(this.validateCategoryName() && !view.requestStart){
+        view.requestStart = true;
+        view.buttomMessage = "Procesando solicitud";
+        console.log('No se puede enviar aun');
+        setTimeout(() => {
+          view.requestStart = false;
+          view.buttomMessage = "Registrar categoría";
+          view.response = true;
+          view.responseMessage = "Proceso satisfactorio";
+          view.responseMessageShow = true;
+          setTimeout(() => {
+            responseMessage = "";
+            view.responseMessageShow = false;
+          }, 3000);
+        }, 3000);
+      }//Fin de if
+    },//Fin del metodo
   }, //Fin de methods
   computed: {
     newCategoryNameLength() {
