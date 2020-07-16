@@ -171,7 +171,7 @@
               <div class="form__body">
                 <label for="newSaleDate" class="form__label">Fecha</label>
                 <div class="form__radio-content">
-                  <input type="radio" name="newSaleDate" id="newSaleNow" class="form__radio">
+                  <input type="radio" name="newSaleDate" id="newSaleNow" class="form__radio" v-model="views.newSale.now">
                   <label for="newSaleNow" class="form__label-inline">En este momento</label>
                 </div>
 

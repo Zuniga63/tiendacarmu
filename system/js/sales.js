@@ -70,6 +70,14 @@ const vm = new Vue({
         responseMessageShow: false,
         buttomMessage: "Registrar categoría",
       }, //Fin de newCategory
+      newSale:{
+        visibility: false,
+        now: true,
+        otherDate: false,
+        saleDescription: "",
+        saleDescriptionError: "",
+        amount: "",
+      }
     }, //Fin de views
   }, //Fin de data
   methods: {
