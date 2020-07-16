@@ -157,7 +157,7 @@
                 </div>
 
               </div>
-              <p class="sumary__count">0 categorías</p>
+              <p class="sumary__count">{{categories.length}} categorías</p>
           </div>
           <!-- Fin de sumary -->
         </div>
@@ -188,6 +188,7 @@
               <label for="newSaleCategory" class="form__label">Categoría</label>
               <select name="newSaleCategory" id="newSaleCategory" class="form__input">
                 <option value="" disabled selected>Selecciona una</option>
+                <option value="category.id" v-for="category in categories" :key="category.id">{{category.name}}</option>
               </select>
             </div>
 

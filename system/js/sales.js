@@ -68,19 +68,26 @@ const vm = new Vue({
         response: true,
         responseMessage: "",
         responseMessageShow: false,
-        buttomMessage : "Registrar categoría"
+        buttomMessage: "Registrar categoría",
       }, //Fin de newCategory
     }, //Fin de views
   }, //Fin de data
   methods: {
+    /**
+     * Verifica que el nombre de usuario no esté en uso, no este en blanco
+     * y cambia el estado de las alertas
+     */
     validateCategoryName() {
       let view = this.views.newCategory;
       let name = view.categoryName.trim();
+
       if (name) {
         if (name.length > 4 && name.length <= 45) {
           let coincidence = this.categories.some(
             (c) => c.name.toUpperCase() === name.toUpperCase()
           );
+
+          //Retorna true unicamente cuando no hay coincidencias
           if (!coincidence) {
             view.categoryNameError = false;
             view.errorMessage = "";
@@ -99,7 +106,6 @@ const vm = new Vue({
           }
         } //Fin de if-else
       } else {
-        //Entrar aquí significa que el campo está vacio
         view.categoryNameError = true;
         view.errorMessage = "Este campo es obligatorio";
       } //Fin de if-else
@@ -107,13 +113,25 @@ const vm = new Vue({
       return false;
     }, //Fin del metodo validateCategoryname,
     formatCurrency: formatCurrencyLite,
+    /**
+     * Lo que se debe hace cuando se le da a enviar el formulario
+     */
     onNewCategorySudmit() {
       let view = this.views.newCategory;
-      if(this.validateCategoryName() && !view.requestStart){
+      if (this.validateCategoryName() && !view.requestStart) {
         view.requestStart = true;
         view.buttomMessage = "Procesando solicitud";
-        console.log('No se puede enviar aun');
+        console.log("No se puede enviar aun");
         setTimeout(() => {
+          let category = {
+            id: this.categories.length + 1,
+            name: view.categoryName,
+            totalAmount: 0,
+            averageSale: 0,
+            sales: [],
+          };
+
+          this.categories.push(category);
           view.requestStart = false;
           view.buttomMessage = "Registrar categoría";
           view.response = true;
@@ -124,8 +142,15 @@ const vm = new Vue({
             view.responseMessageShow = false;
           }, 3000);
         }, 3000);
-      }//Fin de if
-    },//Fin del metodo
+      } //Fin de if
+    }, //Fin del metodo
+    deleteFormaterOfAmount(text) {
+      let value = text.replace("$", "");
+      value = value.split(".");
+      value = value.join("");
+
+      return value;
+    },
   }, //Fin de methods
   computed: {
     newCategoryNameLength() {
