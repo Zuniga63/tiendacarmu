@@ -61,9 +61,11 @@ body {
   font-family: var(--body_font);
   font-size: 16px;
   max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.text-bold{
+.text-bold {
   font-weight: bold;
 }
 
@@ -77,10 +79,11 @@ body {
 }
 
 .container {
-  width: 90%;
+  width: 95%;
   margin-left: auto;
   margin-right: auto;
   padding-top: 0.8rem;
+  margin-bottom: 0.8em;
 }
 
 .container__header {
@@ -117,6 +120,7 @@ body {
 .sumary__title {
   grid-column: 1/-1;
   text-align: center;
+  margin-bottom: 0.8rem;
 }
 
 .sumary__box {
@@ -136,21 +140,28 @@ body {
   background-color: #28a74634;
   padding: 5px;
   width: 95%;
-  border: 2px solid var(--success);
+  border: 1px solid var(--success);
   border-radius: 5px;
   margin-right: auto;
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.5rem;
   margin-left: auto;
+
+  color: var(--dark);
 }
 
 .category-card:nth-child(even) {
-  background-color: #a7282834;
-  border-color: var(--red);
+  background-color: #007bff94;
+  border-color: var(--primary);
 }
 
 .category-card__header {
   margin-bottom: 0.5rem;
-  border-bottom: 2px solid black;
+  border-bottom: 1px solid black;
+}
+
+.category-card__details{
+  display: flex;
+  justify-content: space-between;
 }
 
 .category-card__name,
@@ -165,18 +176,14 @@ body {
   text-transform: uppercase;
 }
 
-.category-card__amount {
-  font-size: 0.9em;
-}
 
-.category-card__average {
+.category-card__amount {
   align-self: center;
   text-align: center;
   font-weight: 600;
   padding-right: 5px;
   border-right: 1px dashed rgba(0, 0, 0, 0.4);
   font-size: 1.5em;
-  color: #5b6464;
 }
 
 .category-card__info {
@@ -429,10 +436,10 @@ body {
   display: block;
   width: 100%;
   margin-bottom: 5px;
-  padding: 0 3px;
+  padding: 5px;
 }
 
-.form__radio-content{
+.form__radio-content {
   display: flex;
   justify-content: space-evenly;
   background-color: var(--concrete);
@@ -444,12 +451,12 @@ body {
 
 .form__radio,
 .form__label-inline,
-.form__input-inline{
+.form__input-inline {
   align-content: center;
   display: inline-block;
 }
 
-.form__input-inline{
+.form__input-inline {
   width: 100%;
 }
 
@@ -1978,7 +1985,7 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   /* min-height: 40vh; */
 }
 
-.modal__title{
+.modal__title {
   padding-bottom: 0.2em;
   border-bottom: 2px solid var(--dark-two);
   margin-bottom: 0.5em;
@@ -1986,7 +1993,7 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   text-align: center;
 }
 
-.modal__info{
+.modal__info {
   margin-bottom: 1em;
 }
 
@@ -2007,6 +2014,97 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   cursor: pointer;
 }
 
+.history__title {
+  font-family: var(--title_font);
+  letter-spacing: 1px;
+  color: var(--dark);
+  background-color: var(--light);
+  text-align: center;
+  text-transform: uppercase;
+  /* margin-bottom: 0.5em; */
+  padding: 0.5em;
+  font-size: 1.3em;
+  border: 1px solid #ccc;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+.history__body {
+  max-height: 60vh;
+}
+
+.history__footer{
+  display: flex;
+  justify-content: space-between;
+  letter-spacing: 1px;
+  background-color: var(--dark);
+  color: var(--light);
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.history__info{
+  padding: 0.6em;
+  font-size: 0.8em;
+}
+.table {
+  border: 1px solid #ccc;
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.table__row {
+  border: 1px solid #ddd;
+  padding: 0.4em;
+}
+
+.table__row:nth-child(even) {
+  background-color: #ddd;
+}
+
+.table__row:nth-child(odd) {
+  background-color: var(--light);
+}
+
+.table__row-header {
+  background-color: var(--dark);
+  color: var(--light);
+}
+
+.table__header,
+.table__data {
+  padding: 0.6em;
+  text-align: center;
+  font-size: 0.9em;
+}
+
+.table--25 {
+  width: 25%;
+}
+
+.table--50 {
+  width: 50%;
+}
+
+.table--lef {
+  text-align: left;
+}
+
+.table--right {
+  text-align: right;
+}
+
+.table__header {
+  text-transform: uppercase;
+  font-size: 0.8em;
+}
+
+@media (min-width: 360px) {
+  body {
+    font-size: 18px;
+  }
+}
+
 @media (max-width: 999px) {
   .home-body {
     display: none;
@@ -2014,6 +2112,15 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 }
 
 @media (min-width: 768px) {
+  body {
+    font-size: 20px;
+  }
+
+  .table__header,
+  .table__data {
+    font-size: 1.1em;
+  }
+
   #featureProductsSlider .slider__items {
     width: calc(100% * (var(--feature-products) / 2));
     /* margin-left: calc( 100% / 2); */
