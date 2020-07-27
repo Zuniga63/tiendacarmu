@@ -106,225 +106,180 @@
     </header>
     <!--Fin de la barra de navegacion-->
 
-    <div id="categories" class="container">
+    <main class="main">
+      <div class="view" id="categories">
+        <section class="view__section">
+          <div class="container">
+            <container-header :title="title" subtitle="Gestion de Categorías"></container-header>
 
-      <div class="container__header">
-        <h1 class="container__title">{{title}}</h1>
-        <p class="container__subtitle">{{subtitle}}</p>
+            <form class="form form--bg-light" @submit.prevent="onNewCategorySubmit">
+              <h2 class="form__title">Nueva categoría</h2>
+
+              <!-- Campo para agregar el nombre -->
+              <div class="form__group">
+                <!-- Cuerpo del formulario -->
+                <div class="form__group__body">
+                  <label for="newCategoryName" class="form__label">Nombre</label>
+                  <input type="text" name="category-name" id="newCategoryName" :class="['form__input', {error : views.newCategory.categoryNameError}]" placeholder="Ingresa la nueva categoría" v-model="views.newCategory.categoryName" @focus="$event.target.select()" @blur="validateCategoryName" required>
+                </div>
+
+                <!-- Seccion para mostrar alertas e informacion adicional -->
+                <div class="form__group__footer">
+                  <span :class="['alert', 'alert--danger', {show: views.newCategory.categoryNameError}]">
+                    {{views.newCategory.errorMessage}}
+                  </span>
+                  <span class="form__input__length">
+                    {{newCategoryNameLength}}
+                  </span>
+                </div>
+
+              </div>
+              <!-- Fin del campo -->
+
+              <p :class="['alert', 'alert--big', {'alert--success' : views.newCategory.response, 'alert--danger' : !views.newCategory.response, show : views.newCategory.responseMessageShow}]">
+                {{views.newCategory.responseMessage}}
+              </p>
+              <input type="submit" v-model="views.newCategory.buttomMessage" :disabled="views.newCategory.requestStart" class="btn btn--success">
+
+            </form>
+
+            <category-module :categories="categories"></category-module>
+          </div>
+        </section>
+
+        <aside class="view__sidebar">
+          <sales-module :sales="sales" :amount="salesAmount"></sales-module>
+        </aside>
       </div>
 
-      <div class="container__content">
-        <!-- Cada item corresponde a un elemento del panel de navegacion -->
-        <div class="container__item">
-          <form class="form form--bg-light" @submit.prevent="onNewCategorySubmit">
-            <h2 class="form__title">Nueva categoría</h2>
+      <div class="view" id="newSale">
+        <section class="view__section">
+          <div class="container">
+            <container-header :title="title" subtitle="Gestion de Ventas"></container-header>
+            <!-- Formulario de nueva venta -->
+            <form class="form form--bg-light" @submit.prevent="validateNewSale">
+              <h2 class="form__title">Registrar Venta</h2>
+              <div class="form__group">
 
-            <!-- Campo para agregar el nombre -->
-            <div class="form__group">
-              <!-- Cuerpo del formulario -->
-              <div class="form__group__body">
-                <label for="newCategoryName" class="form__label">Nombre</label>
-                <input type="text" name="category-name" id="newCategoryName" :class="['form__input', {error : views.newCategory.categoryNameError}]" placeholder="Ingresa la nueva categoría" v-model="views.newCategory.categoryName" @focus="$event.target.select()" @blur="validateCategoryName" required>
-              </div>
-
-              <!-- Seccion para mostrar alertas e informacion adicional -->
-              <div class="form__group__footer">
-                <span :class="['alert', 'alert--danger', {show: views.newCategory.categoryNameError}]">
-                  {{views.newCategory.errorMessage}}
-                </span>
-                <span class="form__input__length">
-                  {{newCategoryNameLength}}
-                </span>
-              </div>
-
-            </div>
-            <!-- Fin del campo -->
-
-            <p :class="['alert', 'alert--big', {'alert--success' : views.newCategory.response, 'alert--danger' : !views.newCategory.response, show : views.newCategory.responseMessageShow}]">
-              {{views.newCategory.responseMessage}}
-            </p>
-            <input type="submit" v-model="views.newCategory.buttomMessage" :disabled="views.newCategory.requestStart" class="btn btn--success">
-
-          </form>
-          <!-- Fin del formulario -->
-
-          <!-- Contenedor con las categorías -->
-          <div class="sumary">
-            <h3 class="sumary__title">Listado de categorías</h2>
-              <div class="sumary__box scroll">
-
-                <div class="category-card" v-for="category in categories" :key="category.id">
-                  <header class="category-card__header">
-                    <h3 class="category-card__name">
-                      {{category.name}}
-                    </h3>
-                    <div class="category-card__details">
-                      <p class="category-card__info">
-                        Promedio: <span class="text-bold">{{formatCurrency(category.averageSale)}}</span>
-                      </p>
-                      <p class="category-card__info">
-                        Ventas: <span class="text-bold">{{category.sales.length}}</span>
-                      </p>
+                <div class="form__body">
+                  <label for="newSaleDate" class="form__label">Establecer el momento</label>
+                  <div class="form__radio-content">
+                    <!-- Seleccion de este momento -->
+                    <div>
+                      <input type="radio" name="newSaleDate" id="newSaleNow" class="form__radio" value="now" v-model="views.newSale.saleMoment">
+                      <label for="newSaleNow" class="form__label-inline">Ahora</label>
                     </div>
-                  </header>
 
-                  <div class="category-card__amount">{{formatCurrency(category.totalAmount)}}</div>
+                    <!-- Seleccion de otro momento -->
+                    <div>
+                      <input type="radio" name="newSaleDate" id="newSaleDateOther" class="form__radio" value="other" v-model="views.newSale.saleMoment">
+                      <label for="newSaleDateOther" class="form__label-inline">Otra Fecha</label>
+                    </div>
+                  </div>
+
+                  <!-- Seleccion de la fecha -->
+                  <input type="date" name="saleDate" id="saleDate" placeholder="Selecciona una fecha" :class="['form__input', {error: views.newSale.saleDate.hasError}]" v-if="views.newSale.saleMoment === 'other'" v-model="views.newSale.saleDate.value" :max="views.newSale.maxDate" @blur="validateSaleDate" @change="validateSaleDate">
+
+                  <span class="alert alert--danger" :class="{show: views.newSale.saleDate.hasError}">
+                    {{views.newSale.saleDate.message}}
+                  </span>
                 </div>
 
               </div>
-              <p class="sumary__count">{{categories.length}} categorías</p>
-          </div>
-          <!-- Fin de sumary -->
-        </div>
-        <!-- Fin de neva categoria -->
 
-        <div class="container__item" v-show="views.newSale.visible">
-          <form class="form form--bg-light" @submit.prevent="validateNewSale">
-            <h2 class="form__title">Registrar Venta</h2>
-            <div class="form__group">
+              <!-- Seleccion de la categoría -->
+              <div class="form__group">
+                <label for="newSaleCategory" class="form__label">Categoría</label>
+                <select name="newSaleCategory" id="newSaleCategory" class="form__input" :class="{error: views.newSale.categoryID.hasError}" v-model="views.newSale.categoryID.value" @blur="validateSaleCategory" @change="validateSaleCategory">
+                  <option value="" disabled selected>Selecciona una categoría</option>
+                  <option :value="category.id" v-for="category in categories" :key="category.id">{{category.name}}</option>
+                </select>
 
-              <div class="form__body">
-                <label for="newSaleDate" class="form__label">Establecer el momento</label>
-                <div class="form__radio-content">
-                  <!-- Seleccion de este momento -->
-                  <div>
-                    <input type="radio" name="newSaleDate" id="newSaleNow" class="form__radio" value="now" v-model="views.newSale.saleMoment">
-                    <label for="newSaleNow" class="form__label-inline">Ahora</label>
-                  </div>
+                <span class="alert alert--danger" :class="{show: views.newSale.categoryID.hasError}">
+                  {{views.newSale.categoryID.message}}
+                </span>
+              </div>
 
-                  <!-- Seleccion de otro momento -->
-                  <div>
-                    <input type="radio" name="newSaleDate" id="newSaleDateOther" class="form__radio" value="other" v-model="views.newSale.saleMoment">
-                    <label for="newSaleDateOther" class="form__label-inline">Otra Fecha</label>
-                  </div>
+              <!-- Ingreso de la descripcion de la venta -->
+              <div class="form__group">
+                <div class="form__group__body">
+                  <label for="newSaleDescription" class="form__label form__label--center">Descripción de la venta</label>
+                  <textarea name="credit_description" id="newSaleDescription" cols="30" rows="3" class="form__input" :class="{error: views.newSale.description.hasError}" placeholder="Escribe los detalles aquí" required v-model.trim="views.newSale.description.value" @focus="$event.target.select()" @change="validateSaleDescription" @blur="validateSaleDescription">
+                        </textarea>
                 </div>
 
-                <!-- Seleccion de la fecha -->
-                <input type="date" name="saleDate" id="saleDate" placeholder="Selecciona una fecha" :class="['form__input', {error: views.newSale.saleDate.hasError}]" v-if="views.newSale.saleMoment === 'other'" v-model="views.newSale.saleDate.value" :max="views.newSale.maxDate" @blur="validateSaleDate" @change="validateSaleDate">
-
-                <span class="alert alert--danger" :class="{show: views.newSale.saleDate.hasError}">
-                  {{views.newSale.saleDate.message}}
-                </span>
+                <div class="form__group__footer">
+                  <span class="alert alert--danger" :class="{show: views.newSale.description.hasError}" id="newSaleDescriptionAlert">
+                    {{views.newSale.description.message}}
+                  </span>
+                  <span class="form__input__length" id="newSaleDescriptionLength">{{newSaleDescriptionLength}}</span>
+                </div>
               </div>
 
-            </div>
-
-            <!-- Seleccion de la categoría -->
-            <div class="form__group">
-              <label for="newSaleCategory" class="form__label">Categoría</label>
-              <select name="newSaleCategory" id="newSaleCategory" class="form__input" :class="{error: views.newSale.categoryID.hasError}" v-model="views.newSale.categoryID.value" @blur="validateSaleCategory" @change="validateSaleCategory">
-                <option value="" disabled selected>Selecciona una categoría</option>
-                <option :value="category.id" v-for="category in categories" :key="category.id">{{category.name}}</option>
-              </select>
-
-              <span class="alert alert--danger" :class="{show: views.newSale.categoryID.hasError}">
-                {{views.newSale.categoryID.message}}
-              </span>
-            </div>
-
-            <!-- Ingreso de la descripcion de la venta -->
-            <div class="form__group">
-              <div class="form__group__body">
-                <label for="newSaleDescription" class="form__label form__label--center">Descripción de la venta</label>
-                <textarea name="credit_description" id="newSaleDescription" cols="30" rows="3" class="form__input" :class="{error: views.newSale.description.hasError}" placeholder="Escribe los detalles aquí" required v-model.trim="views.newSale.description.value" @focus="$event.target.select()" @change="validateSaleDescription" @blur="validateSaleDescription">
-                </textarea>
+              <!-- Ingreso del inporte de la venta -->
+              <div class="form__group">
+                <div class="form__group__body">
+                  <label class="form__label" for="creditAmount">Importe</label>
+                  <input-money id="creditAmount" required v-model="views.newSale.amount.value" @blur="validateSaleAmount" @change="validateSaleAmount">
+                  </input-money>
+                </div>
+                <div class="form__group__footer">
+                  <span class="alert alert--danger" :class="{show: views.newSale.amount.hasError}">
+                    {{views.newSale.amount.message}}
+                  </span>
+                </div>
               </div>
 
-              <div class="form__group__footer">
-                <span class="alert alert--danger" :class="{show: views.newSale.description.hasError}" id="newSaleDescriptionAlert">
-                  {{views.newSale.description.message}}
-                </span>
-                <span class="form__input__length" id="newSaleDescriptionLength">{{newSaleDescriptionLength}}</span>
-              </div>
-            </div>
+              <p class="alert alert--big" :class="{show: views.newSale.showAlert, 'alert--danger': !views.newSale.processSuccess, 'alert--success':views.newSale.processSuccess}">
+                {{views.newSale.alertMessage}}
+              </p>
 
-            <!-- Ingreso del inporte de la venta -->
-            <div class="form__group">
-              <div class="form__group__body">
-                <label class="form__label" for="creditAmount">Importe</label>
-                <input-money id="creditAmount" required v-model="views.newSale.amount.value" @blur="validateSaleAmount" @change="validateSaleAmount">
-                </input-money>
-              </div>
-              <div class="form__group__footer">
-                <span class="alert alert--danger" :class="{show: views.newSale.amount.hasError}">
-                  {{views.newSale.amount.message}}
-                </span>
-              </div>
-            </div>
+              <input type="submit" value="Registrar Venta" class="btn btn--success" id="newCreditBtn">
+            </form>
 
-            <p class="alert alert--big" :class="{show: views.newSale.showAlert, 'alert--danger': !views.newSale.processSuccess, 'alert--success':views.newSale.processSuccess}">
-              {{views.newSale.alertMessage}}
-            </p>
+            <sales-module :sales="sales" :amount="salesAmount" class="view-desktop-colapse"></sales-module>
 
-            <input type="submit" value="Registrar Venta" class="btn btn--success" id="newCreditBtn">
-          </form>
-
-          <div class="history" v-show="sales.length > 0">
-            <h2 class="history__title">Historial de ventas</h2>
-            <div class="history__head">
-              <table class="table">
-                <thead>
-                  <tr class="table__row-header">
-                    <th class="table__header table--25">Fecha</th>
-                    <th class="table__header table--50">Descripción</th>
-                    <th class="table__header table--25">Valor</th>
-                  </tr>
-                </thead>
-              </table>
-            </div>
-            <div class="history__body scroll">
-              <table class="table">
-                <tbody class="table__body">
-                  <template v-for="sale in sales">
-                    <tr class="table__row" :key="sale.id">
-                      <td class="table__data table--25" data-label="id">{{sale.dateToString}}</td>
-                      <td class="table__data table--50 table--lef" data-label="description">{{sale.description}}</td>
-                      <td class="table__data table--25 table--right" data-label="amount">{{formatCurrency(sale.amount)}}</td>
-                    </tr>
-                  </template>
-                </tbody>
-              </table>
-            </div>
-            <footer class="history__footer">
-              <p class="history__info">Total: <span class="text-bold">{{formatCurrency(salesAmount)}}</span></p>
-              <p class="history__info">Ventas: <span class="text-bold">{{sales.length}}</span></p>
-            </footer>
-
+            <category-module :categories="categories" class="view-movil-colapse"></category-module>
           </div>
+        </section>
 
-        </div>
+        <aside class="view__sidebar">
+          <sales-module :sales="sales" :amount="salesAmount"></sales-module>
+        </aside>
       </div>
 
-      <!-- Modal para confirmar la venta -->
-      <div class="modal" :class="{show: modals.newSale.visible}" @click.self="modals.newSale.hiddenModal()">
-        <div class="modal__content">
-          <div class="modal__close" @click="modals.newSale.hiddenModal()">
-            <i class="fas fa-times-circle"></i>
-          </div>
+    </main>
 
-          <h2 class="modal__title">
-            Nueva Venta
-          </h2>
-          <p class="modal__info">
-            Se va a registra la venta de
-            <span class="text-bold">"{{modals.newSale.description}}"</span>
-            realizada el
-            <span class="text-bold">"{{modals.newSale.date}}"</span>
-            por valor de <span class="text-bold">{{modals.newSale.amount}}</span>
-          </p>
-
-          <button class="btn btn--success" @click="registerNewSale">Registrar</button>
+    <!-- Modal para confirmar la venta -->
+    <div class="modal" :class="{show: modals.newSale.visible}" @click.self="modals.newSale.hiddenModal()">
+      <div class="modal__content">
+        <div class="modal__close" @click="modals.newSale.hiddenModal()">
+          <i class="fas fa-times-circle"></i>
         </div>
-      </div>
 
-      <div class="modal" :class="{show: modals.waiting.visible}">
-        <div class="modal__content" style="padding-top: 140px;">
-          <div class="loader"></div>
-          <p class="modal__info" style="text-align: center;">Procesando Solicitud</p>
-        </div>
-      </div>
+        <h2 class="modal__title">
+          Nueva Venta
+        </h2>
+        <p class="modal__info">
+          Se va a registra la venta de
+          <span class="text-bold">"{{modals.newSale.description}}"</span>
+          realizada el
+          <span class="text-bold">"{{modals.newSale.date}}"</span>
+          por valor de <span class="text-bold">{{modals.newSale.amount}}</span>
+        </p>
 
+        <button class="btn btn--success" @click="registerNewSale">Registrar</button>
+      </div>
     </div>
+
+    <div class="modal" :class="{show: modals.waiting.visible}">
+      <div class="modal__content" style="padding-top: 140px;">
+        <div class="loader"></div>
+        <p class="modal__info" style="text-align: center;">Procesando Solicitud</p>
+      </div>
+    </div>
+
+  </div>
 
   </div>
 

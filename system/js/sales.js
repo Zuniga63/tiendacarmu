@@ -151,6 +151,99 @@ Vue.component('input-money', {
   }
 })
 
+Vue.component('category-module', {
+  props: ['categories'],
+  template: `
+  <div class="sumary">
+    <h3 class="sumary__title">Listado de categorías</h3>
+    <div class="sumary__box scroll">
+      <div class="category-card" v-for="category in categories" :key="category.id">
+        <header class="category-card__header">
+          <h3 class="category-card__name">
+            {{category.name}}
+          </h3>
+          <div class="category-card__details">
+            <p class="category-card__info">
+              Promedio: <span class="text-bold">{{formatCurrency(category.averageSale)}}</span>
+            </p>
+            <p class="category-card__info">
+              Ventas: <span class="text-bold">{{category.sales.length}}</span>
+            </p>
+          </div>
+        </header>
+        <p class="category-card__amount">{{formatCurrency(category.totalAmount)}}</p>
+      </div>
+    </div>
+    <p class="sumary__count">{{categories.length}} categorías</p>
+  </div>`,
+  methods: {
+    formatCurrency(value) {
+      var formatted = new Intl.NumberFormat('es-Co', {
+        style: 'currency',
+        currency: 'COP',
+        minimumFractionDigits: 0
+      }).format(value);
+      return formatted;
+    },//Fin del metodo
+  },
+})
+
+Vue.component('container-header', {
+  props:['title', 'subtitle'],
+  template:`
+  <div class="container__header">
+    <h1 class="container__title">{{title}}</h1>
+    <p class="container__subtitle">{{subtitle}}</p>
+  </div>`
+})
+
+Vue.component('sales-module', {
+  props:['sales', 'amount'],
+  template: `
+  <div class="history" v-show="sales.length > 0">
+    <h2 class="history__title">Historial de ventas</h2>
+    <div class="history__head">
+      <table class="table">
+        <thead>
+          <tr class="table__row-header">
+            <th class="table__header table--25">Fecha</th>
+            <th class="table__header table--50">Descripción</th>
+            <th class="table__header table--25">Valor</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+    <div class="history__body scroll">
+      <table class="table">
+        <tbody class="table__body">
+          <template v-for="sale in sales">
+            <tr class="table__row" :key="sale.id">
+              <td class="table__data table--25" data-label="id">{{sale.dateToString}}</td>
+              <td class="table__data table--50 table--lef" data-label="description">{{sale.description}}</td>
+              <td class="table__data table--25 table--right" data-label="amount">{{formatCurrency(sale.amount)}}</td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+    <footer class="history__footer">
+      <p class="history__info">Total: <span class="text-bold">{{formatCurrency(amount)}}</span></p>
+      <p class="history__info">Ventas: <span class="text-bold">{{sales.length}}</span></p>
+    </footer>
+  </div>
+  `,
+  methods: {
+    formatCurrency(value) {
+      var formatted = new Intl.NumberFormat('es-Co', {
+        style: 'currency',
+        currency: 'COP',
+        minimumFractionDigits: 0
+      }).format(value);
+      return formatted;
+    },//Fin del metodo
+  },
+})
+
 const vm = new Vue({
   el: "#app",
   data: {
@@ -459,10 +552,10 @@ const vm = new Vue({
       try {
         const res = await fetch('./api/sales_api.php');
         const data = await res.json();
-        if(data.sessionActive){
+        if (data.sessionActive) {
           let categoriesTemporal = [];
           let salesTemporal = [];
-          
+
           //Se crean las categorías
           data.categories.forEach(c => {
             //Se crea la instancia de categoría
@@ -478,7 +571,7 @@ const vm = new Vue({
           //Ahora se crean las ventas
 
           let totalAmount = 0;
-          data.sales.forEach(s =>{
+          data.sales.forEach(s => {
             console.log(s.saleDate);
             let sale = new Sale(s.id, s.saleDate, s.description, s.amount);
             salesTemporal.push(sale);
@@ -486,10 +579,10 @@ const vm = new Vue({
           })
 
           //Se agregan a los arreglos principales
-          this.categories = categoriesTemporal.sort((c1,c2) => c2.totalAmount - c1.totalAmount);
+          this.categories = categoriesTemporal.sort((c1, c2) => c2.totalAmount - c1.totalAmount);
           this.sales = salesTemporal;
           this.salesAmount = totalAmount;
-        }else{
+        } else {
           location.reload();
         }
       } catch (error) {

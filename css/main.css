@@ -1977,6 +1977,7 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 .modal__content {
   position: relative;
   width: 95%;
+  max-width: 600px;
   padding: 1.5em;
   margin: auto;
   border: 1px solid lightgray;
@@ -2028,6 +2029,7 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
 }
+
 .history__body {
   max-height: 60vh;
 }
@@ -2098,6 +2100,22 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   text-transform: uppercase;
   font-size: 0.8em;
 }
+/* SECCION PARA ROMPER EL VIEWPORT EN ESCRITORIO */
+.view{
+  display: block;
+}
+
+.view-movil-colapse{
+  display: none;
+}
+
+.view-desktop-colapse{
+  display: block;
+}
+
+.view__sidebar{
+  display: none;
+}
 
 @media (min-width: 360px) {
   body {
@@ -2156,5 +2174,28 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 
   #featureProductsSlider .slider__item {
     width: calc(100% / 3);
+  }
+
+  .history__body {
+    max-height: 90vh;
+  }
+
+  .view{
+    display: grid;
+    gap: 1em;
+    grid-template-columns: 5fr 9fr;
+  }
+
+  .view__sidebar{
+    display: block;
+    padding-top: 0.8em;
+  }
+
+  .view-movil-colapse{
+    display: block;
+  }
+  
+  .view-desktop-colapse{
+    display: none;
   }
 }
