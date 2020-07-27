@@ -8,6 +8,9 @@
 
   <!-- SE CARGAN LAS FUENTES DE LOS ICONOS -->
   <link rel="stylesheet" href=<?= "../font/style.css?v=" . VERSION ?> />
+  <!-- FONT AWESOME -->
+  <!-- <script src="https://use.fontawesome.com/7ebcf381fa.js"></script> -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.14.0/css/all.css" integrity="sha384-HzLeBuhoNPvSl5KYnjx0BT+WB0QEEqLprO+NBkkk5gbc67FTaL7XIGa2w1L0Xbgc" crossorigin="anonymous">
 
   <!-- SE CARGAN LOS ESTILOS GENERALES -->
   <link rel="stylesheet" href=<?= "../css/normalize.css?v=" . VERSION ?> />
@@ -63,7 +66,7 @@
 
           <li class="main-navbar__item">
             <a href="sales.php" class="main-navbar__link link__active">
-              <i class="main-navbar__link__prepend icon-home"></i>
+              <i class="main-navbar__link__prepend fas fa-dollar-sign"></i>
               <span class="main-navbar__link__body">Ventas</span>
             </a>
           </li>
