@@ -13,6 +13,20 @@ $allItems = get_all_items();
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tienda Carmú</title>
 
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-171876097-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-171876097-1');
+  </script>
+git
+
   <!-- SE CARGAN LAS FUENTES DE LOS ICONOS -->
   <link rel="stylesheet" href=<?= "./font/style.css?v=" . VERSION ?> />
   <!-- El icono del sitio web -->
@@ -206,7 +220,7 @@ $allItems = get_all_items();
 
         <div class="social">
           <h3 class="social__header">Redes sociales</h3>
-          <a class="social__link" href="https://www.facebook.com/Carm%C3%BA-118428022107296"  target="blank">
+          <a class="social__link" href="https://www.facebook.com/Carm%C3%BA-118428022107296" target="blank">
             <i class="icon-facebook"></i>
             <span class="social__text__body">Facebock</span>
           </a>
