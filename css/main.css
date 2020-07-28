@@ -145,13 +145,21 @@ body {
   margin-right: auto;
   margin-bottom: 0.5rem;
   margin-left: auto;
-
+  cursor: pointer;
   color: var(--dark);
 }
 
 .category-card:nth-child(even) {
   background-color: #007bff94;
   border-color: var(--primary);
+}
+
+.category-card:nth-child(even):hover,
+.category-card:hover,
+.category-card.selected {
+  background-color: var(--dark);
+  border-color: var(--midnightblue);
+  color: var(--light);
 }
 
 .category-card__header {
@@ -2064,8 +2072,19 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   background-color: #ddd;
 }
 
+.table__row:nth-child(even):hover,
+.table__row:nth-child(odd):hover{
+  background-color: #aaa;
+}
+
 .table__row:nth-child(odd) {
   background-color: var(--light);
+}
+
+.table__row:nth-child(even):hover,
+.table__row:nth-child(odd):hover{
+  background-color: var(--dark);
+  color: var(--light);
 }
 
 .table__row-header {
@@ -2177,7 +2196,7 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   }
 
   .history__body {
-    max-height: 90vh;
+    max-height: 55vh;
   }
 
   .view{
