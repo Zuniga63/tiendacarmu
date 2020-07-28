@@ -22,6 +22,10 @@
 
 <body class="customers-view">
 
+  <div class="preloader show" id="preload">
+    <div class="loader"></div>
+  </div>
+
   <div id="app">
     <!-- Barra de navegacion -->
     <header class="header">
@@ -60,16 +64,16 @@
                 <ul class="dropdown__list">
 
                   <li class="dropdown__item">
-                    <a href="#" :class="['dropdown__link', {'dropdown__link--active' : views.newCategory.visible}]" id="sumaryLink">Categorías <span class="dropdown__link__new">New</span></a>
+                    <a href="#" :class="['dropdown__link', {'dropdown__link--active' : views.newCategory.visible}]" id="sumaryLink" @click="showView('newCategory')">Categorías <span class="dropdown__link__new">New</span></a>
                   </li>
 
                   <li class="dropdown__item">
-                    <a href="#" class="dropdown__link" id="sumaryLink">Registrar Venta <span class="dropdown__link__new">New</span></a>
+                    <a href="#" :class="['dropdown__link', {'dropdown__link--active' : views.newSale.visible}]"  id="sumaryLink" @click="showView('newSale')">Registrar Venta <span class="dropdown__link__new">New</span></a>
                   </li>
 
-                  <li class="dropdown__item">
+                  <!-- <li class="dropdown__item">
                     <a href="#" class="dropdown__link" id="sumaryLink">Historial <span class="dropdown__link__new">New</span></a>
-                  </li>
+                  </li> -->
 
                 </ul>
               </nav>
@@ -107,7 +111,7 @@
     <!--Fin de la barra de navegacion-->
 
     <main class="main">
-      <div class="view" id="categories">
+      <div class="view" id="categories" v-show="views.newCategory.visible">
         <section class="view__section">
           <div class="container">
             <container-header :title="title" subtitle="Gestion de Categorías"></container-header>
@@ -152,7 +156,7 @@
         </aside>
       </div>
 
-      <div class="view" id="newSale">
+      <div class="view" id="newSale" v-show="views.newSale.visible">
         <section class="view__section">
           <div class="container">
             <container-header :title="title" subtitle="Gestion de Ventas"></container-header>

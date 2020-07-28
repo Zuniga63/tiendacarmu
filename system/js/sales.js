@@ -1,4 +1,6 @@
-console.log("sale.js está funcionando");
+window.addEventListener("load", () => {
+  document.getElementById("preload").classList.remove("show");
+});
 
 class Category {
   constructor(id, name, totalAmount, averageSale) {
@@ -19,51 +21,51 @@ class Sale {
   constructor(id, saleDate, description, amount) {
     this.id = id;
     this.saleDate = moment(saleDate);
-    this.dateToString = this.saleDate.format('DD-MM-yyyy');
+    this.dateToString = this.saleDate.format("DD-MM-yyyy");
     this.description = description;
     this.amount = amount;
   }
 }
 
 class DataInput {
-  constructor(value = '', hasError = false, message = '') {
+  constructor(value = "", hasError = false, message = "") {
     this.value = value;
     this.hasError = hasError;
     this.message = message;
   }
 
-  isCorret(message = '') {
+  isCorret(message = "") {
     this.hasError = false;
     this.message = message;
   }
 
-  isIncorrect(message = '') {
+  isIncorrect(message = "") {
     this.hasError = true;
     this.message = message;
   }
 
   resetInput() {
-    this.value = '';
-    this.isCorret('');
+    this.value = "";
+    this.isCorret("");
   }
 }
 
 class NewSaleView {
   constructor() {
     this.visible = true;
-    this.saleMoment = 'now';
+    this.saleMoment = "now";
     this.saleDate = new DataInput();
-    this.maxDate = moment().format('yyyy-MM-DD');
+    this.maxDate = moment().format("yyyy-MM-DD");
     this.categoryID = new DataInput();
     this.description = new DataInput();
     this.amount = new DataInput();
     this.showAlert = false;
-    this.alertMessage = '';
+    this.alertMessage = "";
     this.processSuccess = false;
   }
 
   resetView() {
-    this.saleMoment = 'now';
+    this.saleMoment = "now";
     this.saleDate.resetInput();
     this.categoryID.resetInput();
     this.description.resetInput();
@@ -107,8 +109,8 @@ class WaitingModal {
   }
 }
 
-Vue.component('input-money', {
-  props: ['value'],
+Vue.component("input-money", {
+  props: ["value"],
   template: `
   <input
     type="text"
@@ -128,31 +130,31 @@ Vue.component('input-money', {
       if (!isNaN(value)) {
         value = this.formatCurrency(value);
       } else {
-        value = '';
+        value = "";
       }
 
       return value;
     },
     deleteCurrencyFormater(text) {
-      let value = text.replace('$', '');
+      let value = text.replace("$", "");
       value = value.split(".");
-      value = value.join('');
+      value = value.join("");
 
       return value;
     },
     formatCurrency(value) {
-      var formatted = new Intl.NumberFormat('es-Co', {
-        style: 'currency',
-        currency: 'COP',
-        minimumFractionDigits: 0
+      var formatted = new Intl.NumberFormat("es-Co", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0,
       }).format(value);
       return formatted;
-    },//Fin del metodo, 
-  }
-})
+    }, //Fin del metodo,
+  },
+});
 
-Vue.component('category-module', {
-  props: ['categories'],
+Vue.component("category-module", {
+  props: ["categories"],
   template: `
   <div class="sumary">
     <h3 class="sumary__title">Listado de categorías</h3>
@@ -178,27 +180,27 @@ Vue.component('category-module', {
   </div>`,
   methods: {
     formatCurrency(value) {
-      var formatted = new Intl.NumberFormat('es-Co', {
-        style: 'currency',
-        currency: 'COP',
-        minimumFractionDigits: 0
+      var formatted = new Intl.NumberFormat("es-Co", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0,
       }).format(value);
       return formatted;
-    },//Fin del metodo
+    }, //Fin del metodo
   },
-})
+});
 
-Vue.component('container-header', {
-  props:['title', 'subtitle'],
-  template:`
+Vue.component("container-header", {
+  props: ["title", "subtitle"],
+  template: `
   <div class="container__header">
     <h1 class="container__title">{{title}}</h1>
     <p class="container__subtitle">{{subtitle}}</p>
-  </div>`
-})
+  </div>`,
+});
 
-Vue.component('sales-module', {
-  props:['sales', 'amount'],
+Vue.component("sales-module", {
+  props: ["sales", "amount"],
   template: `
   <div class="history" v-show="sales.length > 0">
     <h2 class="history__title">Historial de ventas</h2>
@@ -234,15 +236,15 @@ Vue.component('sales-module', {
   `,
   methods: {
     formatCurrency(value) {
-      var formatted = new Intl.NumberFormat('es-Co', {
-        style: 'currency',
-        currency: 'COP',
-        minimumFractionDigits: 0
+      var formatted = new Intl.NumberFormat("es-Co", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0,
       }).format(value);
       return formatted;
-    },//Fin del metodo
+    }, //Fin del metodo
   },
-})
+});
 
 const vm = new Vue({
   el: "#app",
@@ -254,7 +256,7 @@ const vm = new Vue({
     salesAmount: 0,
     views: {
       newCategory: {
-        visible: true,
+        visible: false,
         categoryName: "",
         categoryNameError: false,
         errorMessage: "",
@@ -270,6 +272,7 @@ const vm = new Vue({
       newSale: new NewSaleModal(),
       waiting: new WaitingModal(),
     },
+    actualView: "newSale",
   }, //Fin de data
   methods: {
     /**
@@ -320,24 +323,34 @@ const vm = new Vue({
         view.requestStart = true;
         view.buttomMessage = "Procesando solicitud";
         const data = new FormData();
-        data.append('category_name', view.categoryName);
+        data.append("category_name", view.categoryName);
 
-        fetch('./api/new_sale_category.php', {
-          method: 'POST',
-          body: data
+        fetch("./api/new_sale_category.php", {
+          method: "POST",
+          body: data,
         })
-          .then(res => res.json())
-          .then(res => {
+          .then((res) => res.json())
+          .then((res) => {
             if (res.sessionActive) {
               if (res.request) {
                 let categories = res.categories;
                 let temporal = [];
 
-                categories.forEach(data => {
-                  let category = new Category(data.id, data.name, data.totalAmount, data.averageSale);
-                  data.sales.forEach(dataSale => {
-                    category.addSale(dataSale.id, dataSale.date, dataSale.description, dataSale.amount);
-                  })
+                categories.forEach((data) => {
+                  let category = new Category(
+                    data.id,
+                    data.name,
+                    data.totalAmount,
+                    data.averageSale
+                  );
+                  data.sales.forEach((dataSale) => {
+                    category.addSale(
+                      dataSale.id,
+                      dataSale.date,
+                      dataSale.description,
+                      dataSale.amount
+                    );
+                  });
 
                   temporal.push(category);
                 });
@@ -349,7 +362,7 @@ const vm = new Vue({
                 view.response = true;
                 view.responseMessage = "Proceso satisfactorio";
                 view.responseMessageShow = true;
-                view.categoryName = '';
+                view.categoryName = "";
               } else {
                 view.response = false;
                 view.responseMessage = "No se pudo agregar la categoría";
@@ -363,9 +376,7 @@ const vm = new Vue({
             } else {
               location.reload();
             }
-
-
-          })
+          });
         // setTimeout(() => {
         //   let category = {
         //     id: this.categories.length + 1,
@@ -395,7 +406,7 @@ const vm = new Vue({
       let isOk = false;
       let date = this.views.newSale.saleDate;
 
-      if (this.views.newSale.saleMoment === 'now') {
+      if (this.views.newSale.saleMoment === "now") {
         isOk = true;
       } else {
         if (moment(date.value).isValid()) {
@@ -403,10 +414,10 @@ const vm = new Vue({
             date.isCorret();
             isOk = true;
           } else {
-            date.isIncorrect('Selecciona o escribe una fecha valida');
+            date.isIncorrect("Selecciona o escribe una fecha valida");
           }
         } else {
-          date.isIncorrect('Selecciona una fecha valida');
+          date.isIncorrect("Selecciona una fecha valida");
         }
       }
 
@@ -415,13 +426,15 @@ const vm = new Vue({
     validateSaleCategory() {
       let isOk = false;
       let categoryID = this.views.newSale.categoryID;
-      let categoryExist = this.categories.some(c => c.id === categoryID.value);
+      let categoryExist = this.categories.some(
+        (c) => c.id === categoryID.value
+      );
 
       if (categoryExist) {
         categoryID.isCorret();
         isOk = true;
       } else {
-        categoryID.isIncorrect('Selecciona una categoría valida');
+        categoryID.isIncorrect("Selecciona una categoría valida");
       }
 
       return isOk;
@@ -433,10 +446,10 @@ const vm = new Vue({
         if (description.value.length >= 5) {
           description.isCorret();
         } else {
-          description.isIncorrect('Descripción demasiado corta');
+          description.isIncorrect("Descripción demasiado corta");
         }
       } else {
-        description.isIncorrect('Campo obligatorio');
+        description.isIncorrect("Campo obligatorio");
       }
 
       return !description.hasError;
@@ -451,10 +464,10 @@ const vm = new Vue({
         if (amountValue > 0) {
           amount.isCorret();
         } else {
-          amount.isIncorrect('Debe ser mayor que cero (0)');
+          amount.isIncorrect("Debe ser mayor que cero (0)");
         }
       } else {
-        amount.isIncorrect('Ingresa un valor valido');
+        amount.isIncorrect("Ingresa un valor valido");
       }
 
       return !amount.hasError;
@@ -467,9 +480,9 @@ const vm = new Vue({
 
       if (dateVal && categoryVal && descriptionVal & amountVal) {
         let view = this.views.newSale;
-        let date = moment().format('dddd LL');
-        if (view.saleMoment !== 'now') {
-          date = moment(view.saleDate.value).format('dddd LL');
+        let date = moment().format("dddd LL");
+        if (view.saleMoment !== "now") {
+          date = moment(view.saleDate.value).format("dddd LL");
         }
         let description = view.description.value;
         let amount = view.amount.value;
@@ -486,34 +499,34 @@ const vm = new Vue({
       let amount = parseFloat(this.deleteFormaterOfAmount(view.amount.value));
 
       const data = new FormData();
-      data.append('moment', moment);
-      data.append('date', date);
-      data.append('category_id', categoryID);
-      data.append('description', description);
-      data.append('amount', amount);
+      data.append("moment", moment);
+      data.append("date", date);
+      data.append("category_id", categoryID);
+      data.append("description", description);
+      data.append("amount", amount);
 
       //Ahora oculto el modal de confirmacion y se muestra el de carga
       this.modals.newSale.hiddenModal();
       this.modals.waiting.showModal();
 
       //Se realiza la peticion al servidor
-      fetch('./api/new_sale.php', {
-        method: 'POST',
-        body: data
+      fetch("./api/new_sale.php", {
+        method: "POST",
+        body: data,
       })
-        .then(res => res.json())
-        .then(res => {
+        .then((res) => res.json())
+        .then((res) => {
           console.log(res);
           if (res.sessionActive) {
             view.showAlert = true;
             if (res.request) {
               view.resetView();
               //Metodo que recargue las vantas
-              view.alertMessage = "Proceso exitoso"
+              view.alertMessage = "Proceso exitoso";
               view.processSuccess = true;
               this.updateModel();
             } else {
-              view.alertMessage = res.message
+              view.alertMessage = res.message;
               view.processSuccess = false;
             }
 
@@ -521,26 +534,23 @@ const vm = new Vue({
 
             setTimeout(() => {
               view.showAlert = false;
-              view.alertMessage = '';
+              view.alertMessage = "";
               view.processSuccess = true;
             }, 3000);
-
           } else {
             location.reload();
           }
-        })
-
-
+        });
     },
     //----------------------------------------------------------
     formatCurrency(value) {
-      var formatted = new Intl.NumberFormat('es-Co', {
-        style: 'currency',
-        currency: 'COP',
-        minimumFractionDigits: 0
+      var formatted = new Intl.NumberFormat("es-Co", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0,
       }).format(value);
       return formatted;
-    },//Fin del metodo
+    }, //Fin del metodo
     deleteFormaterOfAmount(text) {
       let value = text.replace("$", "");
       value = value.split(".");
@@ -550,20 +560,25 @@ const vm = new Vue({
     },
     async updateModel() {
       try {
-        const res = await fetch('./api/sales_api.php');
+        const res = await fetch("./api/sales_api.php");
         const data = await res.json();
         if (data.sessionActive) {
           let categoriesTemporal = [];
           let salesTemporal = [];
 
           //Se crean las categorías
-          data.categories.forEach(c => {
+          data.categories.forEach((c) => {
             //Se crea la instancia de categoría
-            let category = new Category(c.id, c.name, c.totalAmount, c.averageSale);
+            let category = new Category(
+              c.id,
+              c.name,
+              c.totalAmount,
+              c.averageSale
+            );
             //Se agregan las ventas asociadas a esta categoría
-            c.sales.forEach(s => {
+            c.sales.forEach((s) => {
               category.addSale(s.id, s.saleDate, s.description, s.amount);
-            })
+            });
             //Finalmente se agrega al arreglo temporal
             categoriesTemporal.push(category);
           });
@@ -571,15 +586,17 @@ const vm = new Vue({
           //Ahora se crean las ventas
 
           let totalAmount = 0;
-          data.sales.forEach(s => {
+          data.sales.forEach((s) => {
             console.log(s.saleDate);
             let sale = new Sale(s.id, s.saleDate, s.description, s.amount);
             salesTemporal.push(sale);
             totalAmount += sale.amount;
-          })
+          });
 
           //Se agregan a los arreglos principales
-          this.categories = categoriesTemporal.sort((c1, c2) => c2.totalAmount - c1.totalAmount);
+          this.categories = categoriesTemporal.sort(
+            (c1, c2) => c2.totalAmount - c1.totalAmount
+          );
           this.sales = salesTemporal;
           this.salesAmount = totalAmount;
         } else {
@@ -588,7 +605,41 @@ const vm = new Vue({
       } catch (error) {
         console.log(error);
       }
-    }
+    },
+    showView(viewName) {
+      if (this.actualView != viewName) {
+        //En primer lugar oculto todas las vistas
+        for (const key in this.views) {
+          if (this.views.hasOwnProperty(key)) {
+            const view = this.views[key];
+            view.visible = false;
+          }
+        } //Fin de for in
+
+        switch (viewName) {
+          case "newCategory":
+            {
+              this.views.newCategory.visible = true;
+              this.actualView = viewName;
+              showMenu(document.getElementById("navbar-collapse"));
+            }
+            break;
+          case "newSale":
+            {
+              this.views.newSale.visible = true;
+              this.actualView = viewName;
+              showMenu(document.getElementById("navbar-collapse"));
+            }
+            break;
+          default:
+            {
+              this.views.newSale.visible = true;
+              this.actualView = "newSale";
+            }
+            break;
+          } //Fin de swith
+      } //Fin de if
+    }, //Fin del metoo
   }, //Fin de methods
   computed: {
     newCategoryNameLength() {
@@ -611,10 +662,10 @@ const vm = new Vue({
       let availableLength = maxLength - length;
 
       return availableLength;
-    }
+    },
   }, //Fin de computed
   created() {
-    moment.locale('es-do');
+    moment.locale("es-do");
     this.updateModel();
-  }
+  },
 });
