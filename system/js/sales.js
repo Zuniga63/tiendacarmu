@@ -5,6 +5,7 @@ window.addEventListener("load", () => {
 class Category {
   constructor(id, name, totalAmount, averageSale) {
     this.id = id;
+    this.selected = false;
     this.name = name;
     this.totalAmount = totalAmount;
     this.averageSale = averageSale;
@@ -159,7 +160,7 @@ Vue.component("category-module", {
   <div class="sumary">
     <h3 class="sumary__title">Listado de categorías</h3>
     <div class="sumary__box scroll">
-      <div class="category-card" v-for="category in categories" :key="category.id">
+      <div class="category-card" :class="{selected : category.selected}" v-for="category in categories" :key="category.id" @click="$emit('category-selected', category)">
         <header class="category-card__header">
           <h3 class="category-card__name">
             {{category.name}}
@@ -265,6 +266,8 @@ const vm = new Vue({
         responseMessage: "",
         responseMessageShow: false,
         buttomMessage: "Registrar categoría",
+        categorySelected: null,
+        categorySales: [],
       }, //Fin de newCategory
       newSale: new NewSaleView(),
     }, //Fin de views
@@ -542,6 +545,27 @@ const vm = new Vue({
           }
         });
     },
+    //----------------------------------------------------------
+    //MANEJO DE EVENTOS PERSONALIZADOS
+    //----------------------------------------------------------
+    onCategorySelected(category){
+      let view = this.views.newCategory;
+
+      if(view.categorySelected){
+        view.categorySelected.selected = false;
+        view.categorySelected = category;
+        category.selected = true;
+        view.categorySales = category.sales;
+      }else{
+        view.categorySelected = category;
+        category.selected = true;
+        view.categorySales = category.sales;
+      }
+      console.log(category);
+      
+    },
+    //----------------------------------------------------------
+    //UTILIDADES
     //----------------------------------------------------------
     formatCurrency(value) {
       var formatted = new Intl.NumberFormat("es-Co", {

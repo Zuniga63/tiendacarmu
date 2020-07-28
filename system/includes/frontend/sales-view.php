@@ -147,12 +147,12 @@
 
             </form>
 
-            <category-module :categories="categories"></category-module>
+            <category-module :categories="categories" v-on:category-selected="onCategorySelected"></category-module>
           </div>
         </section>
 
         <aside class="view__sidebar">
-          <sales-module :sales="sales" :amount="salesAmount"></sales-module>
+          <sales-module :sales="views.newCategory.categorySales" :amount="views.newCategory.categorySelected ? views.newCategory.categorySelected.totalAmount : 0"></sales-module>
         </aside>
       </div>
 
