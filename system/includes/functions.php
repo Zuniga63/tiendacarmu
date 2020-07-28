@@ -1521,7 +1521,7 @@ function get_sales_of_category($category_id)
 	$sales = [];
 	try {
 		$conn = get_connection();
-		$stmt = $conn->query("SELECT t1.sale_id, t1.sale_date, t1.description, t1.amount FROM sale AS t1 JOIN sale_has_category AS t2 ON t2.category_id = $category_id AND t2.sale_id = t1.sale_id");
+		$stmt = $conn->query("SELECT t1.sale_id, t1.sale_date, t1.description, t1.amount FROM sale AS t1 JOIN sale_has_category AS t2 ON t2.category_id = $category_id AND t2.sale_id = t1.sale_id ORDER BY t1.sale_date DESC");
 
 		while ($row = $stmt->fetch()) {
 			$sale_id = intval($row['sale_id']);
