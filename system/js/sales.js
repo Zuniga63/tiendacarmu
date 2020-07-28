@@ -201,10 +201,13 @@ Vue.component("container-header", {
 });
 
 Vue.component("sales-module", {
-  props: ["sales", "amount"],
+  props: ["sales", "amount", "subtitle"],
   template: `
-  <div class="history" v-show="sales.length > 0">
-    <h2 class="history__title">Historial de ventas</h2>
+  <div class="history">
+    <div class="history__header">
+      <h2 class="history__title">Historial de ventas</h2>
+      <p class="history__subtitle">{{subtitle}}</p>
+    </div>
     <div class="history__head">
       <table class="table">
         <thead>
@@ -561,7 +564,6 @@ const vm = new Vue({
         category.selected = true;
         view.categorySales = category.sales;
       }
-      console.log(category);
       
     },
     //----------------------------------------------------------
@@ -611,7 +613,7 @@ const vm = new Vue({
 
           let totalAmount = 0;
           data.sales.forEach((s) => {
-            console.log(s.saleDate);
+            // console.log(s.saleDate);
             let sale = new Sale(s.id, s.saleDate, s.description, s.amount);
             salesTemporal.push(sale);
             totalAmount += sale.amount;

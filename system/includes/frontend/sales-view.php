@@ -152,7 +152,10 @@
         </section>
 
         <aside class="view__sidebar">
-          <sales-module :sales="views.newCategory.categorySales" :amount="views.newCategory.categorySelected ? views.newCategory.categorySelected.totalAmount : 0"></sales-module>
+          <sales-module 
+            :sales="views.newCategory.categorySales" 
+            :amount="views.newCategory.categorySelected ? views.newCategory.categorySelected.totalAmount : 0" 
+            :subtitle="views.newCategory.categorySelected ? views.newCategory.categorySelected.name : ''"></sales-module>
         </aside>
       </div>
 

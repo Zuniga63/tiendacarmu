@@ -2023,19 +2023,34 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   cursor: pointer;
 }
 
-.history__title {
-  font-family: var(--title_font);
-  letter-spacing: 1px;
-  color: var(--dark);
-  background-color: var(--light);
-  text-align: center;
-  text-transform: uppercase;
-  /* margin-bottom: 0.5em; */
+.history__header{
   padding: 0.5em;
-  font-size: 1.3em;
   border: 1px solid #ccc;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--dark);
+  background-color: var(--light);
+}
+
+.history__title {
+  font-family: var(--title_font);
+  letter-spacing: 1px;
+  /* color: var(--dark); */
+  /* background-color: var(--light); */
+  /* text-align: center; */
+  /* text-transform: uppercase; */
+  /* margin-bottom: 0.5em; */
+  /* padding: 0.5em; */
+  font-size: 1.3em;
+  /* border: 1px solid #ccc;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px; */
+}
+
+.history__subtitle{
+  font-size: 1em;
 }
 
 .history__body {
