@@ -195,157 +195,227 @@
 
     <!-- SECCION PARA AGREGAR UN PAGO -->
     <div class="customers-view__container" id="newPayment">
-      <div class="search-box">
-        <input type="text" class="search-box__search" placeholder="Buscar por nombre">
-        <div class="search-box__result scroll">
-          <div class="customer-card">
-            <h3 class="customer-card__name">Nombre del cliente</h3>
-            <p class="customer-card__balance">$ 1.000.000</p>
-            <div>
-              <p class="customer-card__debts">Creditos: x</p>
-              <p class="customer-card__points">Puntos: x</p>
+      <div class="view">
+        <section class="view__section">
+          <div class="search-box">
+            <input type="text" class="search-box__search" placeholder="Buscar por nombre">
+            <div class="search-box__result scroll">
+              <div class="customer-card">
+                <h3 class="customer-card__name">Nombre del cliente</h3>
+                <p class="customer-card__balance">$ 1.000.000</p>
+                <div>
+                  <p class="customer-card__debts">Creditos: x</p>
+                  <p class="customer-card__points">Puntos: x</p>
+                </div>
+              </div>
+              <div class="customer-card customer-card--late">
+                <h3 class="customer-card__name">Nombre del cliente</h3>
+                <p class="customer-card__balance">$ 1.000.000</p>
+                <div>
+                  <p class="customer-card__debts">Creditos: x</p>
+                  <p class="customer-card__points">Puntos: x</p>
+                </div>
+              </div>
+              <div class="customer-card">
+                <h3 class="customer-card__name">Nombre del cliente</h3>
+                <p class="customer-card__balance">$ 0</p>
+                <div>
+                  <p class="customer-card__debts">Creditos: x</p>
+                  <p class="customer-card__points">Puntos: x</p>
+                </div>
+              </div>
+              <div class="customer-card customer-card--late">
+                <h3 class="customer-card__name">Nombre del cliente</h3>
+                <p class="customer-card__balance">$ 1.000.000</p>
+                <div>
+                  <p class="customer-card__debts">Creditos: x</p>
+                  <p class="customer-card__points">Puntos: x</p>
+                </div>
+              </div>
+              <div class="customer-card">
+                <h3 class="customer-card__name">Nombre del cliente</h3>
+                <p class="customer-card__balance">$ 1.000.000</p>
+                <div>
+                  <p class="customer-card__debts">Creditos: x</p>
+                  <p class="customer-card__points">Puntos: x</p>
+                </div>
+              </div>
+              <div class="customer-card customer-card--late">
+                <h3 class="customer-card__name">Nombre del cliente</h3>
+                <p class="customer-card__balance">$ 1.000.000</p>
+                <div>
+                  <p class="customer-card__debts">Creditos: x</p>
+                  <p class="customer-card__points">Puntos: x</p>
+                </div>
+              </div>
             </div>
+            <p class="search-box__count">6 Clientes</p>
           </div>
-          <div class="customer-card customer-card--late">
-            <h3 class="customer-card__name">Nombre del cliente</h3>
-            <p class="customer-card__balance">$ 1.000.000</p>
-            <div>
-              <p class="customer-card__debts">Creditos: x</p>
-              <p class="customer-card__points">Puntos: x</p>
-            </div>
-          </div>
-          <div class="customer-card">
-            <h3 class="customer-card__name">Nombre del cliente</h3>
-            <p class="customer-card__balance">$ 0</p>
-            <div>
-              <p class="customer-card__debts">Creditos: x</p>
-              <p class="customer-card__points">Puntos: x</p>
-            </div>
-          </div>
-          <div class="customer-card customer-card--late">
-            <h3 class="customer-card__name">Nombre del cliente</h3>
-            <p class="customer-card__balance">$ 1.000.000</p>
-            <div>
-              <p class="customer-card__debts">Creditos: x</p>
-              <p class="customer-card__points">Puntos: x</p>
-            </div>
-          </div>
-          <div class="customer-card">
-            <h3 class="customer-card__name">Nombre del cliente</h3>
-            <p class="customer-card__balance">$ 1.000.000</p>
-            <div>
-              <p class="customer-card__debts">Creditos: x</p>
-              <p class="customer-card__points">Puntos: x</p>
-            </div>
-          </div>
-          <div class="customer-card customer-card--late">
-            <h3 class="customer-card__name">Nombre del cliente</h3>
-            <p class="customer-card__balance">$ 1.000.000</p>
-            <div>
-              <p class="customer-card__debts">Creditos: x</p>
-              <p class="customer-card__points">Puntos: x</p>
-            </div>
-          </div>
-        </div>
-        <p class="search-box__count">6 Clientes</p>
-      </div>
 
-      <form action="" class="form form--bg-light" id="newPaymentForm">
-        <h2 class="form__title">Registrar Abono</h2>
-        <!-- CUSTOMER CARD -->
-        <div class="customer-card" id="newPaymentCustomer">
-          <h3 class="customer-card__name">Nombre del cliente</h3>
-          <p class="customer-card__balance">$ 1.000.000</p>
-          <div>
-            <p class="customer-card__debts">Creditos: x</p>
-            <p class="customer-card__points">Puntos: x</p>
-          </div>
-        </div>
-        <!-- FORMULARIO -->
-        <div class="form__group">
-          <div class="form__group__body">
-            <label class="form__label">Forma de pago</label>
+          <form action="" class="form form--bg-light" id="newPaymentForm">
+            <h2 class="form__title">Registrar Abono</h2>
+            <!-- CUSTOMER CARD -->
+            <div class="customer-card" id="newPaymentCustomer">
+              <h3 class="customer-card__name">Nombre del cliente</h3>
+              <p class="customer-card__balance">$ 1.000.000</p>
+              <div>
+                <p class="customer-card__debts">Creditos: x</p>
+                <p class="customer-card__points">Puntos: x</p>
+              </div>
+            </div>
+            <!-- FORMULARIO -->
+            <div class="form__group">
+              <div class="form__group__body">
+                <label class="form__label">Forma de pago</label>
 
+                <div class="form__container-flex">
+                  <div class="form__group form__group--oneline-flex">
+                    <input type="radio" name="payment_type" id="newPaymentCashPayment" class="form__input form__input--check" checked>
+                    <label for="newPaymentCashPayment" class="form__label">Efectivo</label>
+                  </div>
+                  <div class="form__group form__group--oneline-flex">
+                    <input type="radio" name="payment_type" id="cardPayment" class="form__input form__input--check">
+                    <label for="cardPayment" class="form__label">Tarjeta</label>
+                  </div>
+                </div>
+              </div>
+              <div class="form__group__footer show">
+                <span class="alert alert--danger">Este codigo ya está en uso</span>
+              </div>
+            </div>
+            <!-- IMPORTE A abonar -->
+            <div class="form__group">
+              <div class="form__group__body">
+                <label class="form__label" for="newPaymentAmount">Importe</label>
+                <input class="form__input form__input--money form__input--money-big" type="text" name="payment_amount" placeholder="$0" id="newPaymentAmount" require>
+              </div>
+              <div class="form__group__footer">
+                <span class="alert alert--danger" id="newPaymentAmountAlert">Este codigo ya está en uso</span>
+              </div>
+            </div>
+            <P class="alert alert--big" id="newPaymentAlert">El nombre del cliente es obligatorio</P>
+            <input type="submit" value="Registrar Abono" class="btn btn--success" id="newPaymentBtn">
+          </form>
+        </section>
+        <aside class="view__sidebar">
+          <div class="customer-sumary__container">
+            <h3 class="customer-sumary__title">Historial de Creditos</h3>
             <div class="form__container-flex">
               <div class="form__group form__group--oneline-flex">
-                <input type="radio" name="payment_type" id="newPaymentCashPayment" class="form__input form__input--check" checked>
-                <label for="newPaymentCashPayment" class="form__label">Efectivo</label>
+                <input type="radio" name="select" id="consultDebtsAll" class="form__input form__input--check">
+                <label for="consultDebtsAll" class="form__label">Todos</label>
               </div>
               <div class="form__group form__group--oneline-flex">
-                <input type="radio" name="payment_type" id="cardPayment" class="form__input form__input--check">
-                <label for="cardPayment" class="form__label">Tarjeta</label>
+                <input type="radio" name="select" id="consultDebtsOutstanding" class="form__input form__input--check" checked>
+                <label for="consultDebtsOutstanding" class="form__label">Pendientes</label>
+              </div>
+              <div class="form__group form__group--oneline-flex">
+                <input type="radio" name="select" id="consultDebtsPaid" class="form__input form__input--check">
+                <label for="consultDebtsPaid" class="form__label">Pagados</label>
               </div>
             </div>
+            <div class="customer-sumary__box scroll">
+            </div>
+            <p class="search-box__count show">2 Creditos; $ 4.400.000</p>
           </div>
-          <div class="form__group__footer show">
-            <span class="alert alert--danger">Este codigo ya está en uso</span>
+
+          <div class="customer-sumary__container">
+            <h3 class="customer-sumary__title">Historial de pagos</h3>
+            <div class="customer-sumary__box scroll">
+
+            </div>
+            <p class="search-box__count show">2 Abonos; $ 1.300.000</p>
           </div>
-        </div>
-        <!-- IMPORTE A abonar -->
-        <div class="form__group">
-          <div class="form__group__body">
-            <label class="form__label" for="newPaymentAmount">Importe</label>
-            <input class="form__input form__input--money form__input--money-big" type="text" name="payment_amount" placeholder="$0" id="newPaymentAmount" require>
-          </div>
-          <div class="form__group__footer">
-            <span class="alert alert--danger" id="newPaymentAmountAlert">Este codigo ya está en uso</span>
-          </div>
-        </div>
-        <P class="alert alert--big" id="newPaymentAlert">El nombre del cliente es obligatorio</P>
-        <input type="submit" value="Registrar Abono" class="btn btn--success" id="newPaymentBtn">
-      </form>
+        </aside>
+      </div>
     </div>
 
     <!-- SECCION PARA AGREGAR UNA NUEVA DEUDA -->
     <div class="customers-view__container" id="newDebt">
-      <!-- SECCION PARA SELECCIONAR CLIENTE -->
-      <div class="search-box">
-        <input type="text" class="search-box__search" id="newDebtSearchBox" placeholder="Buscar por nombre">
-        <div class="search-box__result scroll" id="newDebtSearchBoxResult">
-        </div>
-        <p class="search-box__count"></p>
+      <div class="view">
+        <section class="view__section">
+          <!-- SECCION PARA SELECCIONAR CLIENTE -->
+          <div class="search-box">
+            <input type="text" class="search-box__search" id="newDebtSearchBox" placeholder="Buscar por nombre">
+            <div class="search-box__result scroll" id="newDebtSearchBoxResult">
+            </div>
+            <p class="search-box__count"></p>
+          </div>
+
+          <!-- FORMULARIO DE DATOS -->
+          <form class="form form--bg-light" id="newCreditForm">
+            <h2 class="form__title">Registrar Crédito</h2>
+            <!-- CUSTOMER CARD -->
+            <div class="customer-card" id="newDebtCustomer">
+              <h3 class="customer-card__name">Nombre del cliente</h3>
+              <p class="customer-card__balance">$ 1.000.000</p>
+              <div>
+                <p class="customer-card__debts">Creditos: x</p>
+                <p class="customer-card__points">Puntos: x</p>
+              </div>
+            </div>
+
+            <!-- CAMPO PARA DETALLES DEL CREDITO -->
+            <div class="form__group">
+              <div class="form__group__body">
+                <label for="creditDescription" class="form__label form__label--center">Detalles del credito</label>
+                <textarea name="credit_description" id="creditDescription" cols="30" rows="4" class="form__input" placeholder="Escribe los detalles aquí" required></textarea>
+              </div>
+              <div class="form__group__footer">
+                <span class="alert alert--danger" id="creditDescriptionAlert">Este campo es obligatorio</span>
+                <span class="form__input__length" id="creditDescriptionLength">255</span>
+              </div>
+            </div>
+            <!--FIN DEL GRUPO-->
+
+            <!-- IMPORTE A abonar -->
+            <div class="form__group">
+              <div class="form__group__body">
+                <label class="form__label" for="creditAmount">Importe</label>
+                <input class="form__input form__input--money form__input--money-big" type="text" name="credit_amount" id="creditAmount" placeholder="$ 0" required>
+              </div>
+              <div class="form__group__footer">
+                <span class="alert alert--danger" id="creditAmountAlert">Este codigo ya está en uso</span>
+              </div>
+            </div>
+            <!-- ALERTA DE ERROR EN DATOS DE CREDITO -->
+            <P class="alert alert--big" id="newCreditAlert">El nombre del cliente es obligatorio</P>
+            <input type="submit" value="Registrar Credito" class="btn btn--success" id="newCreditBtn">
+          </form>
+        </section>
+
+        <aside class="view__sidebar">
+          <div class="customer-sumary__container">
+            <h3 class="customer-sumary__title">Historial de Creditos</h3>
+            <div class="form__container-flex">
+              <div class="form__group form__group--oneline-flex">
+                <input type="radio" name="select" id="consultDebtsAll" class="form__input form__input--check">
+                <label for="consultDebtsAll" class="form__label">Todos</label>
+              </div>
+              <div class="form__group form__group--oneline-flex">
+                <input type="radio" name="select" id="consultDebtsOutstanding" class="form__input form__input--check" checked>
+                <label for="consultDebtsOutstanding" class="form__label">Pendientes</label>
+              </div>
+              <div class="form__group form__group--oneline-flex">
+                <input type="radio" name="select" id="consultDebtsPaid" class="form__input form__input--check">
+                <label for="consultDebtsPaid" class="form__label">Pagados</label>
+              </div>
+            </div>
+            <div class="customer-sumary__box scroll">
+            </div>
+            <p class="search-box__count show">2 Creditos; $ 4.400.000</p>
+          </div>
+
+          <div class="customer-sumary__container">
+            <h3 class="customer-sumary__title">Historial de pagos</h3>
+            <div class="customer-sumary__box scroll">
+
+            </div>
+            <p class="search-box__count show">2 Abonos; $ 1.300.000</p>
+          </div>
+        </aside>
       </div>
 
-      <!-- FORMULARIO DE DATOS -->
-      <form class="form form--bg-light" id="newCreditForm">
-        <h2 class="form__title">Registrar Crédito</h2>
-        <!-- CUSTOMER CARD -->
-        <div class="customer-card" id="newDebtCustomer">
-          <h3 class="customer-card__name">Nombre del cliente</h3>
-          <p class="customer-card__balance">$ 1.000.000</p>
-          <div>
-            <p class="customer-card__debts">Creditos: x</p>
-            <p class="customer-card__points">Puntos: x</p>
-          </div>
-        </div>
-
-        <!-- CAMPO PARA DETALLES DEL CREDITO -->
-        <div class="form__group">
-          <div class="form__group__body">
-            <label for="creditDescription" class="form__label form__label--center">Detalles del credito</label>
-            <textarea name="credit_description" id="creditDescription" cols="30" rows="4" class="form__input" placeholder="Escribe los detalles aquí" required></textarea>
-          </div>
-          <div class="form__group__footer">
-            <span class="alert alert--danger" id="creditDescriptionAlert">Este campo es obligatorio</span>
-            <span class="form__input__length" id="creditDescriptionLength">255</span>
-          </div>
-        </div>
-        <!--FIN DEL GRUPO-->
-
-        <!-- IMPORTE A abonar -->
-        <div class="form__group">
-          <div class="form__group__body">
-            <label class="form__label" for="creditAmount">Importe</label>
-            <input class="form__input form__input--money form__input--money-big" type="text" name="credit_amount" id="creditAmount" placeholder="$ 0" required>
-          </div>
-          <div class="form__group__footer">
-            <span class="alert alert--danger" id="creditAmountAlert">Este codigo ya está en uso</span>
-          </div>
-        </div>
-        <!-- ALERTA DE ERROR EN DATOS DE CREDITO -->
-        <P class="alert alert--big" id="newCreditAlert">El nombre del cliente es obligatorio</P>
-        <input type="submit" value="Registrar Credito" class="btn btn--success" id="newCreditBtn">
-      </form>
     </div>
 
     <!-- SECCION PARA ACTUALIZAR UN CLIENTE -->
