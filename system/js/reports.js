@@ -60,7 +60,15 @@ class Category {
   }
 }
 
-const DayOfWeek = Object.freeze({ 1: 'Lunes', 2: "Martes", 3: "Miércoles", 4: "Jueves", 5: "Viernes", 6: "Sábado", 7: "Domingo" });
+const DayOfWeek = Object.freeze({
+  1: "Lunes",
+  2: "Martes",
+  3: "Miércoles",
+  4: "Jueves",
+  5: "Viernes",
+  6: "Sábado",
+  7: "Domingo",
+});
 
 /**
  * Clase base para la generacion de reportes
@@ -97,28 +105,24 @@ class Report {
     let lowerBound = 0;
 
     //Se calcula max, min y amount
-    this.sales.forEach(sale => {
+    this.sales.forEach((sale) => {
       saleCount++;
       amount += sale.amount;
 
-      if (typeof max === 'undefined' && typeof min === 'undefined') {
+      if (typeof max === "undefined" && typeof min === "undefined") {
         max = sale;
         min = sale;
       } else {
-        max = max.amount > sale.amount
-          ? max
-          : sale;
+        max = max.amount > sale.amount ? max : sale;
 
-        min = min.amount < sale.amount
-          ? min
-          : sale;
+        min = min.amount < sale.amount ? min : sale;
       }
     });
 
     //Se calcula vaerage y las cotas superior e inferior
     if (saleCount > 0) {
       averageSale = amount / saleCount;
-      this.sales.forEach(sale => {
+      this.sales.forEach((sale) => {
         if (sale.amount >= averageSale) {
           upperBound++;
         } else {
@@ -133,7 +137,6 @@ class Report {
 
     //Se calculan las cotas superio e inferior
 
-
     this.amount = amount;
     this.averageSale = averageSale;
     this.maxSale = max;
@@ -143,7 +146,7 @@ class Report {
   }
 }
 
-class DailyReport extends Report{
+class DailyReport extends Report {
   /**
    * Crea y gestiona los reportes diarios, verificando tambien
    * que las fechas de las ventas correspondan a la fecha del reporte
@@ -155,24 +158,174 @@ class DailyReport extends Report{
     super(id, sales);
     this.date = date;
     this.dayOfWeek = DayOfWeek[date.isoWeekday()];
-    this.error = [];
+    this.salesWithError = [];
   }
 
-  calculateStatistics(){
+  calculateStatistics() {
     //Antes se verifica que todas las ventas sean de la misma fecha
     let temporalSales = [];
-    let saleError = [];
-    this.sales.forEach(sale => {
-      if(sale.saleDate.format('yyyy-MM-DD') === this.date.format('yyyy-MM-DD')){
+    let salesWithError = [];
+    this.sales.forEach((sale) => {
+      if (
+        sale.saleDate.format("yyyy-MM-DD") === this.date.format("yyyy-MM-DD")
+      ) {
         temporalSales.push(sale);
-      }else{
-        saleError.push(sale);
+      } else {
+        salesWithError.push(sale);
       }
-    })
+    });
 
     this.sales = temporalSales;
-    this.error = saleError;
+    this.salesWithError = salesWithError;
 
     super.calculateStatistics();
   }
 }
+
+class PeriodicReport extends Report {
+  /**
+   * @constructor
+   * @param {number} id Identificador del reporte
+   * @param {objetc} sales Arrglo con instancias de ventas
+   * @param {object} since Instancia de moment para la fecha inicial
+   * @param {object} until Instancia de moment para la fecha final
+   */
+  constructor(id, sales, since, until) {
+    super(id, sales);
+    this.since = undefined;
+    this.until = undefined;
+    this.periodIsCorrect = false;
+    this.dailyReports = [];
+    this.maxDailySale = undefined;
+    this.minDailySale = undefined;
+    this.averageDailySale = 0;
+
+    this.__validatePeriod(since, until);
+  }
+
+  calculateStatistics() {
+    if (this.periodIsCorrect) {
+      this.__validateSales();
+      super.calculateStatistics();
+      this.__calculateDailyStatistics();
+    }
+  }
+
+  /**
+   * Verifica que sean instancia de moment y que la fecha inicial
+   * sea menor que la fecha final, ademas pone las fechas la inicio y al final de
+   * sus días
+   * @param {object} since Intancia de moment con la fecha inicial
+   * @param {object} until Intancia de moment con la fecha final
+   */
+  __validatePeriod(since, until) {
+    if (since instanceof moment && until instanceof moment) {
+      //Se verifica que since sea menor que until
+      if (since.isBefore(until)) {
+        this.since = since.startOf("day");
+        this.until = until.endOf("day");
+        this.periodIsCorrect = true;
+      } else {
+        this.since = since;
+        this.until = until;
+      }
+    } else {
+      this.since = moment();
+      this.until = moment();
+    }
+  } //Fin del metodo
+
+  /**
+   * Se verifica que las ventas esten dentro del periodo
+   * y se muta el array original de ventas
+   */
+  __validateSales() {
+    let salescorrect = [];
+    let salesIncorrect = [];
+
+    this.sales.forEach((sale) => {
+      if (
+        sale.saleDate.isSameOrAfter(this.since) &&
+        sale.saleDate.isSameOrBefore(this.until)
+      ) {
+        salescorrect.push(sale);
+      } else {
+        salesIncorrect.push(sale);
+      }
+    });
+
+    this.sales = salescorrect;
+    this.salesWithError = salesIncorrect;
+  }
+
+  __calculateDailyStatistics() {
+    let since = undefined;
+    let until = undefined;
+    let dailySales = [];
+    let actualSaleIndex = 0;
+    let startDate = this.since;
+    let endDate = this.until;
+    let dailyReports = [];
+    let maxDailySale = undefined;
+    let minDailySale = undefined;
+    let averageDailySale = 0;
+
+    //Se define la fecha del primer reporte diario
+    since = moment(startDate).startOf("day");
+    until = moment(since).endOf("day");
+
+    //Se inicia el cilo que va verificando la fechas de las ventas
+    while (since.isBefore(endDate)) {
+      //Empieza el bucle que recorre las ventas
+      for (let index = actualSaleIndex; index < this.sales.length; index++) {
+        const sale = this.sales[index];
+        if (sale.saleDate.isSameOrAfter(since) && sale.saleDate.isSameOrBefore(until)) {
+          dailySales.push(sale);
+        } else {
+          break;
+        }
+
+        actualSaleIndex = index;
+      }//Fin de for
+
+      //En este punto o no hay mas ventas o se rompio el bucle
+      const dailyReport = new DailyReport(
+        this.dailyReports.length + 1,
+        dailySales,
+        since
+      );
+
+      //Se asigna el rporte maximo y el minimo
+      if (
+        typeof minDailySale === "undefined" &&
+        typeof maxDailySale === "undefined"
+      ) {
+        minDailySale = dailyReport;
+        maxDailySale = dailyReport;
+      } else {
+        minDailySale =
+          dailyReport.amount < minDailySale.amount ? dailyReport : minDailySale;
+        maxDailySale =
+          dailyReport.amount > maxDailySale.amount ? dailyReport : maxDailySale;
+      }//Fin de if-else
+
+      dailyReports.push(dailyReport);
+
+      //Se aumenta en un día las fecha limitantes
+      since.add(1, 'day');
+      until.add(1, 'day');
+      //Se reinician las ventas
+      dailySales = [];
+    }//Fin de while
+
+    if(dailyReports.length > 0){
+      averageDailySale = this.amount / dailyReports.length;
+    }
+
+    //Se actualiza la ifnormacion del objeto
+    this.dailyReports = dailyReports;
+    this.maxDailySale = maxDailySale;
+    this.minDailySale = minDailySale;
+    this.averageDailySale = averageDailySale;
+  }//Fin del metodo
+}//Fin de la clase
