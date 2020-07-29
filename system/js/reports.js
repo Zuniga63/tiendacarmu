@@ -76,6 +76,8 @@ class Report{
     this.averageSale = 0;
     this.maxSale = undefined;
     this.minSale = undefined;
+    this.upperBound = 0;
+    this.lowerBound = 0;
   }
 
   /**
@@ -88,7 +90,10 @@ class Report{
     let averageSale = 0;
     let max = undefined;
     let min = undefined;
+    let upperBound = 0;
+    let lowerBound = 0;
 
+    //Se calcula max, min y amount
     this.sales.forEach(sale => {
       saleCount++;
       amount += sale.amount;
@@ -107,13 +112,30 @@ class Report{
       }
     });
 
+    //Se calcula vaerage y las cotas superior e inferior
     if(saleCount > 0){
       averageSale = amount / saleCount;
+      this.sales.forEach(sale => {
+        if(sale.amount >= averageSale){
+          upperBound++;
+        }else{
+          lowerBound++;
+        }
+      });
+
+      //Se convierte en porcentaje
+      upperBound = upperBound / saleCount;
+      lowerBound = lowerBound / saleCount;
     }
+
+    //Se calculan las cotas superio e inferior
+    
 
     this.amount = amount;
     this.averageSale = averageSale;
     this.maxSale = max;
     this.minSale = min;
+    this.upperBound = upperBound;
+    this.lowerBound = lowerBound;
   }
 }
