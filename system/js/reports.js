@@ -60,16 +60,18 @@ class Category {
   }
 }
 
+const DayOfWeek = Object.freeze({ 1: 'Lunes', 2: "Martes", 3: "Miércoles", 4: "Jueves", 5: "Viernes", 6: "Sábado", 7: "Domingo" });
+
 /**
  * Clase base para la generacion de reportes
  */
-class Report{
+class Report {
   /**
    * @constructor
    * @param {number} id identificador del reporte
    * @param {object} sales Arreglo con isntancias de Sale
    */
-  constructor(id, sales){
+  constructor(id, sales) {
     this.id = id;
     this.sales = sales;
     this.amount = 0;
@@ -84,7 +86,8 @@ class Report{
    * Segun los datos de ventas calcula las estadisticas
    * asociadas
    */
-  calculateStatistics(){
+  calculateStatistics() {
+    console.log("Llamando al objeto base");
     let saleCount = 0;
     let amount = 0;
     let averageSale = 0;
@@ -98,38 +101,38 @@ class Report{
       saleCount++;
       amount += sale.amount;
 
-      if(typeof max === 'undefined' && typeof min === 'undefined'){
+      if (typeof max === 'undefined' && typeof min === 'undefined') {
         max = sale;
         min = sale;
-      }else{
-        max = max.amount > sale.amount 
-            ? max
-            : sale;
+      } else {
+        max = max.amount > sale.amount
+          ? max
+          : sale;
 
         min = min.amount < sale.amount
-            ? min
-            : sale;
+          ? min
+          : sale;
       }
     });
 
     //Se calcula vaerage y las cotas superior e inferior
-    if(saleCount > 0){
+    if (saleCount > 0) {
       averageSale = amount / saleCount;
       this.sales.forEach(sale => {
-        if(sale.amount >= averageSale){
+        if (sale.amount >= averageSale) {
           upperBound++;
-        }else{
+        } else {
           lowerBound++;
         }
       });
 
-      //Se convierte en porcentaje
+      //Se convierte en fracciones
       upperBound = upperBound / saleCount;
       lowerBound = lowerBound / saleCount;
     }
 
     //Se calculan las cotas superio e inferior
-    
+
 
     this.amount = amount;
     this.averageSale = averageSale;
@@ -137,5 +140,39 @@ class Report{
     this.minSale = min;
     this.upperBound = upperBound;
     this.lowerBound = lowerBound;
+  }
+}
+
+class DailyReport extends Report{
+  /**
+   * Crea y gestiona los reportes diarios, verificando tambien
+   * que las fechas de las ventas correspondan a la fecha del reporte
+   * @param {number} id Identificador del reporte
+   * @param {object} sales Arreglo con las ventas
+   * @param {object} date Instancia de fecha Moment
+   */
+  constructor(id, sales, date) {
+    super(id, sales);
+    this.date = date;
+    this.dayOfWeek = DayOfWeek[date.isoWeekday()];
+    this.error = [];
+  }
+
+  calculateStatistics(){
+    //Antes se verifica que todas las ventas sean de la misma fecha
+    let temporalSales = [];
+    let saleError = [];
+    this.sales.forEach(sale => {
+      if(sale.saleDate.format('yyyy-MM-DD') === this.date.format('yyyy-MM-DD')){
+        temporalSales.push(sale);
+      }else{
+        saleError.push(sale);
+      }
+    })
+
+    this.sales = temporalSales;
+    this.error = saleError;
+
+    super.calculateStatistics();
   }
 }
