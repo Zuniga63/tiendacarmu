@@ -2,32 +2,6 @@ window.addEventListener("load", () => {
   document.getElementById("preload").classList.remove("show");
 });
 
-class Category {
-  constructor(id, name, totalAmount, averageSale) {
-    this.id = id;
-    this.selected = false;
-    this.name = name;
-    this.totalAmount = totalAmount;
-    this.averageSale = averageSale;
-    this.sales = [];
-  }
-
-  addSale(saleID, saleDate, saleDescription, saleAmount) {
-    let sale = new Sale(saleID, saleDate, saleDescription, saleAmount);
-    this.sales.push(sale);
-  }
-}
-
-class Sale {
-  constructor(id, saleDate, description, amount) {
-    this.id = id;
-    this.saleDate = moment(saleDate);
-    this.dateToString = this.saleDate.format("DD-MM-yyyy");
-    this.description = description;
-    this.amount = amount;
-  }
-}
-
 class DataInput {
   constructor(value = "", hasError = false, message = "") {
     this.value = value;
