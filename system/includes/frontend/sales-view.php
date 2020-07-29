@@ -302,6 +302,9 @@
   <!-- Librería de Vue.js -->
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
+  <!-- Librería personal para reportes de ventas-->
+  <script src=<?= "./js/reports.js?v=" . VERSION ?>></script>
+
   <!-- Script de esta vista -->
   <script src=<?= "./js/sales.js?v=" . VERSION ?>></script>
 </body>
