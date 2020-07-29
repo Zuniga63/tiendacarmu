@@ -1531,7 +1531,7 @@ function get_sales_of_category($category_id)
 
 			$sales[] = [
 				'id' => $sale_id,
-				'date' => $sale_date,
+				'saleDate' => $sale_date,
 				'description' => $description,
 				'amount' => $amount
 			];
