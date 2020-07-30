@@ -306,11 +306,11 @@
                 <label for="consultDebtsAll" class="form__label">Todos</label>
               </div>
               <div class="form__group form__group--oneline-flex">
-                <input type="radio" name="select" id="consultDebtsOutstanding" class="form__input form__input--check" checked>
+                <input type="radio" name="select" class="form__input form__input--check" checked>
                 <label for="consultDebtsOutstanding" class="form__label">Pendientes</label>
               </div>
               <div class="form__group form__group--oneline-flex">
-                <input type="radio" name="select" id="consultDebtsPaid" class="form__input form__input--check">
+                <input type="radio" name="select" class="form__input form__input--check">
                 <label for="consultDebtsPaid" class="form__label">Pagados</label>
               </div>
             </div>
@@ -393,12 +393,12 @@
                 <label for="consultDebtsAll" class="form__label">Todos</label>
               </div>
               <div class="form__group form__group--oneline-flex">
-                <input type="radio" name="select" id="consultDebtsOutstanding" class="form__input form__input--check" checked>
-                <label for="consultDebtsOutstanding" class="form__label">Pendientes</label>
+                <input type="radio" name="select" class="form__input form__input--check" checked>
+                <label class="form__label">Pendientes</label>
               </div>
               <div class="form__group form__group--oneline-flex">
-                <input type="radio" name="select" id="consultDebtsPaid" class="form__input form__input--check">
-                <label for="consultDebtsPaid" class="form__label">Pagados</label>
+                <input type="radio" name="select" class="form__input form__input--check">
+                <label class="form__label">Pagados</label>
               </div>
             </div>
             <div class="customer-sumary__box scroll">
