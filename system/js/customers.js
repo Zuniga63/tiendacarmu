@@ -2078,3 +2078,40 @@ const printBarChart = (ctx, barCharData) => {
 		}
 	})
 }
+
+//--------------------------------------------------------------------------
+//	METODOS PRIVADOS PARA RECUPERAR DATOS DE CLIENTES
+//--------------------------------------------------------------------------
+const printCustomerInfo = () =>{
+	let text = "";
+	customers.forEach(customer => {
+		text += `${customer.id}\t${customer.firstName}\t`
+		text += `${customer.lastName}\t${customer.nit}\t`
+		text += `${customer.phone}\t${customer.email}\t`
+		text += `${Math.ceil(customer.points)}\t${Math.ceil(customer.paymentFrecuency)}\n`
+	})
+
+	console.log(text);
+}
+
+const printDelinquentCustomers = () =>{
+	let text = "";
+	let delinquent = customers.filter(c => c.balance > 0);
+	delinquent.sort((c1,c2) => c2.balance - c1.balance);
+
+	delinquent.forEach(c => {
+		text += `${c.firstName} ${c.lastName}\t${c.balance}\t${c.state}\n`;
+	})
+
+	console.log(text);
+}
+
+const printCustomerOrderByPaymentFrecuency = () =>{
+	let text = "";
+	customers.sort((c1,c2) => c2.paymentFrecuency - c1.paymentFrecuency);
+	customers.forEach(c => {
+		text += `${c.id}\t${c.firstName} ${c.lastName}\t${c.balance}\t${c.state}\n`;
+	})
+
+	console.log(text);
+}
