@@ -20,6 +20,7 @@ class Sale {
    */
   constructor(id, saleDate, description, amount) {
     this.id = id;
+    this.categoryId = 0;
     this.saleDate = moment(saleDate);
     this.dateToString = this.saleDate.format("DD-MM-yyyy");
     this.description = description;
@@ -83,7 +84,7 @@ class Report {
     this.id = id;
     this.sales = sales;
     this.amount = 0;
-    this.averageSale = 0;
+    this.average = 0;
     this.maxSale = undefined;
     this.minSale = undefined;
     this.upperBound = 0;
@@ -97,7 +98,7 @@ class Report {
   calculateStatistics() {
     let saleCount = 0;
     let amount = 0;
-    let averageSale = 0;
+    let average = 0;
     let max = undefined;
     let min = undefined;
     let upperBound = 0;
@@ -112,16 +113,16 @@ class Report {
         max = sale;
         min = sale;
       } else {
-        max = max.amount > sale.amount ? max : sale;
-        min = min.amount < sale.amount ? min : sale;
+        max = max.amount >= sale.amount ? max : sale;
+        min = min.amount <= sale.amount ? min : sale;
       }
     });
 
     //Se calcula average y las cotas superior e inferior
     if (saleCount > 0) {
-      averageSale = amount / saleCount;
+      average = amount / saleCount;
       this.sales.forEach((sale) => {
-        if (sale.amount >= averageSale) {
+        if (sale.amount >= average) {
           upperBound++;
         } else {
           lowerBound++;
@@ -133,8 +134,7 @@ class Report {
       lowerBound = lowerBound / saleCount;
     }
 
-    //Se calculan las cotas superio e inferior
-
+    //Se actualiza los parametros del objeto
     this.amount = amount;
     this.averageSale = averageSale;
     this.maxSale = max;
@@ -158,7 +158,7 @@ class DailyReport extends Report {
   constructor(id, sales, date) {
     super(id, sales);
     this.date = date;
-    this.dayOfWeek = DayOfWeek[date.isoWeekday()]; //Obtengo el numero del día
+    this.dayOfWeek = DayOfWeek[date.isoWeekday()]; //Obtengo el numero del día para luego obtener el nombre del día
     this.salesWithError = []; //Para las ventas que no pertenencen a este día
   }
 
@@ -183,19 +183,24 @@ class DailyReport extends Report {
   }
 }
 
+/**
+ * Clase de reporte basico para todos los reportes que comprenden dos fechas dintintas
+ */
 class PeriodicReport extends Report {
   /**
    * @constructor
    * @param {number} id Identificador del reporte
-   * @param {objetc} sales Arrglo con instancias de ventas
+   * @param {object} sales arreglo con instancias de ventas
    * @param {object} since Instancia de moment para la fecha inicial
    * @param {object} until Instancia de moment para la fecha final
    */
   constructor(id, sales, since, until) {
     super(id, sales);
+    //Estos tres parametros se definen en la validacion del periodo
     this.since = undefined;
     this.until = undefined;
     this.periodIsCorrect = false;
+
     this.dailyReports = [];
     this.maxDailySale = undefined;
     this.minDailySale = undefined;
@@ -239,7 +244,9 @@ class PeriodicReport extends Report {
 
   /**
    * Se verifica que las ventas esten dentro del periodo
-   * y se muta el array original de ventas
+   * y se muta el array original de ventas. 
+   * OJO: ESTE METODO REVIERTE EL ARREGLO DE VENTAS YA QUE POR DEFECTO
+   * EN EL SERVIDOR ESTAS SON ENVIADAS EN ORDEN INVERSO
    */
   __validateSales() {
     let salescorrect = [];
@@ -257,6 +264,7 @@ class PeriodicReport extends Report {
     });
 
     this.sales = salescorrect.reverse();
+    //TODO: Metodo que grantice un ordenamineto de fechas correcto siempre
     this.salesWithError = salesIncorrect;
   }
 
@@ -286,9 +294,6 @@ class PeriodicReport extends Report {
         const sale = this.sales[index];
         actualSaleIndex = index;
 
-        console.log(sale);
-        let result = sale.saleDate.isSameOrAfter(since) && sale.saleDate.isSameOrBefore(until);
-        console.log(result);
         if (
           sale.saleDate.isSameOrAfter(since) &&
           sale.saleDate.isSameOrBefore(until)
@@ -349,3 +354,44 @@ class PeriodicReport extends Report {
     this.dayInWhite = dayInWhite;
   } //Fin del metodo
 } //Fin de la clase
+
+class WeeklyReport extends PeriodicReport{
+  /**
+   * @constructor
+   * @param {number} id Identificador del reporte
+   * @param {object} sales Arreglo con instancias de Sale
+   * @param {object} since Intancia moment con la fecha del inicio de la semana
+   * @param {object} until Instancia moment con la fecha del fin de la semana
+   */
+  constructor(id, sales, since, until){
+    super(id, sales, since, until);
+    this.week = undefined;
+  }
+
+  /**
+   * Antes de verificar que el periodo es correcto
+   * este metodo valida y formatea las fechas al inicio y al final
+   * de la semana
+   */
+  __validatePeriod(){
+    this.__validateWeek();
+    super.__validatePeriod();
+  }
+
+  /**
+   * Verifica que since y until sean instancias de momente y ubica las fechas
+   * correctamente al inicio y al final de la semana de esa fecha
+   */
+  __validateWeek(){
+    if(this.since instanceof moment && this.until instanceof moment){
+      //Primero se define el numero de la semna
+      this.week = this.since.isoWeek();
+      //Ahora se define el inicio y el fin de la semana
+      this.since = this.since.startOf('week');
+      this.until = this.until.endOf('week');
+    }else{
+      this.since = moment().startOf('week');
+      this.until = moment().endOf('week');
+    }
+  }
+}
