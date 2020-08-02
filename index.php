@@ -25,7 +25,6 @@ $allItems = get_all_items();
 
     gtag('config', 'UA-171876097-1');
   </script>
-git
 
   <!-- SE CARGAN LAS FUENTES DE LOS ICONOS -->
   <link rel="stylesheet" href=<?= "./font/style.css?v=" . VERSION ?> />
