@@ -1,6 +1,25 @@
 window.addEventListener("load", () => {
   document.getElementById("preload").classList.remove("show");
+  vm.updateBiweeklyChart();
 });
+
+//---------------------------------------------------------------------------
+//               HERRAMIENTAS PARA PINTAR GRAFICAS
+//---------------------------------------------------------------------------
+/**
+ * Herramienta de ChartJs para gestionar el color
+ */
+let color = Chart.helpers.color;
+
+let chartColors = {
+  red: 'rgb(255, 99, 132)',
+  orange: 'rgb(255, 159, 64)',
+  yellow: 'rgb(255, 205, 86)',
+  green: 'rgb(75, 192, 192)',
+  blue: 'rgb(54, 162, 235)',
+  purple: 'rgb(153, 102, 255)',
+  grey: 'rgb(201, 203, 207)'
+}
 
 class DataInput {
   constructor(value = "", hasError = false, message = "") {
@@ -37,6 +56,7 @@ class NewSaleView {
     this.showAlert = false;
     this.alertMessage = "";
     this.processSuccess = false;
+    this.biweeklyChart = undefined;
   }
 
   resetView() {
@@ -525,20 +545,20 @@ const vm = new Vue({
     //----------------------------------------------------------
     //MANEJO DE EVENTOS PERSONALIZADOS
     //----------------------------------------------------------
-    onCategorySelected(category){
+    onCategorySelected(category) {
       let view = this.views.newCategory;
 
-      if(view.categorySelected){
+      if (view.categorySelected) {
         view.categorySelected.selected = false;
         view.categorySelected = category;
         category.selected = true;
         view.categorySales = category.sales;
-      }else{
+      } else {
         view.categorySelected = category;
         category.selected = true;
         view.categorySales = category.sales;
       }
-      
+
     },
     //----------------------------------------------------------
     //UTILIDADES
@@ -599,6 +619,9 @@ const vm = new Vue({
           );
           this.sales = salesTemporal;
           this.salesAmount = totalAmount;
+
+          //Se actualizan las graficas
+          this.updateBiweeklyChart();
         } else {
           location.reload();
         }
@@ -637,9 +660,79 @@ const vm = new Vue({
               this.actualView = "newSale";
             }
             break;
-          } //Fin de swith
+        } //Fin de swith
       } //Fin de if
     }, //Fin del metoo
+    createBarChart(ctx, data, title, money = false) {
+      let displayTitle = typeof title === 'string' && title.length > 0;
+      let myBar = new Chart(ctx, {
+        type: 'bar',
+        data: data,
+        options: {
+          responsive: true,
+          legend: {
+            position: 'top',
+          },//Fin de legend
+          title: {
+            display: displayTitle,
+            text: title
+          },//Fin de title
+          tooltips: {
+            callbacks: {
+              label: (tooltipItem, data) => {
+                let label = data.datasets[tooltipItem.datasetIndex].label || '';
+
+                if (label) {
+                  label += ': ';
+
+                  if (money) {
+                    label += this.formatCurrency(tooltipItem.yLabel);
+                  } else {
+                    label += tooltipItem.yLabel;
+                  }
+                  return label;
+                }//Fin de if
+
+              }//Fin de ()=>{}
+            },//Fin de callbacks
+          }, //Fin de tooltips
+          scales: {
+            yAxes: [{
+              ticks: {
+                beginAtZero: true,
+                callback: (value, index, values) => {
+                  if (money) {
+                    return this.formatCurrency(value);
+                  } else {
+                    return value;
+                  }//Fin de if-else
+                }//Fin de callback
+              }//Fin de ticks
+            }],//Fin de yAxes
+          },//Fin de scales
+        }, //Fin de options
+      })//Fin del constructor
+
+      return myBar;
+    },
+    updateBiweeklyChart() {
+      if(this.views.biweeklyChart){
+        let datasets = [this.lastWeekDataset, this.thisWeekDataset];
+        this.views.newSale.biweeklyChart.data.datasets = datasets;
+        this.views.newSale.biweeklyChart.update();
+
+      }else{
+        let ctx = document.getElementById('biweeklyChart');
+        let labels = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'];
+        let datasets = [this.lastWeekDataset, this.thisWeekDataset];
+        let barCharData = {
+          labels,
+          datasets
+        }
+        this.views.newSale.biweeklyChart = this.createBarChart(ctx, barCharData, '', true);
+      }
+
+    },
   }, //Fin de methods
   computed: {
     newCategoryNameLength() {
@@ -663,6 +756,67 @@ const vm = new Vue({
 
       return availableLength;
     },
+    biweeklyReports() {
+      let thisWeekStart = moment().startOf('week').startOf('day');
+      let thisWeekEnd = moment().endOf('week').endOf('days');
+      let lasWeekStart = moment(thisWeekStart).subtract(7, 'days');
+      let lasWeekEnd = moment(thisWeekEnd).subtract(7, 'days');
+      let saleOfThisWeek = [];
+      let salesOfLastWeek = [];
+      let lastWeekReport = undefined;
+      let thisWeekReport = undefined;
+
+      //En primer lugar procedo a recuperar las ventas de la ultimas dos semanas
+      for (let index = 0; index < this.sales.length; index++) {
+        const sale = this.sales[index];
+        if (sale.saleDate.isSameOrBefore(thisWeekEnd) && sale.saleDate.isSameOrAfter(thisWeekStart)) {
+          saleOfThisWeek.push(sale);
+        } else if (sale.saleDate.isSameOrBefore(lasWeekEnd) && sale.saleDate.isSameOrAfter(lasWeekStart)) {
+          salesOfLastWeek.push(sale);
+        } else {
+          break;
+        }
+      }//Fin de for
+
+      //Ahora se crean los dos reportes
+      lastWeekReport = new WeeklyReport(1, salesOfLastWeek, lasWeekStart, lasWeekEnd);
+      lastWeekReport.calculateStatistics();
+      thisWeekReport = new WeeklyReport(2, saleOfThisWeek, thisWeekStart, thisWeekEnd);
+      thisWeekReport.calculateStatistics();
+
+
+      return { lastWeekReport, thisWeekReport, thisWeekStart };
+    },
+    thisWeekDataset() {
+      let report = this.biweeklyReports;
+      let data = [];
+      report.thisWeekReport.dailyReports.forEach(r => {
+        data.push(r.amount);
+      });
+
+      return {
+        label: "Esta Semana",
+        backgroundColor: color(chartColors.green).alpha(0.5).rgbString(),
+        borderColor: chartColors.green,
+        borderWidth: 1,
+        data: data
+      }
+    },
+    lastWeekDataset() {
+      let report = this.biweeklyReports;
+      let data = [];
+      report.lastWeekReport.dailyReports.forEach(r => {
+        data.push(r.amount);
+      });
+
+      return {
+        label: "Semana Pasada",
+        backgroundColor: color(chartColors.orange).alpha(0.5).rgbString(),
+        borderColor: chartColors.orange,
+        borderWidth: 1,
+        data: data
+      }
+    }
   }, //Fin de computed
   created() {
     moment.locale("es-do");

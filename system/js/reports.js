@@ -136,7 +136,7 @@ class Report {
 
     //Se actualiza los parametros del objeto
     this.amount = amount;
-    this.averageSale = averageSale;
+    this.average = average;
     this.maxSale = max;
     this.minSale = min;
     this.upperBound = upperBound;
@@ -278,7 +278,7 @@ class PeriodicReport extends Report {
     let amount = 0;
     let dailySales = [];
     let dailyReports = [];
-    let dayInWhite = [];
+    let dayInWhite = 0;
     let maxDailySale = undefined;
     let minDailySale = undefined;
     let averageDailySale = 0;
@@ -366,16 +366,7 @@ class WeeklyReport extends PeriodicReport{
   constructor(id, sales, since, until){
     super(id, sales, since, until);
     this.week = undefined;
-  }
-
-  /**
-   * Antes de verificar que el periodo es correcto
-   * este metodo valida y formatea las fechas al inicio y al final
-   * de la semana
-   */
-  __validatePeriod(){
     this.__validateWeek();
-    super.__validatePeriod();
   }
 
   /**
