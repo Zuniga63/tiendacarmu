@@ -17,6 +17,9 @@
 </head>
 
 <body class="customers-view">
+  <div class="preloader show" id="preload">
+    <div class="loader"></div>
+  </div>
   <!-- Barra de navegacion -->
   <header class="header">
     <nav class="main-navbar" id="mainNavbar">
@@ -714,8 +717,14 @@
   </div>
 
 
+  <!-- Librería de Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+  <!-- Libería de Moment.js -->
   <script src="../js/moment.js"></script>
+  <!-- Librería de Vue.js -->
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+  <!-- Scripts Personalizados -->
   <script src=<?= "../js/app.js?v=" . VERSION ?>></script>
   <script src=<?= "./js/customers.js?v=" . VERSION ?>></script>
 </body>

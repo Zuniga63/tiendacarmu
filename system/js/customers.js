@@ -581,7 +581,9 @@ window.addEventListener('load', async () => {
 	newPaymentController();
 	consultDebtsController();
 	searchBoxController();
-	customerHistoryController();
+  customerHistoryController();
+  
+  document.getElementById("preload").classList.remove("show");
 })
 
 //---------------------------------------------------------------------------------------------
