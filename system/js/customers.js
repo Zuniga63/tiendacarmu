@@ -2117,3 +2117,57 @@ const printCustomerOrderByPaymentFrecuency = () =>{
 
 	console.log(text);
 }
+
+//--------------------------------------------------------------------------
+//	INTANCIAS DE VUE
+//--------------------------------------------------------------------------
+Vue.component('customer-register', {
+	data: function(){
+
+	},
+
+})
+
+const app = new Vue({
+	el:'#app',
+	data:{
+		customers:[],
+
+	},
+	methods:{
+		/**
+		 * Solicita al servidor la informacion de todos los clientes
+		 */
+		async updateModel(){
+			try {
+				const res = await fetch('./api/all_customers.php');
+				const data = await res.json();
+				if(data.sessionActive){
+					this.customers = [];
+					data.customers.forEach(c => {
+						const customer = new Customer(c.id, c.firstName, c.lastName, c.nit, c.phone, c.email, c.points);
+						//Ahora agrego los creditos del cliente
+						c.credits.forEach(credit => {
+							customer.addCredit(credit.id, credit.creditDate, credit.description, credit.amount, credit.balance);
+						})
+						//Se agregan los abonos
+						c.payments.forEach(payment => {
+							customer.addPayment(payment.id, payment.paymentDate, payment.amount, payment.cash);
+						})
+
+						customer.defineState();
+						this.customers.push(customer);
+					})
+				}else{
+					location.reload();
+				}
+			} catch (error) {
+				console.log(error)
+			}
+		},//Fin del metodo
+	},//Fin de methods
+	created(){
+		this.updateModel();
+	},//Fin de create
+});
+
