@@ -91,24 +91,32 @@ body {
   justify-content: space-between;
 }
 
+/****************************************************/
+/* CONTENEDOR BASICO: utilizado para el cuerpo      */
+/****************************************************/
 .container {
   width: 95%;
-  margin-left: auto;
-  margin-right: auto;
   padding-top: 0.8rem;
+  margin-right: auto;
   margin-bottom: 0.8em;
+  margin-left: auto;
 }
 
 .container__header {
-  font-family: var(--title_font);
-  text-align: center;
-  background-color: #17a3b859;
-  padding: 0.5rem;
   width: 100%;
+  padding: 0.5rem;
   border: 2px solid var(--belizehole);
   border-color: var(--belizehole);
   border-radius: 10px;
   margin-bottom: 1rem;
+  background-color: #17a3b859;
+  font-family: var(--title_font);
+  text-align: center;
+}
+
+.container__header--success {
+  border-color: var(--nephritis);
+  background-color: #28a74559;
 }
 
 .container__title {
@@ -117,9 +125,9 @@ body {
 }
 
 .container__subtitle {
+  font-family: var(--body_font);
   font-size: 1.2em;
   font-weight: 700;
-  font-family: var(--body_font);
 }
 
 .sumary {
@@ -321,9 +329,18 @@ body {
   background-color: lightcoral;
 }
 
-/********************************************************************************************/
-/*                            ESTILOS DE LAS ALERTAS                                        */
-/********************************************************************************************/
+.btn--primary {
+  background-color: var(--primary);
+  border-color: blue;
+}
+
+.btn--primary:hover {
+  background-color: var(--peterriver);
+}
+
+/********************************************************/
+/*  ESTILOS DE LAS ALERTAS                              */
+/********************************************************/
 
 .alert {
   display: none;
@@ -363,24 +380,119 @@ body {
   border-color: #c3e6cb;
 }
 
+/********************************************************/
+/*  ESTILOS DE LAS TARJETAS SIMPLES                     */
+/********************************************************/
+.card-container {
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 2px solid #7f8c8d;
+  border-radius: 10px;
+  background-color: #bdc3c7ad;
+}
+
+.card-container__title {
+  margin-bottom: 0.5em;
+  color: var(--dark);
+  text-align: center;
+  font-family: var(--title_font);
+  font-size: 1.2em;
+}
+
+.card-container__options {
+  margin-bottom: 0.5em;
+}
+
+.card-container__box {
+  min-height: 300px;
+  max-height: 60vh;
+  padding: 0.5em;
+  margin-bottom: 0.8rem;
+  border: 2px solid var(--asbestos);
+  background-color: var(--light);
+}
+
+.card-container__footer {
+  margin-bottom: 0.5em;
+  text-align: right;
+  font-size: 0.8em;
+}
+
+.card-simple{
+  padding: 0.2em;
+  border: 1px solid var(--silver);
+  border-radius: 3px;
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  align-items: center;
+  background-color: var(--clouds);
+}
+
+.card-simple__title{
+  font-size: 1em;
+}
+
+.card-simple .btn{
+  font-size: 0.7em;
+}
+
 /********************************************************************************************/
 /*                            ESTILOS PARA FORMULARIOS                                      */
 /********************************************************************************************/
 .form {
   padding: 1rem 0.5rem;
+  margin-bottom: 1rem;
+  border: 2px solid transparent;
+  color: var(--dark);
 }
 
 .form--bg-light {
-  background-color: #ecf0f1a8;
+  border-color: var(--concrete);
   border-radius: 10px;
-  border: 2px solid var(--concrete);
-  margin-bottom: 1rem;
+  background-color: #ecf0f1a8;
 }
 
 .form__title {
-  text-align: center;
-  font-family: var(--title_font);
+  font-size: 1.3em;
   margin-bottom: 1rem;
+  font-family: var(--title_font);
+  text-align: center;
+}
+
+.form__radio {
+  vertical-align: middle;
+}
+
+.form__label,
+.form__input {
+  display: block;
+  width: 100%;
+  margin-bottom: 5px;
+  padding: 5px;
+}
+
+.form__input:focus,
+.form__option:focus {
+  outline-color: var(--primary);
+}
+
+.form__actions-double {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5em;
+}
+
+.form__group-flex {
+  /* font-size: 0.8em; */
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--dark);
+  border-radius: 5px;
+  color: var(--light);
+  background-color: var(--wetasphalt);
+  flex-wrap: wrap;
+  letter-spacing: 2px;
 }
 
 .form__container {
@@ -451,14 +563,6 @@ body {
   grid-template-columns: 1fr auto;
 }
 
-.form__label,
-.form__input {
-  display: block;
-  width: 100%;
-  margin-bottom: 5px;
-  padding: 5px;
-}
-
 .form__radio-content {
   display: flex;
   justify-content: space-evenly;
@@ -469,7 +573,6 @@ body {
   margin-bottom: 0.5em;
 }
 
-.form__radio,
 .form__label-inline,
 .form__input-inline {
   align-content: center;
@@ -478,11 +581,6 @@ body {
 
 .form__input-inline {
   width: 100%;
-}
-
-.form__input:focus,
-.form__option:focus {
-  outline-color: var(--primary);
 }
 
 .form__input.error {
@@ -2091,6 +2189,7 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   padding: 0.6em;
   font-size: 0.8em;
 }
+
 .table {
   border: 1px solid #ccc;
   width: 100%;
@@ -2129,13 +2228,17 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 
 .table__header,
 .table__data {
-  padding: 0.6em;
+  padding: 0.2em;
   text-align: center;
   font-size: 0.9em;
 }
 
 .table--25 {
   width: 25%;
+}
+
+.table--20{
+  width: 20%;
 }
 
 .table--50 {
@@ -2247,7 +2350,11 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 
   .table__header,
   .table__data {
-    font-size: 1.1em;
+    font-size: 1em;
+  }
+
+  .table .btn{
+    font-size: 0.4em;
   }
 
   #featureProductsSlider .slider__items {
