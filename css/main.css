@@ -420,6 +420,7 @@ body {
 
 .card-simple{
   padding: 0.2em;
+  margin-bottom: 1em;
   border: 1px solid var(--silver);
   border-radius: 3px;
   display: grid;

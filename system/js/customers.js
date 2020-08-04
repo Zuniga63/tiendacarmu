@@ -60,7 +60,7 @@ class Customer {
 	 * @param {string} email Correo electronico
 	 * @param {number} points Puntos de fiabilidad del cliente
 	 */
-	constructor(id = 0, firstName, lastName = '', nit = '', phone = '', email = '', points = 0) {
+	constructor(id = 0, firstName, lastName = '', nit = '', phone = '', email = '', points = 0, archived = false) {
 		this.id = id;
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -72,7 +72,8 @@ class Customer {
 		this.payments = [];
 		this.balance = 0;
 		this.state = '';
-		this.inactive = false;
+    this.inactive = false;
+    this.archived = archived;
 		this.deliquentBalance = false;
 		this.paymentFrecuency = 0;
 	}
@@ -2121,11 +2122,306 @@ const printCustomerOrderByPaymentFrecuency = () =>{
 //--------------------------------------------------------------------------
 //	INTANCIAS DE VUE
 //--------------------------------------------------------------------------
+/**
+ * Utilizado para agrupar las propiedades de un campo que debe ser validado
+ */
+class DataInput {
+  /**
+   * @constructor
+   * @param {*} value Valor del campo
+   * @param {bool} hasError Si el campo tiene algun error
+   * @param {string} message El mensaje a mostar producto de la validacion
+   */
+  constructor(value = "", hasError = false, message = "") {
+    this.value = value;
+    this.hasError = hasError;
+    this.message = message;
+  }
+
+  isCorret(message = "") {
+    this.hasError = false;
+    this.message = message;
+  }
+
+  isIncorrect(message = "") {
+    this.hasError = true;
+    this.message = message;
+  }
+
+  resetInput() {
+    this.value = "";
+    this.isCorret("");
+  }
+}
+
 Vue.component('customer-register', {
+  props:['customers', 'id'],
 	data: function(){
-
+    return{
+      customerSelected:undefined,
+      updatingCustomer: false,
+      typeList: "active",
+      //los campos para el formulario
+      firtsName:'',
+      lastName: '',
+      nit: new DataInput(),
+      phone: new DataInput(),
+      email: new DataInput(),
+    }
 	},
+	template:`
+    <div class="view" :id="id">
+      <section class="view__section">
+        <div class="container">
+          <div class="container__header" :class="{'container__header--success': !updatingCustomer, 'container__header--primary': updatingCustomer}">
+            <h1 class="container__title">Sistema de Clientes</h1>
+            <p class="container__subtitle">
+              {{updatingCustomer ? 'Actualización de Datos' : 'Nuevo Cliente'}}
+            </p>
+          </div>
+          <!-- FORMULARIO DE REGISTRO O ACTUALIZACIÓN -->
+          <form class="form form--bg-light">
+            <h2 class="form__title">Formulario de registro</h2>
+            <!-- Campo para el nombre -->
+            <label v-bind:for="id + 'Name'" class="form__label">Nombres</label>
+            <input
+              type="text"
+              name="firts_name"
+              v-bind:id="id + 'Name'"
+              v-model.trim="firtsName"
+              @focus="$event.target.select()"
+              @blur="validateFirstName"
+              class="form__input"
+              placeholder="Ingresa el nombre aquí"
+            />
 
+            <!-- Campo para el apellido -->
+            <label v-bind:for="id + 'LastName'" class="form__label"
+              >Apellidos</label
+            >
+            <input
+              type="text"
+              name="last_name"
+              v-bind:id="id + 'LastName'"
+              v-model.trim="lastName"
+              @focus="$event.target.select()"
+              @blur="validateLastName"
+              class="form__input"
+              placeholder="Ingresa el apellido aquí"
+            />
+
+            <!-- Campo para la identificacion -->
+            <label v-bind:for="id + 'Nit'" class="form__label">Nit o C.C</label>
+            <input
+              type="text"
+              name="nit"
+              v-bind:id="id + 'Nit'"
+              v-model.trim="nit.value"
+              @focus="$event.target.select()"
+              @blur="validateNit"
+              class="form__input"
+              placeholder="Ingresa el Nit o CC"
+            />
+            <p class="alert alert--danger" :class="{show: nit.hasError}">{{nit.message}}</p>
+
+            <!-- Campo para el numero de telefono -->
+            <label v-bind:for="id + 'Phone'" class="form__label">Telefono</label>
+            <input
+              type="text"
+              name="regCustomerName"
+              v-bind:id="id + 'Phone'"
+              v-model.trim="phone.value"
+              @focus="$event.target.select()"
+              @blur="validatePhone"
+              class="form__input"
+              placeholder="Escribe el numero aquí"
+            />
+            <p class="alert alert--danger" :class="{show:phone.hasError}">{{phone.message}}</p>
+
+            <!-- Campo para el correo elecctronico -->
+            <label v-bind:for="id + 'Email'" class="form__label">Correo</label>
+            <input
+              type="email"
+              name="regCustomerEmail"
+              v-bind:id="id + 'Email'"
+              v-model.trim="email.value"
+              @focus="$event.target.select()"
+              @blur="validateEmail"
+              class="form__input"
+              placeholder="Escribe el correo aquí"
+            />
+            <p class="alert alert--danger" :class="{show: email.hasError}">{{email.message}}</p>
+
+            <!-- Botones del formulario: Para crear nuevo cliente -->
+            <input
+              v-if="!updatingCustomer"
+              type="button"
+              value="Registrar Cliente"
+              class="btn btn--success"
+            />
+            <!-- Botones del formulario: Para actualizar los datos -->
+            <div class="form__actions-double" v-if="updatingCustomer">
+              <input
+                type="submit"
+                value="Actualizar"
+                class="btn btn--primary"
+              />
+              <input type="submit" value="Descartar" class="btn btn--danger" />
+            </div>
+          </form>
+
+          <!-- Tarjetas de los clientes -->
+          <div class="card-container">
+            <h2 class="card-container__title">Listado de Clientes</h2>
+            <div class="card-container__options">
+              <div class="form__group-flex">
+                <div class="form__radio-group">
+                  <input
+                    type="radio"
+                    value="active"
+                    v-bind:id="id+'Active'"
+                    v-model="typeList"
+                    class="form__radio"
+                  />
+                  <label v-bind:for="id+'Active'" class="form__radio">Act</label>
+                </div>
+
+                <div class="form__radio-group">
+                  <input
+                    type="radio"
+                    value="inactive"
+                    v-bind:id="id +'Inactive'"
+                    v-model="typeList"
+                    class="form__radio"
+                  />
+                  <label v-bind:for="id +'Inactive'" class="form__radio">Inact</label>
+                </div>
+
+                <div class="form__radio-group">
+                  <input
+                    type="radio"
+                    value="archived"
+                    v-bind:id="id +'Archived'"
+                    v-model="typeList"
+                    class="form__radio"
+                  />
+                  <label v-bind:for="id +'Archived'" class="form__radio">Arch</label>
+                </div>
+              </div>
+            </div>
+            <div class="card-container__box scroll">
+              <div class="card-simple" v-for="customer in selectedList" :key="customer.id">
+                <p class="card-simple__title">
+                  {{customer.firstName + ' ' + customer.lastName}}
+                </p>
+                <div class="card-simple__actions">
+                  <button class="btn btn--success" @click="loadCustomer(customer)">Actualizar Datos</button>
+                </div>
+              </div>
+            </div>
+            <p class="card-container__footer">Clientes: <span class="text-bold">{{selectedList.length}}</span></p>
+          </div>
+        </div>
+      </section>
+      <aside class="view__sidebar">
+        <div class="history__header">
+          <h2 class="history__title">Listado de clientes</h2>
+        </div>
+        <div class="history__head">
+          <table class="table">
+            <thead>
+              <tr class="table__row-header">
+                <th class="table__header table--25">Nombres</th>
+                <th class="table__header table--25">Apellidos</th>
+                <th class="table__header table--25">Telefono</th>
+                <th class="table__header table--25">Archivado</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+        <div class="history__body scroll">
+          <table class="table">
+            <tbody class="table__body">
+              <template v-for="customer in customers">
+                <tr class="table__row" :key="customer.id">
+                  <td class="table__data table--25">{{customer.firstName}}</td>
+                  <td class="table__data table--25">{{customer.lastName}}</td>
+                  <td class="table__data table--25">{{customer.phone}}</td>
+                  <td class="table__data table--25">
+                    <input type="checkbox" name="" id="" style="zoom: 2;" />
+                  </td>
+                </tr>
+              </template v-for="customer">
+            </tbody>
+          </table>
+        </div>
+        <div class="history__footer">
+          <p class="history__info">Activos: <span class="text-bold">{{activeCustomers.length}}</span></p>
+          <p class="history__info">Inactivos: <span class="text-bold">{{inactiveCustomers.length}}</span></p>
+          <p class="history__info">Archivados: <span class="text-bold">{{archivedCustomers.length}}</span></p>
+          <p class="history__info">Total: <span class="text-bold">{{customers.length}}</span></p>
+        </div>
+      </aside>
+    </div>
+	`,
+  computed:{
+    inactiveCustomers(){
+      const result = this.customers.filter(c => c.inactive && !c.archived);
+      return result;
+    },
+    activeCustomers(){
+      const result = this.customers.filter(c => !c.inactive && !c.archived);
+      return result;
+    },
+    archivedCustomers(){
+      const result = this.customers.filter(c => c.archived);
+      return result;
+    },
+    selectedList(){
+      let result = [];
+      switch (this.typeList) {
+        case "active":
+          {
+            result = this.activeCustomers;
+          }
+          break;
+        case "inactive":
+          {
+            result = this.inactiveCustomers;
+          }
+          break;
+        case "archived":
+          {
+            this.archivedCustomers;
+          }
+          break;
+        default: {
+          result = this.activeCustomers;
+        }
+      }
+      return result;
+    }
+  },
+  methods:{
+    validateFirstName(){
+      console.log('Validando Nombres');
+    },
+    validateLastName(){
+      console.log('Validando Apellidos');
+    },
+    validateNit(){
+      console.log('Validando Identificacion');
+    },
+    validatePhone(){
+      console.log('Validando numero de telefono')
+    },
+    validateEmail(){
+      console.log('Validando Correo electronico');
+    },
+    loadCustomer(customer){
+      console.log(`Montando al cliente: ${customer.firstName}`);
+    }
+  },//Fin de methods
 })
 
 const app = new Vue({
@@ -2165,7 +2461,17 @@ const app = new Vue({
 				console.log(error)
 			}
 		},//Fin del metodo
-	},//Fin de methods
+  },//Fin de methods
+  computed:{
+    customersList(){
+      const all = this.customers;
+      const inactiveCustomers = this.inactiveCustomers;
+      const activeCustomers = this.activeCustomers;
+      const archivedCustomers = this.archivedCustomers;
+      return {all, activeCustomers, inactiveCustomers, archivedCustomers};
+    },
+    
+  },//Fin de compute
 	created(){
 		this.updateModel();
 	},//Fin de create
