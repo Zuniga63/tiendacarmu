@@ -444,13 +444,19 @@ body {
   padding: 1rem 0.5rem;
   margin-bottom: 1rem;
   border: 2px solid transparent;
+  border-radius: 10px;
   color: var(--dark);
+  transition: all 0.2s;
 }
 
 .form--bg-light {
   border-color: var(--concrete);
-  border-radius: 10px;
   background-color: #ecf0f1a8;
+}
+
+.form--bg-primary{
+  border-color: var(--primary);
+  background-color: #007bff65;
 }
 
 .form__title {
@@ -2098,7 +2104,10 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 }
 
 .modal__content {
-  position: relative;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 95%;
   max-width: 600px;
   padding: 1.5em;
@@ -2107,6 +2116,22 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   border-top: 10px solid #58abb7;
   background-color: #fefefe;
   /* min-height: 40vh; */
+}
+
+.modal__icon{
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.modal__icon__img{
+  display: block;
+  width: 100%;
+  margin-bottom: 0.5em;
+}
+
+.modal__icon__caption{
+  text-align: center;
 }
 
 .modal__title {
@@ -2207,17 +2232,14 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   background-color: #ddd;
 }
 
-.table__row:nth-child(even):hover,
-.table__row:nth-child(odd):hover {
-  background-color: #aaa;
-}
-
 .table__row:nth-child(odd) {
   background-color: var(--light);
 }
 
 .table__row:nth-child(even):hover,
-.table__row:nth-child(odd):hover {
+.table__row:nth-child(odd):hover, 
+.table__row:nth-child(even).selected,
+.table__row:nth-child(odd).selected{
   background-color: var(--dark);
   color: var(--light);
 }
@@ -2474,5 +2496,10 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 
   .view-desktop-colapse {
     display: none;
+  }
+
+  .modal__content{
+    width: auto;
+    min-width: 300px;
   }
 }

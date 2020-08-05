@@ -717,7 +717,13 @@
   </div>
 
   <div id="app">
-    <customer-register :customers="customers" id="customerReg"></customer-register>
+    <customer-register 
+      :customers="customers" 
+      id="customerReg"
+      @update-customer="updateCustomer"
+      @new-customer="newCustomer"
+    >
+    </customer-register>
   </div>
 
   <!-- Librería de Chart.js -->
