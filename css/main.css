@@ -10,13 +10,20 @@
 /********************************************************************************************/
 /*                            TIPOGRAFIAS DE GOOGLE FONTS                                   */
 /********************************************************************************************/
-@import url("https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,900;1,400;1,900&display=swap");
+/* Raleway para titulos */
+/* @import url("https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,900;1,400;1,900&display=swap"); */
+/* Nunito para titulos */
+/* @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap'); */
+/* Poppins para titulos */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
 /********************************************************************************************/
 /*                                VARIABLES DEL DOCUMENTO                                   */
 /********************************************************************************************/
 :root {
-  --title_font: "Raleway", sans-serif;
+  /* --title_font: "Raleway", sans-serif; */
+  /* --title_font: 'Nunito', sans-serif; */
+  --title_font: 'Poppins', sans-serif;
   --body_font: "Roboto", sans-serif;
   --feature-products: 0;
   --black: #190a05;
@@ -66,6 +73,10 @@ body {
   margin-right: auto;
 }
 
+.text-center{
+  text-align: center;
+}
+
 .text-bold {
   font-weight: bold;
 }
@@ -84,6 +95,10 @@ body {
 
 .p-r-1 {
   padding-right: 5px;
+}
+
+.m-b{
+  margin-bottom: 0.5em;
 }
 
 .container-flex {
@@ -1747,20 +1762,30 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 .search-box {
   padding: 0.5rem;
   margin-bottom: 1rem;
-  background-color: #bdc3c7ad;
   border: 2px solid #7f8c8d;
   border-radius: 10px;
+  border-color: var(--concrete);
+  background-color: #ecf0f1a8;
 }
 
 .search-box__search {
   display: block;
   width: 100%;
-  margin-bottom: 5px;
-  padding: 0 3px;
+  padding: 5px;
+  margin-bottom: 0.5em;
 }
 
 .search-box__search:focus {
   outline-color: var(--primary);
+}
+
+.search-box__content{
+  display: none;
+  margin-bottom: 1em;
+}
+
+.search-box__content.show{
+  display: block;
 }
 
 .search-box__result {
@@ -1769,11 +1794,11 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 }
 
 .search-box__result.show {
-  border: 2px solid var(--asbestos);
-  background-color: var(--light);
   height: 300px;
-  margin-bottom: 0.8rem;
   padding-top: 0.8rem;
+  border: 2px solid var(--asbestos);
+  margin-bottom: 0.8rem;
+  background-color: var(--light);
 }
 
 .search-box__count {
@@ -1878,7 +1903,7 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 .debt-card {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  width: 95%;
+  width: 100%;
   margin-right: auto;
   margin-left: auto;
   margin-bottom: 1rem;
@@ -2264,6 +2289,13 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   width: 20%;
 }
 
+.table--34{
+  width: 34%;
+}
+
+.table--33{
+  width: 33%;
+}
 .table--50 {
   width: 50%;
 }
