@@ -2594,12 +2594,50 @@ Vue.component('customer-register', {
             this.processResult.message = "Solicitud Rechazada";
           }          
         } else {
-          this.$emit('new-customer', body)
-          this.resetForm();
-        }
-      }
+          try {
+            const res = await fetch('./api/new_customer.php', {
+              method: 'POST',
+              body: body
+            })
 
-    },
+            const data = await res.json();
+
+            if(data.sessionActive){
+              if(data.request){
+                let actualCount = this.customers.length;       
+                this.$emit('new-customer');   
+                let timerId = setInterval(() => {
+                  if(actualCount < this.customers.length){
+                    this.waiting = false;
+                    this.processResult.visible = true;
+                    this.processResult.hasError = false;
+                    this.processResult.message = "Cliente Agregado satisfactoriamente";
+                    this.resetForm();
+                    clearInterval(timerId);
+                  }
+                  console.log('Repitiendo: ' + actualCount )
+                }, 1000);
+
+                
+              }else{
+                this.processResult.visible = true;
+                this.processResult.hasError = true;
+                this.processResult.message = "No se pudo crear al cliente";
+              }
+            }else{
+              location.reload();
+            }
+            
+          } catch (error) {
+            console.log(res.text);
+            this.waiting = false;
+            this.processResult.visible = true;
+            this.processResult.hasError = true;
+            this.processResult.message = "Solicitud Rechazada";
+          }
+        }//Fin de if-else
+      }//Fin de if
+    },//Fin del metodo
 		/**
 		 * Este metodo carga al modulo los datos delcliente
 		 * @param {Customer} customer Instancia de customer
@@ -2646,9 +2684,8 @@ const app = new Vue({
         customer.update(data);
       }
     },
-    newCustomer(data) {
-      console.log('Evento para crear nuevo usuario capturado');
-      console.log(data);
+    newCustomer() {
+      this.updateModel();
     },
 		/**
 		 * Solicita al servidor la informacion de todos los clientes
