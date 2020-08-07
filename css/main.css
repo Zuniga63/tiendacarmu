@@ -1779,11 +1779,6 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   outline-color: var(--primary);
 }
 
-.search-box__content {
-  display: none;
-  margin-bottom: 1em;
-}
-
 .search-box__content.show {
   display: block;
 }
@@ -1824,6 +1819,7 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   display: grid;
   grid-template-columns: 3fr 2fr;
   margin-bottom: 0.8rem;
+  cursor: pointer;
 }
 
 .customer-card--late {

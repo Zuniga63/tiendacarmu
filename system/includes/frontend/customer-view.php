@@ -734,7 +734,6 @@
           </div>
           <!-- Modulo para la busqueda de cliente -->
           <search-box :customers="customers"></search-box>
-          <search-box :customers="customers"></search-box>
           <!-- FORMULARIO DE REGISTRO O ACTUALIZACIÓN -->
           <form class="form form--bg-light">
             <div class="form__header">
