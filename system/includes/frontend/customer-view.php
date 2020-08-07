@@ -733,142 +733,11 @@
             <p class="container__subtitle">Registrar Operaciones</p>
           </div>
           <!-- Modulo para la busqueda de cliente -->
-          <search-box :customers="customers"></search-box>
+          <search-box :customers="customers" @customer-selected="onCustomerSelected"></search-box>
           <!-- FORMULARIO DE REGISTRO O ACTUALIZACIÓN -->
-          <form class="form form--bg-light">
-            <div class="form__header">
-              <h2 class="form__title">Formulario</h2>
-            </div>
-            <div class="form__content">
-              <!-- Campo para definir el tipo de operacion -->
-              <label class="form__label">Tipo de operacion</label>
-              <div class="form__group-flex m-b">
-                <!-- Seleccion de credito -->
-                <div class="form__radio-group">
-                  <input
-                    type="radio"
-                    name="credit"
-                    id="credit"
-                    class="form__radio"
-                  />
-                  <label for="credit" class="form__radio">Credito</label>
-                </div>  
-                <!-- Seleccion de pago -->
-                <div class="form__radio-group">
-                  <input
-                    type="radio"
-                    name="payment"
-                    id="payment"
-                    class="form__radio"
-                  />
-                  <label for="payment" class="form__radio">Abono</label>
-                </div>
-              </div>
-
-              <!-- Campo para definir la fecha de la operacion -->
-              <label class="form__label">Fecha del credito/Abono</label>
-              <div class="form__group-flex m-b">
-                <!-- Seleccion de credito -->
-                <div class="form__radio-group">
-                  <input
-                    type="radio"
-                    name="credit"
-                    id="now"
-                    class="form__radio"
-                  />
-                  <label for="now" class="form__radio">Ahora</label>
-                </div>  
-                <!-- Seleccion de pago -->
-                <div class="form__radio-group">
-                  <input
-                    type="radio"
-                    name="payment"
-                    id="other"
-                    class="form__radio"
-                  />
-                  <label for="other" class="form__radio">Otro Momento</label>
-                </div>
-              </div>
-              <!-- Campo opcional para seleccionar la fecha -->
-              <label for="date" class="form__label">Selecciona una fecha</label>
-              <input type="date" name="" id="date" class="form__input">
-              <p class="alert alert--danger show">Selecciona una fecha valida</p>
-
-              <!-- Campo para agregar la descripcion del credito -->
-              <label for="description" class="form__label text-bold text-center">Detalles del credito</label>
-              <textarea name="" id="description" cols="30" rows="3" class="form__input" placeholder="Escribe los detalles aquí"></textarea>
-              <p class="alert alert--danger show">Esta informacion es importante</p>
-
-              <!-- Campo para el ingreso del importe -->
-              <label for="amount" class="form__label text-bold text-center">Valor del credito / Cantidad abonada</label>
-              <!-- Forma de pago -->
-              <div class="form__group-flex m-b">
-                <div class="form__radio-group">
-                  <input
-                    type="radio"
-                    name="credit"
-                    id="cash"
-                    class="form__radio"
-                  />
-                  <label for="now" class="form__radio">Efectivo</label>
-                </div>  
-                <!-- Seleccion de pago -->
-                <div class="form__radio-group">
-                  <input
-                    type="radio"
-                    name="payment"
-                    id="card"
-                    class="form__radio"
-                  />
-                  <label for="other" class="form__radio">Tarjetas</label>
-                </div>
-              </div>
-              <input type="text" name="" id="amount" class="form__input" placeholder="Ingrea el valor aquí">
-              <p class="alert alert--danger show">Campo obligatorio</p>
-            </div>
-            <div class="form__actions">
-              <input type="submit" value="Registar Credito/Abono" class="btn btn--success">
-            </div>            
-          </form>
+          <new-operation-form></new-operation-form>
           <!-- Contenedor con las tarjetas de creditos -->
-          <div class="card-container">
-            <h2 class="card-container__title text-bold">Historial de Creditos</h2>
-            <div class="card-container__options">
-              <div class="form__group-flex">
-                <!-- Seleccion de credito -->
-                <div class="form__radio-group">
-                  <input
-                    type="radio"
-                    name="credit"
-                    id="credit"
-                    class="form__radio"
-                  />
-                  <label for="credit" class="form__radio">Todos</label>
-                </div>  
-                <!-- Seleccion de pago -->
-                <div class="form__radio-group">
-                  <input
-                    type="radio"
-                    name="payment"
-                    id="payment"
-                    class="form__radio"
-                  />
-                  <label for="payment" class="form__radio">Pendientes</label>
-                </div>
-              </div>
-            </div>
-            <div class="card-container__box scroll">
-              <div class="debt-card">
-                <p class="debt-card__title">Sueter Americanino</p>
-                <p class="debt-card__date">hoy a las 4:13 PM (hace 17 minutos)</p>
-                <p class="debt-card__label">Valor Inicial</p>
-                <p class="debt-card__label">Saldo pendiente</p>
-                <p class="debt-card__money">$&nbsp;1.200.000</p>
-                <p class="debt-card__money debt-card__money--bold">$&nbsp;1.200.000</p>
-              </div>
-            </div>
-            <p class="card-container__footer">Creditos(1): <span class="text-bold">$1.200.000</span></p>
-          </div>
+          <customer-credits :customer="customerSelected" id="creditHistoryMovil"></customer-credits>
           <!-- Historial del cliente -->
           <div class="">
             <div class="history__header">
@@ -905,44 +774,7 @@
       </section>
       <aside class="view__sidebar">
         <!-- Contenedor con las tarjetas de creditos -->
-        <div class="card-container">
-          <h2 class="card-container__title text-bold">Historial de Creditos</h2>
-          <div class="card-container__options">
-            <div class="form__group-flex">
-              <!-- Seleccion de credito -->
-              <div class="form__radio-group">
-                <input
-                  type="radio"
-                  name="credit"
-                  id="credit"
-                  class="form__radio"
-                />
-                <label for="credit" class="form__radio">Todos</label>
-              </div>  
-              <!-- Seleccion de pago -->
-              <div class="form__radio-group">
-                <input
-                  type="radio"
-                  name="payment"
-                  id="payment"
-                  class="form__radio"
-                />
-                <label for="payment" class="form__radio">Pendientes</label>
-              </div>
-            </div>
-          </div>
-          <div class="card-container__box scroll">
-            <div class="debt-card">
-              <p class="debt-card__title">Sueter Americanino</p>
-              <p class="debt-card__date">hoy a las 4:13 PM (hace 17 minutos)</p>
-              <p class="debt-card__label">Valor Inicial</p>
-              <p class="debt-card__label">Saldo pendiente</p>
-              <p class="debt-card__money">$&nbsp;1.200.000</p>
-              <p class="debt-card__money debt-card__money--bold">$&nbsp;1.200.000</p>
-            </div>
-          </div>
-          <p class="card-container__footer">Creditos(1): <span class="text-bold">$1.200.000</span></p>
-        </div>
+        <customer-credits :customer="customerSelected" id="creditHistoryDesktop"></customer-credits>
 
         <div class="history__header">
           <h2 class="history__title">Historial</h2>

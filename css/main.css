@@ -428,8 +428,9 @@ body {
 }
 
 .card-container__footer {
+  display: flex;
+  justify-content: space-between;
   margin-bottom: 0.5em;
-  text-align: right;
   font-size: 0.8em;
 }
 

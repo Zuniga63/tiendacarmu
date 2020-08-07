@@ -919,33 +919,268 @@ Vue.component('search-box',{
     return {
       customerSelected: undefined,
       showBox: false,
+      customerName:'',
     }
   },//Fin de data
   methods:{
-
+    onCustomerSelected(customer){
+      this.customerSelected = customer;
+      this.$emit('customer-selected', customer);
+    }
   },//Fin de methods
+  computed:{
+    customerResult(){
+      let result = [];
+      if(this.customerName){
+        result = this.customers.filter(c => textInclude(`${c.firstName} ${c.lastName}`, this.customerName));
+      }else{
+        result = this.customers;
+      }
+      return result;
+    }
+  },
   template: `
   <div class="search-box">
     <input 
       type="text" 
       class="search-box__search" 
       placeholder="Buscar Cliente por Nombre"
+      v-model.trim="customerName"
       @focus="showBox=true"
       @blur="showBox=false">
     <div class="search-box__content" :class="{'m-b': showBox}">
       <div class="search-box__result scroll" :class="{show: showBox}">
         <customer-card 
-          v-for="customer in customers" 
+          v-for="customer in customerResult" 
           :key="customer.id" 
           :customer="customer"
-          @click="customerSelected = customer"
+          @click="onCustomerSelected(customer)"
         >
         </customer-card>
       </div>
-      <p class="search-box__count" :class="{show: showBox}">Clientes: <span class="text-bold">{{customers.length}}</span></p>
+      <p class="search-box__count" :class="{show: showBox}">Clientes: <span class="text-bold">{{customerResult.length}}</span></p>
     </div>
     <div class="search-box__selected" v-show="customerSelected">
       <customer-card :customer="customerSelected"></customer-card>
+    </div>
+  </div>`
+})
+
+Vue.component('new-operation-form', {
+  data:function(){
+    return {
+      operationType:'payment',
+    }
+  },//Fin de data
+  methods:{
+
+  },//Fin de methods
+  computed:{
+
+  },//Fin de computed,
+  template:`
+  <form class="form form--bg-light">
+    <div class="form__header">
+      <h2 class="form__title">Formulario</h2>
+    </div>
+    <div class="form__content">
+      <!-- Campo para definir el tipo de operacion -->
+      <label class="form__label">Tipo de operacion</label>
+      <div class="form__group-flex m-b">
+        <!-- Seleccion de credito -->
+        <div class="form__radio-group">
+          <input
+            type="radio"
+            name="credit"
+            id="credit"
+            class="form__radio"
+          />
+          <label for="credit" class="form__radio">Credito</label>
+        </div>  
+        <!-- Seleccion de pago -->
+        <div class="form__radio-group">
+          <input
+            type="radio"
+            name="payment"
+            id="payment"
+            class="form__radio"
+          />
+          <label for="payment" class="form__radio">Abono</label>
+        </div>
+      </div>
+      <!-- Campo para definir la fecha de la operacion -->
+      <label class="form__label">Fecha del credito/Abono</label>
+      <div class="form__group-flex m-b">
+        <!-- Seleccion de credito -->
+        <div class="form__radio-group">
+          <input
+            type="radio"
+            name="credit"
+            id="now"
+            class="form__radio"
+          />
+          <label for="now" class="form__radio">Ahora</label>
+        </div>  
+        <!-- Seleccion de pago -->
+        <div class="form__radio-group">
+          <input
+            type="radio"
+            name="payment"
+            id="other"
+            class="form__radio"
+          />
+          <label for="other" class="form__radio">Otro Momento</label>
+        </div>
+      </div>
+      <!-- Campo opcional para seleccionar la fecha -->
+      <label for="date" class="form__label">Selecciona una fecha</label>
+      <input type="date" name="" id="date" class="form__input">
+      <p class="alert alert--danger show">Selecciona una fecha valida</p>
+      
+      <!-- Campo para agregar la descripcion del credito -->
+      <label for="description" class="form__label text-bold text-center">Detalles del credito</label>
+      <textarea name="" id="description" cols="30" rows="3" class="form__input" placeholder="Escribe los detalles aquí"></textarea>
+      <p class="alert alert--danger show">Esta informacion es importante</p>
+
+      <!-- Campo para el ingreso del importe -->
+      <label for="amount" class="form__label text-bold text-center">Valor del credito / Cantidad abonada</label>
+      <!-- Forma de pago -->
+      <div class="form__group-flex m-b">
+        <div class="form__radio-group">
+          <input
+            type="radio"
+            name="credit"
+            id="cash"
+            class="form__radio"
+          />
+          <label for="now" class="form__radio">Efectivo</label>
+        </div>  
+        <!-- Seleccion de pago -->
+        <div class="form__radio-group">
+          <input
+            type="radio"
+            name="payment"
+            id="card"
+            class="form__radio"
+          />
+          <label for="other" class="form__radio">Tarjetas</label>
+        </div>
+      </div>
+      <input type="text" name="" id="amount" class="form__input" placeholder="Ingrea el valor aquí">
+      <p class="alert alert--danger show">Campo obligatorio</p>
+    </div>
+    <div class="form__actions">
+      <input type="submit" value="Registar Credito/Abono" class="btn btn--success">
+    </div>            
+  </form>`
+})
+
+Vue.component('customer-credits', {
+  props:['customer', 'id'],
+  data:function(){
+    return{
+      // creditType:"pending",
+      creditType:"pending",
+    }
+  },//Fin de data
+  methods:{
+
+  },//Fin fr mrthods
+  computed:{
+    credits(){
+      let credits = [];
+      if(this.customer){
+        switch(this.creditType){
+          case 'pending':{
+            credits = this.customer.credits.filter(c => c.balance > 0);
+          }break;
+          case 'all': {
+            credits = this.customer.credits;
+          }
+        }
+      }
+      
+      return credits;
+    },
+    creditsData(){
+      let data = [];      
+      //Ahora construyo los datos
+      this.credits.forEach(c => {
+        let id = c.id
+        let title = c.title;
+        let date = `${moment(c.date).calendar()} (${moment(c.date).fromNow()})`;
+        let amount = formatCurrencyLite(c.amount, 0);
+        let balance = formatCurrencyLite(c.balance, 0);
+        data.push({
+          id,
+          title,
+          date,
+          amount,
+          balance
+        })
+      })
+      return data
+    },
+    totalAmount(){
+      let amount = 0;
+      this.credits.forEach(c => {
+        amount += c.amount;
+      })
+
+      return formatCurrencyLite(amount, 0);
+    },
+    deliquentBalance(){
+      let balance = 0;
+      this.credits.forEach(c => {
+        balance += c.balance;
+      })
+      return formatCurrencyLite(balance, 0);
+    }
+  },//Fin de computed
+  template:`
+  <div class="card-container">
+    <h2 class="card-container__title text-bold">Historial de Creditos</h2>
+    <div class="card-container__options">
+      <div class="form__group-flex">
+        <!-- Seleccion de los creditos a mostar-->
+        <div class="form__radio-group">
+          <input
+            type="radio"
+            :name="id + 'crediType'"
+            :id="id + 'Credit'"
+            class="form__radio"
+            value="all"
+            v-model="creditType"
+          />
+          <label :for="id + 'Credit'" class="form__radio">Todos</label>
+        </div>  
+        <!-- Seleccion de pago -->
+        <div class="form__radio-group">
+          <input
+            type="radio"
+            :name="id + 'crediType'"
+            :id="id + 'Pending'"
+            value="pending"
+            v-model="creditType"
+            class="form__radio"
+          />
+          <label :for="id + 'Pending'" class="form__radio">Pendientes</label>
+        </div>
+      </div>
+    </div>
+    <div class="card-container__box scroll">
+      <div class="debt-card" v-for="data in creditsData" :key="data.id">
+        <p class="debt-card__title">{{data.title}}</p>
+        <p class="debt-card__date">{{data.date}}</p>
+        <p class="debt-card__label">Valor Inicial</p>
+        <p class="debt-card__label">Saldo pendiente</p>
+        <p class="debt-card__money">{{data.amount}}</p>
+        <p class="debt-card__money debt-card__money--bold">{{data.balance}}</p>
+      </div>
+    </div>
+    <div class="card-container__footer">
+      <p>Creditos({{credits.length}}): <span class="text-bold">{{totalAmount}}</span></p>
+      <p>Pendiente: <span class="text-bold">{{deliquentBalance}}</span></p>
     </div>
   </div>`
 })
@@ -959,7 +1194,9 @@ const app = new Vue({
     customers: [],
     modals:{
       waiting: new WaitingModal(),
-    }
+    },
+    // propiedades temporales
+    customerSelected: undefined,
   },
   methods: {
     /**
@@ -1011,6 +1248,10 @@ const app = new Vue({
         console.log(error)
       }
     },//Fin del metodo
+
+    onCustomerSelected(customer){
+      this.customerSelected = customer;
+    }
   },//Fin de methods
   computed: {
   },//Fin de compute
