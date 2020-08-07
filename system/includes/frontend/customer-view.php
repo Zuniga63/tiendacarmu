@@ -733,40 +733,8 @@
             <p class="container__subtitle">Registrar Operaciones</p>
           </div>
           <!-- Modulo para la busqueda de cliente -->
-          <div class="search-box">
-            <input type="text" class="search-box__search" placeholder="Buscar Cliente por Nombre">
-            <div class="search-box__content">
-              <div class="search-box__result scroll">
-                <div class="customer-card">
-                  <div class="customer-card__header">
-                      <h3 class="customer-card__name">Nombre</h3>
-                      <p class="customer-card__info">Esto es una info</p>
-                  </div>
-                  <p class="customer-card__balance">$2.000.000</p>
-                  <div>
-                    <p class="customer-card__debts">Creditos: 123</p>
-                    <p class="customer-card__points">Abonos: 244</p>
-                    <p class="customer-card__points text-success">Puntos: 9999</p>
-                  </div>
-                </div>
-              </div>
-              <p class="search-box__count">6 Clientes</p>
-            </div>
-            <div class="search-box__selected">
-              <div class="customer-card">
-                <div class="customer-card__header">
-                    <h3 class="customer-card__name">Nombre</h3>
-                    <p class="customer-card__info">Esto es una info</p>
-                </div>
-                <p class="customer-card__balance">$2.000.000</p>
-                <div>
-                  <p class="customer-card__debts">Creditos: 123</p>
-                  <p class="customer-card__points">Abonos: 244</p>
-                  <p class="customer-card__points text-success">Puntos: 9999</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <search-box :customers="customers"></search-box>
+          <search-box :customers="customers"></search-box>
           <!-- FORMULARIO DE REGISTRO O ACTUALIZACIÓN -->
           <form class="form form--bg-light">
             <div class="form__header">

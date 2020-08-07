@@ -1415,7 +1415,7 @@ const searchBoxController = () => {
 
 
     printCustomerResult(container, customers);
-    footer.innerText = `Clientes: ${customers.length}`;
+    // footer.innerText = `Clientes: ${customers.length}`;
   });
 }
 
@@ -1449,10 +1449,10 @@ const updateSearchBoxResult = searchBox => {
   if (input.value) {
     let result = customers.filter(c => textInclude(c.firstName, input.value));
     printCustomerResult(container, result);
-    footer.innerText = `Clientes: ${result.length}`;
+    footer.innerText = `Clientesd: ${result.length}`;
   } else {
     printCustomerResult(container, customers);
-    footer.innerText = `Clientes: ${customers.length}`;
+    footer.innerText = `Clientesd: ${customers.length}`;
   }
 }
 
@@ -2690,6 +2690,74 @@ Vue.component('customer-register', {
   },//Fin de methods
 })
 
+Vue.component('customer-card', {
+  props:['customer'],
+  methods:{
+    formatCurrency(value) {
+      var formatted = new Intl.NumberFormat("es-Co", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0,
+      }).format(value);
+      return formatted;
+    }, //Fin del metodo,
+  },
+  computed:{
+    classState(){
+      if(this.customer.inactive){
+        return{'customer-card--inactive': true};
+      }else if(this.customer.deliquentBalance){
+        return{'customer-card--late': true};
+      }
+
+      return {success:false};
+    }
+  },
+  template:`
+  <div class="customer-card" :class="classState">
+    <div class="customer-card__header">
+      <h3 class="customer-card__name">{{customer.firstName + ' ' + customer.lastName}}</h3>
+      <p class="customer-card__info">{{customer.state}}</p>
+    </div>
+    <p class="customer-card__balance">{{formatCurrency(customer.balance)}}</p>
+    <div>
+      <p class="customer-card__debts">Creditos: {{customer.credits.length}}</p>
+      <p class="customer-card__points">Abonos: {{customer.payments.length}}</p>
+      <p class="customer-card__points">
+        Puntos: <span class="text-bold" :class="{'text-success': customer.points > 0, 'text-danger': customer.points < 0}">{{customer.points}}</span>
+      </p>
+    </div>
+  </div>`
+})
+
+Vue.component('search-box',{
+  props:['customers'],
+  data: function(){
+    return {
+      customerSelected: new Customer(0,''),
+    }
+  },//Fin de data
+  methods:{
+
+  },//Fin de methods
+  template: `
+  <div class="search-box">
+    <input type="text" class="search-box__search" placeholder="Buscar Cliente por Nombre">
+    <div class="search-box__content show">
+      <div class="search-box__result scroll show">
+        <customer-card v-for="customer in customers" :key="customer.id" :customer="customer"></customer-card>
+      </div>
+      <p class="search-box__count show">Clientes: <span class="text-bold">{{customers.length}}</span></p>
+    </div>
+    <div class="search-box__selected">
+      <customer-card :customer="customerSelected"></customer-card>
+    </div>
+  </div>`
+})
+
+//---------------------------------------------
+//  RAIZ DE LA APLICACION
+//---------------------------------------------
 const app = new Vue({
   el: '#app',
   data: {
