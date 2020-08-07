@@ -2120,8 +2120,12 @@ const printCustomerOrderByPaymentFrecuency = () => {
 }
 
 //--------------------------------------------------------------------------
-//	INTANCIAS DE VUE
+//	INTANCIAS DE VUE Y COMPONENTES
 //--------------------------------------------------------------------------
+
+//---------------------------------------------
+//  CLASES
+//---------------------------------------------
 /**
  * Utilizado para agrupar las propiedades de un campo que debe ser validado
  */
@@ -2168,6 +2172,14 @@ class WaitingModal {
   }
 }
 
+//---------------------------------------------
+//  COMPONENTES
+//---------------------------------------------
+/**
+ * Componente reutilizable para notoficarle al usuario
+ * que la peticion fue enviada al servidor y se está esperando
+ * una respuestas. Requiere que se le pasa la propiedad visible
+ */
 Vue.component('waiting-modal', {
   props:['visible'],
   template:`
@@ -2180,6 +2192,13 @@ Vue.component('waiting-modal', {
   </div>    `
 })
 
+/**
+ * Componente reutilizable para notificar al usuario el 
+ * resultado de la peticion al servidor. Requiere un objeto
+ * process-result con los resultados de la peiicion.
+ * Este componente emite un evento hidden-modal para que el estado visible
+ * pueda ser cambiado desde la raiz
+ */
 Vue.component('process-result', {
   props:['processResult'],
   template: `
@@ -2203,6 +2222,10 @@ Vue.component('process-result', {
   `
 })
 
+/**
+ * Componente no reutilizable de momento con la vista 
+ * para agregar nuevos clientes o actualizar los datos
+ */
 Vue.component('customer-register', {
   props: ['customers', 'id'],
   data: function () {
@@ -2673,17 +2696,25 @@ const app = new Vue({
     customers: [],
     modals:{
       waiting: new WaitingModal(),
-      confirmCreateCustomer: undefined,
-      confirmUpdateCustomer: undefined,
     }
   },
   methods: {
+    /**
+     * Este metodo se ejecuta cuando se recibe el evento emitido por el modulo
+     * para crear y actualizar clientes y se encarga de actualizar los
+     * datos del cliente que el servidor ya procesó
+     * @param {object} data Objeto devulto por l servidor con los datos del cliente actualizado
+     */
     updateCustomer(data) {
       if (this.customers.some(c => c.id === data.id)) {
         let customer = this.customers.filter(c => c.id === data.id)[0];
         customer.update(data);
       }
     },
+    /**
+     * Cuando se recibe el evento de customer-update se encarga de vomver a peidor los datos
+     * del cliente al servidor. 
+     */
     newCustomer() {
       this.updateModel();
     },
@@ -2719,14 +2750,6 @@ const app = new Vue({
     },//Fin del metodo
   },//Fin de methods
   computed: {
-    customersList() {
-      const all = this.customers;
-      const inactiveCustomers = this.inactiveCustomers;
-      const activeCustomers = this.activeCustomers;
-      const archivedCustomers = this.archivedCustomers;
-      return { all, activeCustomers, inactiveCustomers, archivedCustomers };
-    },
-
   },//Fin de compute
   created() {
     this.updateModel();

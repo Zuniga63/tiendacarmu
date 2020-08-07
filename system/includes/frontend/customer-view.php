@@ -724,6 +724,297 @@
       @new-customer="newCustomer"
     >
     </customer-register>
+
+    <div class="view" id="operationView">
+      <section class="view__section">
+        <div class="container">
+          <div class="container__header container__header--success">
+            <h1 class="container__title">Sistema de Clientes</h1>
+            <p class="container__subtitle">Registrar Operaciones</p>
+          </div>
+          <!-- Modulo para la busqueda de cliente -->
+          <div class="search-box">
+            <input type="text" class="search-box__search" placeholder="Buscar Cliente por Nombre">
+            <div class="search-box__content">
+              <div class="search-box__result scroll">
+                <div class="customer-card">
+                  <div class="customer-card__header">
+                      <h3 class="customer-card__name">Nombre</h3>
+                      <p class="customer-card__info">Esto es una info</p>
+                  </div>
+                  <p class="customer-card__balance">$2.000.000</p>
+                  <div>
+                    <p class="customer-card__debts">Creditos: 123</p>
+                    <p class="customer-card__points">Abonos: 244</p>
+                    <p class="customer-card__points text-success">Puntos: 9999</p>
+                  </div>
+                </div>
+              </div>
+              <p class="search-box__count">6 Clientes</p>
+            </div>
+            <div class="search-box__selected">
+              <div class="customer-card">
+                <div class="customer-card__header">
+                    <h3 class="customer-card__name">Nombre</h3>
+                    <p class="customer-card__info">Esto es una info</p>
+                </div>
+                <p class="customer-card__balance">$2.000.000</p>
+                <div>
+                  <p class="customer-card__debts">Creditos: 123</p>
+                  <p class="customer-card__points">Abonos: 244</p>
+                  <p class="customer-card__points text-success">Puntos: 9999</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- FORMULARIO DE REGISTRO O ACTUALIZACIÓN -->
+          <form class="form form--bg-light">
+            <div class="form__header">
+              <h2 class="form__title">Formulario</h2>
+            </div>
+            <div class="form__content">
+              <!-- Campo para definir el tipo de operacion -->
+              <label class="form__label">Tipo de operacion</label>
+              <div class="form__group-flex m-b">
+                <!-- Seleccion de credito -->
+                <div class="form__radio-group">
+                  <input
+                    type="radio"
+                    name="credit"
+                    id="credit"
+                    class="form__radio"
+                  />
+                  <label for="credit" class="form__radio">Credito</label>
+                </div>  
+                <!-- Seleccion de pago -->
+                <div class="form__radio-group">
+                  <input
+                    type="radio"
+                    name="payment"
+                    id="payment"
+                    class="form__radio"
+                  />
+                  <label for="payment" class="form__radio">Abono</label>
+                </div>
+              </div>
+
+              <!-- Campo para definir la fecha de la operacion -->
+              <label class="form__label">Fecha del credito/Abono</label>
+              <div class="form__group-flex m-b">
+                <!-- Seleccion de credito -->
+                <div class="form__radio-group">
+                  <input
+                    type="radio"
+                    name="credit"
+                    id="now"
+                    class="form__radio"
+                  />
+                  <label for="now" class="form__radio">Ahora</label>
+                </div>  
+                <!-- Seleccion de pago -->
+                <div class="form__radio-group">
+                  <input
+                    type="radio"
+                    name="payment"
+                    id="other"
+                    class="form__radio"
+                  />
+                  <label for="other" class="form__radio">Otro Momento</label>
+                </div>
+              </div>
+              <!-- Campo opcional para seleccionar la fecha -->
+              <label for="date" class="form__label">Selecciona una fecha</label>
+              <input type="date" name="" id="date" class="form__input">
+              <p class="alert alert--danger show">Selecciona una fecha valida</p>
+
+              <!-- Campo para agregar la descripcion del credito -->
+              <label for="description" class="form__label text-bold text-center">Detalles del credito</label>
+              <textarea name="" id="description" cols="30" rows="3" class="form__input" placeholder="Escribe los detalles aquí"></textarea>
+              <p class="alert alert--danger show">Esta informacion es importante</p>
+
+              <!-- Campo para el ingreso del importe -->
+              <label for="amount" class="form__label text-bold text-center">Valor del credito / Cantidad abonada</label>
+              <!-- Forma de pago -->
+              <div class="form__group-flex m-b">
+                <div class="form__radio-group">
+                  <input
+                    type="radio"
+                    name="credit"
+                    id="cash"
+                    class="form__radio"
+                  />
+                  <label for="now" class="form__radio">Efectivo</label>
+                </div>  
+                <!-- Seleccion de pago -->
+                <div class="form__radio-group">
+                  <input
+                    type="radio"
+                    name="payment"
+                    id="card"
+                    class="form__radio"
+                  />
+                  <label for="other" class="form__radio">Tarjetas</label>
+                </div>
+              </div>
+              <input type="text" name="" id="amount" class="form__input" placeholder="Ingrea el valor aquí">
+              <p class="alert alert--danger show">Campo obligatorio</p>
+            </div>
+            <div class="form__actions">
+              <input type="submit" value="Registar Credito/Abono" class="btn btn--success">
+            </div>            
+          </form>
+          <!-- Contenedor con las tarjetas de creditos -->
+          <div class="card-container">
+            <h2 class="card-container__title text-bold">Historial de Creditos</h2>
+            <div class="card-container__options">
+              <div class="form__group-flex">
+                <!-- Seleccion de credito -->
+                <div class="form__radio-group">
+                  <input
+                    type="radio"
+                    name="credit"
+                    id="credit"
+                    class="form__radio"
+                  />
+                  <label for="credit" class="form__radio">Todos</label>
+                </div>  
+                <!-- Seleccion de pago -->
+                <div class="form__radio-group">
+                  <input
+                    type="radio"
+                    name="payment"
+                    id="payment"
+                    class="form__radio"
+                  />
+                  <label for="payment" class="form__radio">Pendientes</label>
+                </div>
+              </div>
+            </div>
+            <div class="card-container__box scroll">
+              <div class="debt-card">
+                <p class="debt-card__title">Sueter Americanino</p>
+                <p class="debt-card__date">hoy a las 4:13 PM (hace 17 minutos)</p>
+                <p class="debt-card__label">Valor Inicial</p>
+                <p class="debt-card__label">Saldo pendiente</p>
+                <p class="debt-card__money">$&nbsp;1.200.000</p>
+                <p class="debt-card__money debt-card__money--bold">$&nbsp;1.200.000</p>
+              </div>
+            </div>
+            <p class="card-container__footer">Creditos(1): <span class="text-bold">$1.200.000</span></p>
+          </div>
+          <!-- Historial del cliente -->
+          <div class="">
+            <div class="history__header">
+              <h2 class="history__title">Historial</h2>
+            </div>
+            <div class="history__head">
+              <table class="table">
+                <thead>
+                  <tr class="table__row-header">
+                    <th class="table__header table--34">Fecha</th>
+                    <th class="table__header table--33">Credito</th>
+                    <th class="table__header table--33">Abono</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+            <div class="history__body scroll">
+              <table class="table">
+                <tbody class="table__body">
+                  <tr class="table__row" key="customer.id">
+                    <td class="table__data table--34">12-03-01</td>
+                    <td class="table__data table--33">$1.2000.000</td>
+                    <td class="table__data table--33">$1.200.000</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="history__footer">
+              <p></p>
+              <p class="history__info">Operaciones: 0</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <aside class="view__sidebar">
+        <!-- Contenedor con las tarjetas de creditos -->
+        <div class="card-container">
+          <h2 class="card-container__title text-bold">Historial de Creditos</h2>
+          <div class="card-container__options">
+            <div class="form__group-flex">
+              <!-- Seleccion de credito -->
+              <div class="form__radio-group">
+                <input
+                  type="radio"
+                  name="credit"
+                  id="credit"
+                  class="form__radio"
+                />
+                <label for="credit" class="form__radio">Todos</label>
+              </div>  
+              <!-- Seleccion de pago -->
+              <div class="form__radio-group">
+                <input
+                  type="radio"
+                  name="payment"
+                  id="payment"
+                  class="form__radio"
+                />
+                <label for="payment" class="form__radio">Pendientes</label>
+              </div>
+            </div>
+          </div>
+          <div class="card-container__box scroll">
+            <div class="debt-card">
+              <p class="debt-card__title">Sueter Americanino</p>
+              <p class="debt-card__date">hoy a las 4:13 PM (hace 17 minutos)</p>
+              <p class="debt-card__label">Valor Inicial</p>
+              <p class="debt-card__label">Saldo pendiente</p>
+              <p class="debt-card__money">$&nbsp;1.200.000</p>
+              <p class="debt-card__money debt-card__money--bold">$&nbsp;1.200.000</p>
+            </div>
+          </div>
+          <p class="card-container__footer">Creditos(1): <span class="text-bold">$1.200.000</span></p>
+        </div>
+
+        <div class="history__header">
+          <h2 class="history__title">Historial</h2>
+        </div>
+        <div class="history__head">
+          <table class="table">
+            <thead>
+              <tr class="table__row-header">
+                <th class="table__header table--25">Fecha</th>
+                <th class="table__header table--25">Credito</th>
+                <th class="table__header table--25">Abono</th>
+                <th class="table__header table--25">Saldo</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+        <div class="history__body scroll">
+          <table class="table">
+            <tbody class="table__body">
+              <template v-for="customer in customers">
+                <tr class="table__row" :key="customer.id">
+                  <td class="table__data table--25">{{customer.firstName}}</td>
+                  <td class="table__data table--25">{{customer.lastName}}</td>
+                  <td class="table__data table--25">{{customer.phone}}</td>
+                  <td class="table__data table--25">
+                    <input type="checkbox" name="" id="" style="zoom: 2;" />
+                  </td>
+                </tr>
+              </template v-for="customer">
+              
+            </tbody>
+          </table>
+        </div>
+        <div class="history__footer">
+          <p></p>
+          <p class="history__info">Operaciones: 0</p>
+        </div>
+      </aside>
+    </div>
   </div>
 
   <!-- Librería de Chart.js -->
