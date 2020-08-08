@@ -1107,7 +1107,7 @@ Vue.component('customer-credits', {
       //Ahora construyo los datos
       this.credits.forEach(c => {
         let id = c.id
-        let title = c.title;
+        let title = c.description;
         let date = `${moment(c.date).calendar()} (${moment(c.date).fromNow()})`;
         let amount = formatCurrencyLite(c.amount, 0);
         let balance = formatCurrencyLite(c.balance, 0);
@@ -1181,6 +1181,125 @@ Vue.component('customer-credits', {
     <div class="card-container__footer">
       <p>Creditos({{credits.length}}): <span class="text-bold">{{totalAmount}}</span></p>
       <p>Pendiente: <span class="text-bold">{{deliquentBalance}}</span></p>
+    </div>
+  </div>`
+})
+
+Vue.component('customer-history', {
+  props:['customer'],
+  data:function(){
+    return {
+
+    }
+  },//Fin de data
+  methods:{
+    historyCompareByDate(history1, history2){
+      if(history1.date.isBefore(history2.date)){
+        return -1;
+      }else if(history1.date.isSame(history2.date)){
+        return 0;
+      }else{
+        return 1;
+      }
+
+      return 0;
+    },
+
+  },//Fin de methods
+  computed:{
+    creditData(){
+      let result = [];
+      if(this.customer  && this.customer instanceof Customer){
+        let credits = this.customer.credits;
+        credits.forEach(credit => {
+          let date = moment(credit.date);
+          let creditAmount = credit.amount;
+          let paymentAmount = 0;
+          let balance = 0;
+          result.push({date, creditAmount, paymentAmount, balance});
+        })
+      }//Fin de if
+      return result;
+    },
+    paymentData(){
+      let result = [];
+      if(this.customer && this.customer instanceof Customer){
+        let payments = this.customer.payments;
+        payments.forEach(payment => {
+          let date = moment(payment.date);
+          let creditAmount = 0;
+          let paymentAmount = payment.amount;
+          let balance = 0;
+          result.push({date, creditAmount, paymentAmount, balance});
+        })
+      }
+      return result;
+    },
+    historyData(){
+      let credits = this.creditData;
+      let payments = this.paymentData;
+      let historyData = credits.concat(payments);
+      //Ahora se ordena por orden cronologico
+      historyData.sort(this.historyCompareByDate);
+
+      //Ahora se calcula el saldo
+      let balance = 0;
+      historyData.forEach(data => {
+        balance += (data.creditAmount - data.paymentAmount);
+        data.balance = balance;
+      })
+
+      //Ahora se retrnan los datos
+      return historyData;
+    }, 
+    viewData(){
+      let history = this.historyData;
+      let data = [];
+      history.forEach(h => {
+        let date = h.date.format('MMM DD [de] YYYY');
+        let credit = h.creditAmount > 0 ? formatCurrencyLite(h.creditAmount, 0) : '';
+        let payment = h.paymentAmount > 0 ? formatCurrencyLite(h.paymentAmount, 0) : '';
+        let balance = formatCurrencyLite(h.balance, 0);
+        data.push({date, credit, payment, balance});
+      })
+      console.log(data)
+      return data;
+    }
+  },//Fin de computed
+  template:`
+  <div>
+    <div class="history__header">
+      <h2 class="history__title">Historial</h2>
+    </div>
+    <div class="history__head">
+      <table class="table">
+        <thead>
+          <tr class="table__row-header">
+            <th class="table__header table--25">Fecha</th>
+            <th class="table__header table--25">Credito</th>
+            <th class="table__header table--25">Abono</th>
+            <th class="table__header table--25">Saldo</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+    <div class="history__body scroll">
+      <table class="table">
+        <tbody class="table__body">
+          <template v-for="(data, index) in viewData">
+            <tr class="table__row" :key="index">
+              <td class="table__data table--25">{{data.date}}</td>
+              <td class="table__data table--25">{{data.credit}}</td>
+              <td class="table__data table--25">{{data.payment}}</td>
+              <td class="table__data table--25">{{data.balance}}</td>
+            </tr>
+          </template>        
+        </tbody>
+      </table>
+    </div>
+    <div class="history__footer">
+      <p></p>
+      <p class="history__info">Operaciones: {{viewData.length}}</p>
     </div>
   </div>`
 })

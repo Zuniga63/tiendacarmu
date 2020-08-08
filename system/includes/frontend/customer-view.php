@@ -739,79 +739,13 @@
           <!-- Contenedor con las tarjetas de creditos -->
           <customer-credits :customer="customerSelected" id="creditHistoryMovil"></customer-credits>
           <!-- Historial del cliente -->
-          <div class="">
-            <div class="history__header">
-              <h2 class="history__title">Historial</h2>
-            </div>
-            <div class="history__head">
-              <table class="table">
-                <thead>
-                  <tr class="table__row-header">
-                    <th class="table__header table--34">Fecha</th>
-                    <th class="table__header table--33">Credito</th>
-                    <th class="table__header table--33">Abono</th>
-                  </tr>
-                </thead>
-              </table>
-            </div>
-            <div class="history__body scroll">
-              <table class="table">
-                <tbody class="table__body">
-                  <tr class="table__row" key="customer.id">
-                    <td class="table__data table--34">12-03-01</td>
-                    <td class="table__data table--33">$1.2000.000</td>
-                    <td class="table__data table--33">$1.200.000</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="history__footer">
-              <p></p>
-              <p class="history__info">Operaciones: 0</p>
-            </div>
-          </div>
-        </div>
+          <customer-history :customer="customerSelected"></customer-history>
       </section>
       <aside class="view__sidebar">
         <!-- Contenedor con las tarjetas de creditos -->
         <customer-credits :customer="customerSelected" id="creditHistoryDesktop"></customer-credits>
 
-        <div class="history__header">
-          <h2 class="history__title">Historial</h2>
-        </div>
-        <div class="history__head">
-          <table class="table">
-            <thead>
-              <tr class="table__row-header">
-                <th class="table__header table--25">Fecha</th>
-                <th class="table__header table--25">Credito</th>
-                <th class="table__header table--25">Abono</th>
-                <th class="table__header table--25">Saldo</th>
-              </tr>
-            </thead>
-          </table>
-        </div>
-        <div class="history__body scroll">
-          <table class="table">
-            <tbody class="table__body">
-              <template v-for="customer in customers">
-                <tr class="table__row" :key="customer.id">
-                  <td class="table__data table--25">{{customer.firstName}}</td>
-                  <td class="table__data table--25">{{customer.lastName}}</td>
-                  <td class="table__data table--25">{{customer.phone}}</td>
-                  <td class="table__data table--25">
-                    <input type="checkbox" name="" id="" style="zoom: 2;" />
-                  </td>
-                </tr>
-              </template v-for="customer">
-              
-            </tbody>
-          </table>
-        </div>
-        <div class="history__footer">
-          <p></p>
-          <p class="history__info">Operaciones: 0</p>
-        </div>
+        <customer-history :customer="customerSelected"></customer-history>
       </aside>
     </div>
   </div>
