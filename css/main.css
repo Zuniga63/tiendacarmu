@@ -499,6 +499,10 @@ body {
   outline-color: var(--primary);
 }
 
+.form__content{
+  margin-bottom: 1em;
+}
+
 .form__actions-double {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -2380,6 +2384,14 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 
 .report__statistics__statistic {
   margin-bottom: 0.3em;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s
+}
+
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0
 }
 
 @media (min-width: 360px) {
