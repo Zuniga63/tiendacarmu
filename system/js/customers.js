@@ -1105,9 +1105,18 @@ Vue.component('new-operation-form', {
       if (value) {
         value = parseFloat(deleteCurrencyFormater(value));
         if (!isNaN(value) && value > 0) {
-          this.verifyQuota(value);
           if (value >= 1000) {
-            isOk = true;
+            if(this.operationType === 'payment'){
+              this.exceedsTheQuota = false;
+              if(this.customer.balance >= value){
+                isOk = true;
+              }else{
+                message = "El abono supera la deuda";
+              }
+            }else{
+              this.verifyQuota(value);
+              isOk = true;
+            }
           } else {
             message = 'La cifra es muy pequeña';
           }
@@ -1211,6 +1220,27 @@ Vue.component('new-operation-form', {
       }
       return minDate;
     },
+    disabledSubmit(){
+      //by default the button is activated
+      let result = false;
+      if(this.customer){
+        if(this.operationType === 'payment' && this.customer.balance <= 0){
+          /**
+           * The button is disabled when 
+           * the customer's balance is zero 
+           */
+          result = true;
+        }
+      }else{
+        /**
+         * The button is disables in all case when a
+         * customer has not been selected
+         */
+        result = true;
+      }
+
+      return result;
+    }
   },//Fin de computed,
   mounted() {
     this.$root.$on('customer-updated', this.onCustomerUpdated);
@@ -1367,7 +1397,11 @@ Vue.component('new-operation-form', {
       </p>
     </div>
     <div class="form__actions">
-      <input type="submit" :value="isCredit ? 'Registar Credito' : 'Registrar Abono'" class="btn btn--success">
+      <input type="submit" 
+        :value="isCredit ? 'Registar Credito' : 'Registrar Abono'" 
+        :class="['btn', {'btn--success': !disabledSubmit, 'btn--disabled':disabledSubmit}]"
+        :disabled="disabledSubmit"
+      >
     </div>            
   </form>`
 })
