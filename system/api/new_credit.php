@@ -4,13 +4,14 @@ if (session_active()) {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (
             isset($_POST['customer_id']) && isset($_POST['description']) &&
-            isset($_POST['amount'])
+            isset($_POST['amount'])  && isset($_POST['date'])
         ) {
             $customer_id = htmlspecialchars($_POST['customer_id']);
             $description = htmlspecialchars($_POST['description']);
             $amount = htmlspecialchars($_POST['amount']);
+            $date = htmlspecialchars($_POST['date']);
 
-            $request = create_new_credit($customer_id, $description, $amount);   
+            $request = create_new_credit($customer_id, $description, $amount, $date);   
             $customer = null;
             if($request){
                 $customer = get_customer($customer_id);

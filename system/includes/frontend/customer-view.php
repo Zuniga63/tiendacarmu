@@ -720,38 +720,10 @@
     <customer-register :customers="customers" id="customerReg" @update-customer="updateCustomer" @new-customer="newCustomer">
     </customer-register>
 
-    <div class="view" id="operationView">
-      <section class="view__section">
-        <div class="container">
-          <div class="container__header container__header--success">
-            <h1 class="container__title">Sistema de Clientes</h1>
-            <p class="container__subtitle">Registrar Operaciones</p>
-          </div>
-          <!-- Modulo para la busqueda de cliente -->
-          <search-box :customers="customers" @customer-selected="onCustomerSelected"></search-box>
-          <!-- FORMULARIO DE REGISTRO O ACTUALIZACIÓN -->
-          <transition name="fade">
-            <new-operation-form v-if="customerSelected" :customer="customerSelected"></new-operation-form>
-          </transition>
+    <operation-register :customers="customers" id="customerOperation" @new-credit="onNewCredit" @new-payment="onNewPayment"></operation-register>
 
-          <!-- Contenedor con las tarjetas de creditos -->
-          <transition name="fade">
-            <customer-credits :customer="customerSelected" id="creditHistoryMovil" v-if="customerSelected"></customer-credits>
-          </transition>
-          
-          <!-- Historial del cliente -->
-          <transition name="fade">
-            <customer-history :customer="customerSelected" v-if="customerSelected"></customer-history>
-          </transition>
-
-      </section>
-      <aside class="view__sidebar">
-        <!-- Contenedor con las tarjetas de creditos -->
-        <customer-credits :customer="customerSelected" id="creditHistoryDesktop"></customer-credits>
-
-        <customer-history :customer="customerSelected"></customer-history>
-      </aside>
-    </div>
+    <waiting-modal v-bind:visible="waiting"></waiting-modal>
+    <process-result v-bind:process-result="processResult" @hidden-modal="processResult.visible = false"></process-result>
   </div>
 
   <!-- Librería de Chart.js -->

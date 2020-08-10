@@ -43,6 +43,25 @@ class DataInput {
   }
 }
 
+class RequesProcess{
+  constructor(){
+    this.visible = false;
+    this.hasError = false;
+    this.message = '';
+  }
+
+  isSuccess(message){
+    this.visible = true;
+    this.hasError = false;
+    this.message = message;
+  }
+
+  hasError(message){
+    this.visible = true;
+    this.hasError = true;
+    this.message = message;
+  }
+}
 class WaitingModal {
   constructor() {
     this.visible = false;
@@ -423,207 +442,6 @@ Vue.component('customer-register', {
       email: new DataInput(),
     }
   },
-  template: `
-  <div class="view" :id="id">
-    <section class="view__section">
-      <div class="container">
-        <div class="container__header" :class="{'container__header--success': !updatingCustomer, 'container__header--primary': updatingCustomer}">
-          <h1 class="container__title">Sistema de Clientes</h1>
-          <p class="container__subtitle">
-            {{updatingCustomer ? 'Actualización de Datos' : 'Nuevo Cliente'}}
-          </p>
-        </div>
-        <!-- FORMULARIO DE REGISTRO O ACTUALIZACIÓN -->
-        <form 
-          :class="['form', {'form--bg-light': !updatingCustomer, 'form--bg-primary': updatingCustomer}]" 
-          :id="id+'Form'"
-          @submit.prevent="onSubmit"
-        >
-          <h2 class="form__title">{{updatingCustomer ? 'Actualización' : 'Nuevo Cliente'}}</h2>
-          <!-- Campo para el nombre -->
-          <label v-bind:for="id + 'Name'" class="form__label">Nombres</label>
-          <input
-            type="text"
-            name="firts_name"
-            v-bind:id="id + 'Name'"
-            v-model.trim="firstName.value"
-            @focus="$event.target.select()"
-            @blur="validateFirstName"
-            class="form__input"
-            placeholder="Ingresa el nombre aquí"
-          />
-          <p class="alert alert--danger" :class="{show: firstName.hasError}">{{firstName.message}}</p>
-
-          <!-- Campo para el apellido -->
-          <label v-bind:for="id + 'LastName'" class="form__label"
-            >Apellidos</label
-          >
-          <input
-            type="text"
-            name="last_name"
-            v-bind:id="id + 'LastName'"
-            v-model.trim="lastName.value"
-            @focus="$event.target.select()"
-            class="form__input"
-            placeholder="Ingresa el apellido aquí"
-          />
-
-          <!-- Campo para la identificacion -->
-          <label v-bind:for="id + 'Nit'" class="form__label">Nit o C.C</label>
-          <input
-            type="text"
-            name="nit"
-            v-bind:id="id + 'Nit'"
-            v-model.trim="nit.value"
-            @focus="$event.target.select()"
-            @blur="validateNit"
-            class="form__input"
-            placeholder="Ingresa el Nit o CC"
-          />
-          <p class="alert alert--danger" :class="{show: nit.hasError}">{{nit.message}}</p>
-
-          <!-- Campo para el numero de telefono -->
-          <label v-bind:for="id + 'Phone'" class="form__label">Telefono</label>
-          <input
-            type="text"
-            name="regCustomerName"
-            v-bind:id="id + 'Phone'"
-            v-model.trim="phone.value"
-            @focus="$event.target.select()"
-            @blur="validatePhone"
-            class="form__input"
-            placeholder="Escribe el numero aquí"
-          />
-          <p class="alert alert--danger" :class="{show:phone.hasError}">{{phone.message}}</p>
-
-          <!-- Campo para el correo elecctronico -->
-          <label v-bind:for="id + 'Email'" class="form__label">Correo</label>
-          <input
-            type="email"
-            name="regCustomerEmail"
-            v-bind:id="id + 'Email'"
-            v-model.trim="email.value"
-            @focus="$event.target.select()"
-            @blur="validateEmail"
-            class="form__input"
-            placeholder="Escribe el correo aquí"
-          />
-          <p class="alert alert--danger" :class="{show: email.hasError}">{{email.message}}</p>
-
-          <!-- Botones del formulario: Para crear nuevo cliente -->
-          <input
-            v-if="!updatingCustomer"
-            type="submit"
-            value="Registrar Cliente"
-            class="btn btn--success"
-          />
-          <!-- Botones del formulario: Para actualizar los datos -->
-          <div class="form__actions-double" v-if="updatingCustomer">
-            <input
-              type="submit"
-              value="Actualizar"
-              class="btn btn--primary"
-            />
-            <input type="button" value="Descartar" class="btn btn--danger" @click="discardUpdate"/>
-          </div>
-        </form>
-
-        <!-- Tarjetas de los clientes -->
-        <div class="card-container  view-desktop-colapse">
-          <h2 class="card-container__title">Listado de Clientes</h2>
-          <div class="card-container__options">
-            <div class="form__group-flex">
-              <div class="form__radio-group">
-                <input
-                  type="radio"
-                  value="active"
-                  v-bind:id="id+'Active'"
-                  v-model="typeList"
-                  class="form__radio"
-                />
-                <label v-bind:for="id+'Active'" class="form__radio">Act</label>
-              </div>
-
-              <div class="form__radio-group">
-                <input
-                  type="radio"
-                  value="inactive"
-                  v-bind:id="id +'Inactive'"
-                  v-model="typeList"
-                  class="form__radio"
-                />
-                <label v-bind:for="id +'Inactive'" class="form__radio">Inact</label>
-              </div>
-
-              <div class="form__radio-group">
-                <input
-                  type="radio"
-                  value="archived"
-                  v-bind:id="id +'Archived'"
-                  v-model="typeList"
-                  class="form__radio"
-                />
-                <label v-bind:for="id +'Archived'" class="form__radio">Arch</label>
-              </div>
-            </div>
-          </div>
-          <div class="card-container__box scroll">
-            <div class="card-simple" v-for="customer in selectedList" :key="customer.id">
-              <p class="card-simple__title">
-                {{customer.firstName + ' ' + customer.lastName}}
-              </p>
-              <div class="card-simple__actions">
-                <a :href="'#'+id+'Form'" class="btn btn--success" @click="loadCustomer(customer)">Actualizar Datos</a>
-              </div>
-            </div>
-          </div>
-          <p class="card-container__footer">Clientes: <span class="text-bold">{{selectedList.length}}</span></p>
-        </div>
-      </div>
-    </section>
-    <aside class="view__sidebar">
-      <div class="history__header">
-        <h2 class="history__title">Listado de clientes</h2>
-      </div>
-      <div class="history__head">
-        <table class="table">
-          <thead>
-            <tr class="table__row-header">
-              <th class="table__header table--25">Nombres</th>
-              <th class="table__header table--25">Apellidos</th>
-              <th class="table__header table--25">Telefono</th>
-              <th class="table__header table--25">Archivado</th>
-            </tr>
-          </thead>
-        </table>
-      </div>
-      <div class="history__body scroll">
-        <table class="table">
-          <tbody class="table__body">
-            <template v-for="customer in customers">
-              <tr class="table__row" :class="{selected: customerSelected && customerSelected.id === customer.id}" :key="customer.id"  @click="loadCustomer(customer)">
-                <td class="table__data table--25">{{customer.firstName}}</td>
-                <td class="table__data table--25">{{customer.lastName}}</td>
-                <td class="table__data table--25">{{customer.phone}}</td>
-                <td class="table__data table--25" @click.stop="">
-                  <input type="checkbox" name="" id="" style="zoom: 2;" />
-                </td>
-              </tr>
-            </template v-for="customer">
-          </tbody>
-        </table>
-      </div>
-      <div class="history__footer">
-        <p class="history__info">Activos: <span class="text-bold">{{activeCustomers.length}}</span></p>
-        <p class="history__info">Inactivos: <span class="text-bold">{{inactiveCustomers.length}}</span></p>
-        <p class="history__info">Archivados: <span class="text-bold">{{archivedCustomers.length}}</span></p>
-        <p class="history__info">Total: <span class="text-bold">{{customers.length}}</span></p>
-      </div>
-    </aside>  
-    <waiting-modal v-bind:visible="waiting"></waiting-modal>
-    <process-result v-bind:process-result="processResult" @hidden-modal="processResult.visible = false"></process-result>
-  </div>
-	`,
   computed: {
     inactiveCustomers() {
       const result = this.customers.filter(c => c.inactive && !c.archived);
@@ -868,6 +686,208 @@ Vue.component('customer-register', {
       this.email.resetInput();
     },
   },//Fin de methods
+  template: `
+  <div class="view" :id="id">
+    <section class="view__section">
+      <div class="container">
+        <div class="container__header" :class="{'container__header--success': !updatingCustomer, 'container__header--primary': updatingCustomer}">
+          <h1 class="container__title">Sistema de Clientes</h1>
+          <p class="container__subtitle">
+            {{updatingCustomer ? 'Actualización de Datos' : 'Nuevo Cliente'}}
+          </p>
+        </div>
+        <!-- FORMULARIO DE REGISTRO O ACTUALIZACIÓN -->
+        <form 
+          :class="['form', {'form--bg-light': !updatingCustomer, 'form--bg-primary': updatingCustomer}]" 
+          :id="id+'Form'"
+          @submit.prevent="onSubmit"
+        >
+          <h2 class="form__title">{{updatingCustomer ? 'Actualización' : 'Nuevo Cliente'}}</h2>
+          <!-- Campo para el nombre -->
+          <label v-bind:for="id + 'Name'" class="form__label">Nombres</label>
+          <input
+            type="text"
+            name="firts_name"
+            v-bind:id="id + 'Name'"
+            v-model.trim="firstName.value"
+            @focus="$event.target.select()"
+            @blur="validateFirstName"
+            class="form__input"
+            placeholder="Ingresa el nombre aquí"
+          />
+          <p class="alert alert--danger" :class="{show: firstName.hasError}">{{firstName.message}}</p>
+
+          <!-- Campo para el apellido -->
+          <label v-bind:for="id + 'LastName'" class="form__label"
+            >Apellidos</label
+          >
+          <input
+            type="text"
+            name="last_name"
+            v-bind:id="id + 'LastName'"
+            v-model.trim="lastName.value"
+            @focus="$event.target.select()"
+            class="form__input"
+            placeholder="Ingresa el apellido aquí"
+          />
+
+          <!-- Campo para la identificacion -->
+          <label v-bind:for="id + 'Nit'" class="form__label">Nit o C.C</label>
+          <input
+            type="text"
+            name="nit"
+            v-bind:id="id + 'Nit'"
+            v-model.trim="nit.value"
+            @focus="$event.target.select()"
+            @blur="validateNit"
+            class="form__input"
+            placeholder="Ingresa el Nit o CC"
+          />
+          <p class="alert alert--danger" :class="{show: nit.hasError}">{{nit.message}}</p>
+
+          <!-- Campo para el numero de telefono -->
+          <label v-bind:for="id + 'Phone'" class="form__label">Telefono</label>
+          <input
+            type="text"
+            name="regCustomerName"
+            v-bind:id="id + 'Phone'"
+            v-model.trim="phone.value"
+            @focus="$event.target.select()"
+            @blur="validatePhone"
+            class="form__input"
+            placeholder="Escribe el numero aquí"
+          />
+          <p class="alert alert--danger" :class="{show:phone.hasError}">{{phone.message}}</p>
+
+          <!-- Campo para el correo elecctronico -->
+          <label v-bind:for="id + 'Email'" class="form__label">Correo</label>
+          <input
+            type="email"
+            name="regCustomerEmail"
+            v-bind:id="id + 'Email'"
+            v-model.trim="email.value"
+            @focus="$event.target.select()"
+            @blur="validateEmail"
+            class="form__input"
+            placeholder="Escribe el correo aquí"
+          />
+          <p class="alert alert--danger" :class="{show: email.hasError}">{{email.message}}</p>
+
+          <!-- Botones del formulario: Para crear nuevo cliente -->
+          <input
+            v-if="!updatingCustomer"
+            type="submit"
+            value="Registrar Cliente"
+            class="btn btn--success"
+          />
+          <!-- Botones del formulario: Para actualizar los datos -->
+          <div class="form__actions-double" v-if="updatingCustomer">
+            <input
+              type="submit"
+              value="Actualizar"
+              class="btn btn--primary"
+            />
+            <input type="button" value="Descartar" class="btn btn--danger" @click="discardUpdate"/>
+          </div>
+        </form>
+
+        <!-- Tarjetas de los clientes -->
+        <div class="card-container  view-desktop-colapse">
+          <h2 class="card-container__title">Listado de Clientes</h2>
+          <div class="card-container__options">
+            <div class="form__group-flex">
+              <div class="form__radio-group">
+                <input
+                  type="radio"
+                  value="active"
+                  v-bind:id="id+'Active'"
+                  v-model="typeList"
+                  class="form__radio"
+                />
+                <label v-bind:for="id+'Active'" class="form__radio">Act</label>
+              </div>
+
+              <div class="form__radio-group">
+                <input
+                  type="radio"
+                  value="inactive"
+                  v-bind:id="id +'Inactive'"
+                  v-model="typeList"
+                  class="form__radio"
+                />
+                <label v-bind:for="id +'Inactive'" class="form__radio">Inact</label>
+              </div>
+
+              <div class="form__radio-group">
+                <input
+                  type="radio"
+                  value="archived"
+                  v-bind:id="id +'Archived'"
+                  v-model="typeList"
+                  class="form__radio"
+                />
+                <label v-bind:for="id +'Archived'" class="form__radio">Arch</label>
+              </div>
+            </div>
+          </div>
+          <div class="card-container__box scroll">
+            <div class="card-simple" v-for="customer in selectedList" :key="customer.id">
+              <p class="card-simple__title">
+                {{customer.firstName + ' ' + customer.lastName}}
+              </p>
+              <div class="card-simple__actions">
+                <a :href="'#'+id+'Form'" class="btn btn--success" @click="loadCustomer(customer)">Actualizar Datos</a>
+              </div>
+            </div>
+          </div>
+          <p class="card-container__footer">Clientes: <span class="text-bold">{{selectedList.length}}</span></p>
+        </div>
+      </div>
+    </section>
+    <aside class="view__sidebar">
+      <div class="history__header">
+        <h2 class="history__title">Listado de clientes</h2>
+      </div>
+      <div class="history__head">
+        <table class="table">
+          <thead>
+            <tr class="table__row-header">
+              <th class="table__header table--25">Nombres</th>
+              <th class="table__header table--25">Apellidos</th>
+              <th class="table__header table--25">Telefono</th>
+              <th class="table__header table--25">Archivado</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+      <div class="history__body scroll">
+        <table class="table">
+          <tbody class="table__body">
+            <template v-for="customer in customers">
+              <tr class="table__row" :class="{selected: customerSelected && customerSelected.id === customer.id}" :key="customer.id"  @click="loadCustomer(customer)">
+                <td class="table__data table--25">{{customer.firstName}}</td>
+                <td class="table__data table--25">{{customer.lastName}}</td>
+                <td class="table__data table--25">{{customer.phone}}</td>
+                <td class="table__data table--25" @click.stop="">
+                  <input type="checkbox" name="" id="" style="zoom: 2;" />
+                </td>
+              </tr>
+            </template v-for="customer">
+          </tbody>
+        </table>
+      </div>
+      <div class="history__footer">
+        <p class="history__info">Activos: <span class="text-bold">{{activeCustomers.length}}</span></p>
+        <p class="history__info">Inactivos: <span class="text-bold">{{inactiveCustomers.length}}</span></p>
+        <p class="history__info">Archivados: <span class="text-bold">{{archivedCustomers.length}}</span></p>
+        <p class="history__info">Total: <span class="text-bold">{{customers.length}}</span></p>
+      </div>
+    </aside>  
+    <waiting-modal v-bind:visible="waiting"></waiting-modal>
+    <process-result v-bind:process-result="processResult" @hidden-modal="processResult.visible = false"></process-result>
+  </div>
+	`,
+
 })
 
 Vue.component("input-money", {
@@ -1086,10 +1106,10 @@ Vue.component('new-operation-form', {
         value = parseFloat(deleteCurrencyFormater(value));
         if (!isNaN(value) && value > 0) {
           this.verifyQuota(value);
-          if(value >= 1000){
+          if (value >= 1000) {
             isOk = true;
-          }else{
-            message= 'La cifra es muy pequeña';
+          } else {
+            message = 'La cifra es muy pequeña';
           }
         } else {
           message = 'Ingresa un valor válido';
@@ -1134,25 +1154,28 @@ Vue.component('new-operation-form', {
         let cash = this.paymentType === 'cash' ? true : false;
         let amount = parseFloat(deleteCurrencyFormater(this.amount.value));
 
-        let body = new FormData();
-        body.append('customer-id', customerId);
-        body.append('is-now', isNow);
-        body.append('date', date);
-        body.append('description', description);
-        body.append('cash', cash);
-        body.append('amount', amount);
+        let data = new FormData();
+        data.append('customer_id', customerId);
+        data.append('date', date);
+        data.append('description', description);
+        data.append('cash', cash);
+        data.append('amount', amount);
 
         switch (this.operationType) {
           case 'credit':
-            console.log({customerId, isNow, date, description, cash, amount });
+
+            this.$emit('new-credit', data)
             break;
           case 'payment':
-            console.log({customerId, isNow, date, description, cash, amount });
+            this.$emit('new-payment', { customerId, isNow, date, description, cash, amount });
             break;
           default:
             break;
         }
       }
+    },
+    onCustomerUpdated() {
+      this.description.resetInput();
     }
   },//Fin de methods
   computed: {
@@ -1176,8 +1199,10 @@ Vue.component('new-operation-form', {
       //Si el cliente no tiene credito la fecha minima
       if (this.customer) {
         let creditCount = this.customer.credits.length;
+        console.log(creditCount);
         if (creditCount > 0) {
           let maxCreditDate = moment(this.customer.credits[creditCount - 1].date);
+          minDate = maxCreditDate;
           let paymentCount = this.customer.payments.length;
           if (paymentCount > 0) {
             let maxPaymentDate = moment(this.customer.payments[paymentCount - 1].date);
@@ -1188,8 +1213,11 @@ Vue.component('new-operation-form', {
       return minDate;
     },
   },//Fin de computed,
+  mounted() {
+    this.$root.$on('customer-updated', this.onCustomerUpdated);
+  },
   template: `
-  <form class="form form--bg-light" @submit.prevent="onSubmit">
+  <form class="form form--bg-light" @submit.prevent="onSubmit" :id="id + 'Form'">
     <div class="form__header">
       <h2 class="form__title">{{formTitle}}</h2>
     </div>
@@ -1573,6 +1601,67 @@ Vue.component('customer-history', {
   </div>`
 })
 
+Vue.component('operation-register', {
+  props: ['customers', 'id'],
+  data: function () {
+    return {
+      customerSelected: undefined,
+      waiting: false,
+      processResult: { visible: false, hasError: false, message: '' },
+    }
+  },
+  methods: {
+    onCustomerSelected(customer) {
+      this.customerSelected = customer;
+    },
+  },
+  computed: {
+
+  },
+  template: `
+  <div class="view" :id="id">
+    <section class="view__section">
+      <div class="container">
+        <div class="container__header container__header--success">
+          <h1 class="container__title">Sistema de Clientes</h1>
+          <p class="container__subtitle">Registrar Operaciones</p>
+        </div>
+        <!-- Modulo para la busqueda de cliente -->
+        <search-box :customers="customers" @customer-selected="onCustomerSelected"></search-box>
+        <!-- FORMULARIO DE REGISTRO O ACTUALIZACIÓN -->
+        <transition name="fade">
+          <new-operation-form 
+            v-if="customerSelected" 
+            :customer="customerSelected" 
+            :id="id +'Form'"            
+            @new-credit="$emit('new-credit', $event)"
+            @new-payment="$emit('new-payment', $event)"
+          >
+          </new-operation-form>
+        </transition>
+
+        <!-- Contenedor con las tarjetas de creditos -->
+        <transition name="fade">
+          <customer-credits :customer="customerSelected" :id="id + 'creditHistoryMovil'" v-if="customerSelected"></customer-credits>
+        </transition>
+        
+        <!-- Historial del cliente -->
+        <transition name="fade">
+          <customer-history :customer="customerSelected" v-if="customerSelected"></customer-history>
+        </transition>
+      </div>
+    </section>
+    <aside class="view__sidebar">
+      <!-- Contenedor con las tarjetas de creditos -->
+      <customer-credits :customer="customerSelected" :id="id + 'creditHistoryDesktop'"></customer-credits>
+
+      <customer-history :customer="customerSelected"></customer-history>
+    </aside>
+    <waiting-modal v-bind:visible="waiting"></waiting-modal>
+    <process-result v-bind:process-result="processResult" @hidden-modal="processResult.visible = false"></process-result>
+  </div>`
+})
+
 //---------------------------------------------
 //  RAIZ DE LA APLICACION
 //---------------------------------------------
@@ -1584,14 +1673,15 @@ const app = new Vue({
       waiting: new WaitingModal(),
     },
     // propiedades temporales
-    customerSelected: undefined,
+    waiting: false,
+    processResult: new RequesProcess(),
   },
   methods: {
     /**
      * Este metodo se ejecuta cuando se recibe el evento emitido por el modulo
      * para crear y actualizar clientes y se encarga de actualizar los
      * datos del cliente que el servidor ya procesó
-     * @param {object} data Objeto devulto por l servidor con los datos del cliente actualizado
+     * @param {object} data Objeto devuelto por l servidor con los datos del cliente actualizado
      */
     updateCustomer(data) {
       if (this.customers.some(c => c.id === data.id)) {
@@ -1605,6 +1695,34 @@ const app = new Vue({
      */
     newCustomer() {
       this.updateModel();
+    },
+    async onNewCredit(formData) {
+      console.log(formData);
+      //Se monta la espera
+      this.waiting = true;
+      try {
+        const res = await fetch('./api/new_credit.php', { method: 'POST', body: formData });
+        const data = await res.json();
+        console.log(data);
+        if (data.sessionActive) {
+          if (data.request) {
+            this.updateCustomer(data.customer);
+            this.waiting = false;
+            this.processResult.isSuccess('Credito registrado con exito');
+          } else {
+            this.waiting = false;
+            this.processResult.hasError('No se pudo registrar el credito');
+          }
+        } else {
+          // location.reload();
+        }
+      } catch (error) {
+        console.log(error)
+      }
+      this.$root.$emit('customer-updated');
+    },
+    onNewPayment(data) {
+      console.log(data);
     },
 		/**
 		 * Solicita al servidor la informacion de todos los clientes
@@ -1637,9 +1755,6 @@ const app = new Vue({
       }
     },//Fin del metodo
 
-    onCustomerSelected(customer) {
-      this.customerSelected = customer;
-    }
   },//Fin de methods
   computed: {
   },//Fin de compute

@@ -1079,7 +1079,7 @@ function get_customer_payments($customer_id)
  * @param {float} $amount El valor total de la deuda.
  * @return {bool} True si fue satisfactorio
  */
-function create_new_credit($customer_id, $description, $amount)
+function create_new_credit($customer_id, $description, $amount, $date='')
 {
 	$result = false;
 
@@ -1089,16 +1089,29 @@ function create_new_credit($customer_id, $description, $amount)
 		$description = trim($description);
 
 		if (!empty($description) && $amount > 0) {
+			$query = "";
+			$date_is_ok = false;
+			if(!empty($date) && validate_date($date)){
+				$date_is_ok = true;
+				$query = "INSERT INTO customer_credit(customer_id, credit_date, description, amount) ";
+				$query .= "VALUES (:customer_id, :credit_date, :description, :amount)";
+			}else{
+				$query = "INSERT INTO customer_credit(customer_id, description, amount) VALUES (:customer_id, :description, :amount)";
+			}
+			
 			try {
 				$conn = get_connection();
 				$conn->beginTransaction();
 
-				$stmt = $conn->prepare("INSERT INTO customer_credit(customer_id, description, amount) VALUES (:customer_id, :description, :amount)");
+				$stmt = $conn->prepare($query);
 
 				if ($stmt) {
 					$stmt->bindParam(':customer_id', $customer_id, PDO::PARAM_INT);
 					$stmt->bindParam(':description', $description, PDO::PARAM_STR);
 					$stmt->bindParam(':amount', $amount, PDo::PARAM_STR);
+					if($date_is_ok){
+						$stmt->bindParam(':credit_date', $date, PDO::PARAM_STR);
+					}
 					$stmt->execute();
 
 					//Se actualiza el registro
@@ -1602,6 +1615,15 @@ function go_to_page($page)
 	if (isset($page) && !empty($page)) {
 		header("location: $page");
 	}
+}
+
+function validate_date($date){
+	$values = explode('-', $date);
+	if(3 === count($values) && checkdate($values[1], $values[2], $values[0])){
+		return true;
+	}
+
+	return false;
 }
 
 function update_user_log($message)
