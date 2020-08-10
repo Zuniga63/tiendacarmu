@@ -1150,7 +1150,7 @@ function create_new_credit($customer_id, $description, $amount, $date='')
  * @param {bool} $cash True cuando la transaccion fu en efectivo
  * @param {float} $amount El valor del abono
  */
-function create_new_payment($customer_id, $cash, $amount)
+function create_new_payment($customer_id, $cash, $amount, $date="")
 {
 	$result = false;
 
@@ -1187,10 +1187,19 @@ function create_new_payment($customer_id, $cash, $amount)
 			$customer_balance = $customer_credits - $customer_payments;
 
 			if ($customer_balance > 0 && $amount <= $customer_balance) {
-				$stmt = $conn->prepare("INSERT INTO customer_payment(customer_id, cash, amount) VALUES (:customer_id, :cash, :amount)");
+				$query = "INSERT INTO customer_payment(customer_id, cash, amount) VALUES (:customer_id, :cash, :amount)";
+				$date_is_ok = false;
+				if(!empty($date) && validate_date($date)){
+					$date_is_ok = true;
+					$query = "INSERT INTO customer_payment(customer_id, payment_date, cash, amount) VALUES (:customer_id, :payment_date, :cash, :amount)";
+				}
+				$stmt = $conn->prepare($query);
 				$stmt->bindParam(':customer_id', $customer_id, PDO::PARAM_INT);
 				$stmt->bindParam(':cash', $cash, PDO::PARAM_BOOL);
 				$stmt->bindParam(':amount', $amount, PDO::PARAM_STR);
+				if($date_is_ok){
+					$stmt->bindParam(':payment_date', $date, PDO::PARAM_STR);
+				}
 				$stmt->execute();
 
 				$last_id = $conn->lastInsertId();

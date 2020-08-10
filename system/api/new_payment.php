@@ -4,17 +4,18 @@ if (session_active()) {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (
             isset($_POST['customer_id']) && isset($_POST['cash']) &&
-            isset($_POST['amount'])
+            isset($_POST['amount'])  && isset($_POST['date'])
         ) {
             $customer_id = htmlspecialchars($_POST['customer_id']);
             $cash = htmlspecialchars($_POST['cash']);
             $amount = htmlspecialchars($_POST['amount']);
+            $date = htmlspecialchars($_POST['date']);
 
-            $request = create_new_payment($customer_id, $cash, $amount);   
+            $request = create_new_payment($customer_id, $cash, $amount, $date);
             $customer = null;
-            if($request){
+            if ($request) {
                 $customer = get_customer($customer_id);
-            }        
+            }
 
             $result = [
                 'sessionActive' => true,

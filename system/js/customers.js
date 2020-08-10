@@ -43,20 +43,20 @@ class DataInput {
   }
 }
 
-class RequesProcess{
-  constructor(){
+class RequesProcess {
+  constructor() {
     this.visible = false;
     this.hasError = false;
     this.message = '';
   }
 
-  isSuccess(message){
+  isSuccess(message) {
     this.visible = true;
     this.hasError = false;
     this.message = message;
   }
 
-  hasError(message){
+  isDanger(message) {
     this.visible = true;
     this.hasError = true;
     this.message = message;
@@ -1163,11 +1163,10 @@ Vue.component('new-operation-form', {
 
         switch (this.operationType) {
           case 'credit':
-
             this.$emit('new-credit', data)
             break;
           case 'payment':
-            this.$emit('new-payment', { customerId, isNow, date, description, cash, amount });
+            this.$emit('new-payment', data);
             break;
           default:
             break;
@@ -1711,18 +1710,32 @@ const app = new Vue({
             this.processResult.isSuccess('Credito registrado con exito');
           } else {
             this.waiting = false;
-            this.processResult.hasError('No se pudo registrar el credito');
+            this.processResult.isDanger('No se pudo registrar el credito');
           }
         } else {
-          // location.reload();
+          location.reload();
         }
       } catch (error) {
         console.log(error)
       }
       this.$root.$emit('customer-updated');
     },
-    onNewPayment(data) {
+    async onNewPayment(formData) {
+      const res = await fetch('./api/new_payment.php', { method: 'POST', body: formData });
+      const data = await res.json();
       console.log(data);
+      if (data.sessionActive) {
+        if (data.request) {
+          this.updateCustomer(data.customer);
+          this.waiting = false;
+          this.processResult.isSuccess('Abono registrado con exito');
+        } else {
+          this.waiting = false;
+          this.processResult.isDanger('No se pudo registrar el abono');
+        }
+      } else {
+        location.reload();
+      }
     },
 		/**
 		 * Solicita al servidor la informacion de todos los clientes
