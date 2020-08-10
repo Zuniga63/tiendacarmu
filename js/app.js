@@ -423,6 +423,17 @@ const formatCurrencyInputText = (object) => {
 };
 
 /**
+ * Elimina el simbolo de moneda y junta los puntos
+ * @param {string} text Texto a eliminar formato
+ */
+const deleteCurrencyFormater = text => {
+  let value = text.replace("$", "");
+  value = value.split(".");
+  value = value.join("");
+
+  return value;
+}
+/**
  * Este metodo elimina los signos de puntuacion, cerifas, virguillas, dieresis, cedillas, etc
  * @param {string} text Texto a normalizar
  * @return {string} texto normalizado
