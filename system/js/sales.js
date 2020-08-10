@@ -28,7 +28,7 @@ class DataInput {
     this.message = message;
   }
 
-  isCorret(message = "") {
+  isCorrect(message = "") {
     this.hasError = false;
     this.message = message;
   }
@@ -40,7 +40,7 @@ class DataInput {
 
   resetInput() {
     this.value = "";
-    this.isCorret("");
+    this.isCorrect("");
   }
 }
 
@@ -411,7 +411,7 @@ const vm = new Vue({
       } else {
         if (moment(date.value).isValid()) {
           if (date.value <= this.views.newSale.maxDate) {
-            date.isCorret();
+            date.isCorrect();
             isOk = true;
           } else {
             date.isIncorrect("Selecciona o escribe una fecha valida");
@@ -431,7 +431,7 @@ const vm = new Vue({
       );
 
       if (categoryExist) {
-        categoryID.isCorret();
+        categoryID.isCorrect();
         isOk = true;
       } else {
         categoryID.isIncorrect("Selecciona una categoría valida");
@@ -444,7 +444,7 @@ const vm = new Vue({
 
       if (description.value) {
         if (description.value.length >= 5) {
-          description.isCorret();
+          description.isCorrect();
         } else {
           description.isIncorrect("Descripción demasiado corta");
         }
@@ -462,7 +462,7 @@ const vm = new Vue({
 
       if (!isNaN(amountValue)) {
         if (amountValue > 0) {
-          amount.isCorret();
+          amount.isCorrect();
         } else {
           amount.isIncorrect("Debe ser mayor que cero (0)");
         }

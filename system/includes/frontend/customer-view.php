@@ -717,12 +717,7 @@
   </div>
 
   <div id="app">
-    <customer-register 
-      :customers="customers" 
-      id="customerReg"
-      @update-customer="updateCustomer"
-      @new-customer="newCustomer"
-    >
+    <customer-register :customers="customers" id="customerReg" @update-customer="updateCustomer" @new-customer="newCustomer">
     </customer-register>
 
     <div class="view" id="operationView">
@@ -735,11 +730,20 @@
           <!-- Modulo para la busqueda de cliente -->
           <search-box :customers="customers" @customer-selected="onCustomerSelected"></search-box>
           <!-- FORMULARIO DE REGISTRO O ACTUALIZACIÓN -->
-          <new-operation-form></new-operation-form>
+          <transition name="fade">
+            <new-operation-form v-if="customerSelected" :customer="customerSelected"></new-operation-form>
+          </transition>
+
           <!-- Contenedor con las tarjetas de creditos -->
-          <customer-credits :customer="customerSelected" id="creditHistoryMovil"></customer-credits>
+          <transition name="fade">
+            <customer-credits :customer="customerSelected" id="creditHistoryMovil" v-if="customerSelected"></customer-credits>
+          </transition>
+          
           <!-- Historial del cliente -->
-          <customer-history :customer="customerSelected"></customer-history>
+          <transition name="fade">
+            <customer-history :customer="customerSelected" v-if="customerSelected"></customer-history>
+          </transition>
+
       </section>
       <aside class="view__sidebar">
         <!-- Contenedor con las tarjetas de creditos -->

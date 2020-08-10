@@ -1,4 +1,4 @@
-window.addEventListener('load', ()=> {
+window.addEventListener('load', () => {
   //Se configura la librería de moment
   moment.locale('es-do');
   moment().format('DD/MM/YYYY hh:mm a');
@@ -27,7 +27,7 @@ class DataInput {
     this.message = message;
   }
 
-  isCorret(message = "") {
+  isCorrect(message = "") {
     this.hasError = false;
     this.message = message;
   }
@@ -39,7 +39,7 @@ class DataInput {
 
   resetInput() {
     this.value = "";
-    this.isCorret("");
+    this.isCorrect("");
   }
 }
 
@@ -361,8 +361,8 @@ class Payment extends Transaction {
  * una respuestas. Requiere que se le pasa la propiedad visible
  */
 Vue.component('waiting-modal', {
-  props:['visible'],
-  template:`
+  props: ['visible'],
+  template: `
   <div :class="['modal', {show:visible}]">
     <div class="modal__content" style="padding-top: 140px;">
       <div class="loader"></div>
@@ -380,7 +380,7 @@ Vue.component('waiting-modal', {
  * pueda ser cambiado desde la raiz
  */
 Vue.component('process-result', {
-  props:['processResult'],
+  props: ['processResult'],
   template: `
   <div
     class="modal"
@@ -414,7 +414,7 @@ Vue.component('customer-register', {
       updatingCustomer: false,
       typeList: "active",
       waiting: false,
-      processResult: {visible: false, hasError:false, message:''},
+      processResult: { visible: false, hasError: false, message: '' },
       //los campos para el formulario
       firstName: new DataInput(),
       lastName: new DataInput(),
@@ -666,7 +666,7 @@ Vue.component('customer-register', {
     validateFirstName() {
       let firstName = this.firstName;
       if (firstName.value && typeof firstName.value === 'string') {
-        firstName.isCorret();
+        firstName.isCorrect();
         return true;
       } else {
         firstName.isIncorrect("Este campo es obligatorio");
@@ -688,10 +688,10 @@ Vue.component('customer-register', {
           nit.isIncorrect('Esta identificación ya fue asignada')
           return false;
         } else {
-          nit.isCorret()
+          nit.isCorrect()
         }
       } else {
-        nit.isCorret();
+        nit.isCorrect();
       }
 
       return true;
@@ -710,10 +710,10 @@ Vue.component('customer-register', {
           phone.isIncorrect('Este número ya fue asignado');
           return false;
         } else {
-          phone.isCorret();
+          phone.isCorrect();
         }
       } else {
-        phone.isCorret();
+        phone.isCorrect();
       }
 
       return true;
@@ -735,14 +735,14 @@ Vue.component('customer-register', {
             email.isIncorrect('Esta dirección de correo ya fue asignada');
             return false;
           } else {
-            email.isCorret();
+            email.isCorrect();
           }
         } else {
           email.isIncorrect('Ingresa una dirección de correo valida');
           return false;
         }
       } else {
-        email.isCorret();
+        email.isCorrect();
       }
 
       return true;
@@ -771,22 +771,22 @@ Vue.component('customer-register', {
             });
             const data = await res.json();
 
-            if(data.sessionActive){
-              if(data.request){
+            if (data.sessionActive) {
+              if (data.request) {
                 this.waiting = false;
                 this.processResult.visible = true;
                 this.processResult.hasError = false;
                 this.processResult.message = "Cliente actualizado";
-                
+
                 this.$emit('update-customer', data.customer);
                 this.discardUpdate();
-              }else{
+              } else {
                 this.waiting = false;
                 this.processResult.visible = true;
                 this.processResult.hasError = true;
                 this.processResult.message = "No se pudo actualizar";
               }
-            }else{
+            } else {
               location.reload();
             }
           } catch (error) {
@@ -795,7 +795,7 @@ Vue.component('customer-register', {
             this.processResult.visible = true;
             this.processResult.hasError = true;
             this.processResult.message = "Solicitud Rechazada";
-          }          
+          }
         } else {
           try {
             const res = await fetch('./api/new_customer.php', {
@@ -805,12 +805,12 @@ Vue.component('customer-register', {
 
             const data = await res.json();
 
-            if(data.sessionActive){
-              if(data.request){
-                let actualCount = this.customers.length;       
-                this.$emit('new-customer');   
+            if (data.sessionActive) {
+              if (data.request) {
+                let actualCount = this.customers.length;
+                this.$emit('new-customer');
                 let timerId = setInterval(() => {
-                  if(actualCount < this.customers.length){
+                  if (actualCount < this.customers.length) {
                     this.waiting = false;
                     this.processResult.visible = true;
                     this.processResult.hasError = false;
@@ -818,19 +818,19 @@ Vue.component('customer-register', {
                     this.resetForm();
                     clearInterval(timerId);
                   }
-                  console.log('Repitiendo: ' + actualCount )
+                  console.log('Repitiendo: ' + actualCount)
                 }, 1000);
 
-                
-              }else{
+
+              } else {
                 this.processResult.visible = true;
                 this.processResult.hasError = true;
                 this.processResult.message = "No se pudo crear al cliente";
               }
-            }else{
+            } else {
               location.reload();
             }
-            
+
           } catch (error) {
             console.log(res.text);
             this.waiting = false;
@@ -870,9 +870,39 @@ Vue.component('customer-register', {
   },//Fin de methods
 })
 
-Vue.component('customer-card', {
-  props:['customer'],
-  methods:{
+Vue.component("input-money", {
+  props: ["value"],
+  template: `
+  <input
+    type="text"
+    class="form__input form__input--money form__input--money-big"
+    :value="value"
+    @focus="$event.target.select()"
+    @input="$emit('input', formatCurrencyInput($event.target.value))"
+    @blur="$emit('blur')"
+    @change="$emit('change')"
+    placeholder="$0"
+    style="letter-spacing: 5px;"
+  />`,
+  methods: {
+    formatCurrencyInput(value) {
+      value = this.deleteCurrencyFormater(value);
+      value = parseFloat(value);
+      if (!isNaN(value)) {
+        value = this.formatCurrency(value);
+      } else {
+        value = "";
+      }
+
+      return value;
+    },
+    deleteCurrencyFormater(text) {
+      let value = text.replace("$", "");
+      value = value.split(".");
+      value = value.join("");
+
+      return value;
+    },
     formatCurrency(value) {
       var formatted = new Intl.NumberFormat("es-Co", {
         style: "currency",
@@ -882,21 +912,35 @@ Vue.component('customer-card', {
       return formatted;
     }, //Fin del metodo,
   },
-  computed:{
-    classState(){
-      if(this.customer.inactive){
-        return{'customer-card--inactive': true};
-      }else if(this.customer.deliquentBalance){
-        return{'customer-card--late': true};
+});
+
+Vue.component('customer-card', {
+  props: ['customer'],
+  methods: {
+    formatCurrency(value) {
+      var formatted = new Intl.NumberFormat("es-Co", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0,
+      }).format(value);
+      return formatted;
+    }, //Fin del metodo,
+  },
+  computed: {
+    classState() {
+      if (this.customer.inactive) {
+        return { 'customer-card--inactive': true };
+      } else if (this.customer.deliquentBalance) {
+        return { 'customer-card--late': true };
       }
 
-      return {success:false};
+      return { success: false };
     },
-    fullName(){
+    fullName() {
       return this.customer.firstName + ' ' + this.customer.lastName;
     }
   },
-  template:`
+  template: `
   <div class="customer-card" :class="classState" v-if="customer" @click="$emit('click')">
     <div class="customer-card__header">
       <h3 class="customer-card__name">{{fullName}}</h3>
@@ -913,27 +957,27 @@ Vue.component('customer-card', {
   </div>`
 })
 
-Vue.component('search-box',{
-  props:['customers'],
-  data: function(){
+Vue.component('search-box', {
+  props: ['customers'],
+  data: function () {
     return {
       customerSelected: undefined,
       showBox: false,
-      customerName:'',
+      customerName: '',
     }
   },//Fin de data
-  methods:{
-    onCustomerSelected(customer){
+  methods: {
+    onCustomerSelected(customer) {
       this.customerSelected = customer;
       this.$emit('customer-selected', customer);
     }
   },//Fin de methods
-  computed:{
-    customerResult(){
+  computed: {
+    customerResult() {
       let result = [];
-      if(this.customerName){
+      if (this.customerName) {
         result = this.customers.filter(c => textInclude(`${c.firstName} ${c.lastName}`, this.customerName));
-      }else{
+      } else {
         result = this.customers;
       }
       return result;
@@ -967,143 +1011,369 @@ Vue.component('search-box',{
 })
 
 Vue.component('new-operation-form', {
-  data:function(){
+  props: ['customer', 'id'],
+  data: function () {
     return {
-      operationType:'payment',
+      operationType: 'payment',
+      operationMoment: 'now',
+      maxDate: moment().subtract(1, 'd').format('YYYY-MM-DD'),
+      date: new DataInput(),
+      description: new DataInput(),
+      paymentType: 'cash',
+      amount: new DataInput(),
+      exceedsTheQuota: false,
     }
   },//Fin de data
-  methods:{
+  methods: {
+    validateDate() {
+      let isOk = false;
+      let value = this.date.value;
+      let message = ';'
+      if (this.operationMoment !== 'now') {
+        if (value && typeof value === 'string') {
+          if (moment(value).isValid()) {
+            let date = moment(value);
+            if (date.isAfter(this.minDate) && date.isBefore(moment().startOf('day'))) {
+              isOk = true;
+            } else {
+              message = "Está fecha no está permitida";
+            }
+          } else {
+            message = 'Ingresa una fecha valida';
+          }
+        } else {
+          message = "Selecciona o escribe una fecha valida";
+        }
+      } else {
+        isOk = true;
+        message = '';
+      }
 
+      if (isOk) {
+        this.date.isCorrect();
+      } else {
+        this.date.isIncorrect(message);
+      }
+
+      return isOk;
+    },
+    validateDescription() {
+      let isOk = false;
+
+      if (this.isCredit) {
+        if (this.description.value) {
+          if (this.description.value.length < 45) {
+            isOk = true;
+            this.description.isCorrect();
+          } else {
+            this.description.isIncorrect('Descripción demasiado larga');
+          }
+        } else {
+          this.description.isIncorrect('Este campo no puede estar en blanco');
+        }
+      } else {
+        isOk = true;
+        this.description.isCorrect();
+      }
+
+      return isOk;
+    },
+    validateAmount() {
+      let isOk = false;
+      let value = this.amount.value;
+      let message = '';
+      if (value) {
+        value = parseFloat(deleteCurrencyFormater(value));
+        if (!isNaN(value) && value > 0) {
+          this.verifyQuota(value);
+          if(value >= 1000){
+            isOk = true;
+          }else{
+            message= 'La cifra es muy pequeña';
+          }
+        } else {
+          message = 'Ingresa un valor válido';
+        }
+      } else {
+        message = 'Este campo es requerído';
+      }
+
+      if (isOk) {
+        this.amount.isCorrect();
+      } else {
+        this.amount.isIncorrect(message);
+      }
+
+      return isOk;
+    },
+    verifyQuota(value) {
+      if (this.customer) {
+        let customerBalance = this.customer.balance;
+        if ((customerBalance + value) > 250000) {
+          this.exceedsTheQuota = true;
+        } else {
+          this.exceedsTheQuota = false;
+        }
+      } else {
+        this.exceedsTheQuota = false;
+      }
+    },
+    onClick() {
+      console.log(this.date)
+    },
+    onSubmit() {
+      let dateIsOk = this.validateDate();
+      let descriptionIsOk = this.validateDescription();
+      let amountIsOk = this.validateAmount();
+
+      if (this.customer && this.customer instanceof Customer && dateIsOk && descriptionIsOk && amountIsOk) {
+        let customerId = this.customer.id;
+        let isNow = this.operationMoment === 'now' ? true : false;
+        let date = this.date.value;
+        let description = this.description.value;
+        let cash = this.paymentType === 'cash' ? true : false;
+        let amount = parseFloat(deleteCurrencyFormater(this.amount.value));
+
+        let body = new FormData();
+        body.append('customer-id', customerId);
+        body.append('is-now', isNow);
+        body.append('date', date);
+        body.append('description', description);
+        body.append('cash', cash);
+        body.append('amount', amount);
+
+        switch (this.operationType) {
+          case 'credit':
+            console.log({customerId, isNow, date, description, cash, amount });
+            break;
+          case 'payment':
+            console.log({customerId, isNow, date, description, cash, amount });
+            break;
+          default:
+            break;
+        }
+      }
+    }
   },//Fin de methods
-  computed:{
+  computed: {
+    formTitle() {
+      let title = '';
+      switch (this.operationType) {
+        case 'payment': title = "Registrar Abono";
+          break;
+        case 'credit': title = "Registar Credito";
+          break;
+        default: title = "Selecciona una opción";
+      }
 
+      return title;
+    },
+    isCredit() {
+      return this.operationType === 'credit';
+    },
+    minDate() {
+      let minDate = moment().startOf('year');
+      //Si el cliente no tiene credito la fecha minima
+      if (this.customer) {
+        let creditCount = this.customer.credits.length;
+        if (creditCount > 0) {
+          let maxCreditDate = moment(this.customer.credits[creditCount - 1].date);
+          let paymentCount = this.customer.payments.length;
+          if (paymentCount > 0) {
+            let maxPaymentDate = moment(this.customer.payments[paymentCount - 1].date);
+            minDate = maxPaymentDate.isSameOrAfter(maxCreditDate) ? maxPaymentDate : maxCreditDate;
+          }
+        }
+      }
+      return minDate;
+    },
   },//Fin de computed,
-  template:`
-  <form class="form form--bg-light">
+  template: `
+  <form class="form form--bg-light" @submit.prevent="onSubmit">
     <div class="form__header">
-      <h2 class="form__title">Formulario</h2>
+      <h2 class="form__title">{{formTitle}}</h2>
     </div>
     <div class="form__content">
-      <!-- Campo para definir el tipo de operacion -->
+      <!-- CAMPO PARA DEFINIR LA OPERACION -->
       <label class="form__label">Tipo de operacion</label>
       <div class="form__group-flex m-b">
-        <!-- Seleccion de credito -->
+        <!-- CREDITO -->
         <div class="form__radio-group">
           <input
             type="radio"
-            name="credit"
-            id="credit"
+            name="operationType"
+            value="credit"
+            v-bind:id="id + 'credit'"
+            v-model="operationType"
             class="form__radio"
           />
-          <label for="credit" class="form__radio">Credito</label>
+          <label v-bind:for="id + 'credit'" class="form__radio">Credito</label>
         </div>  
-        <!-- Seleccion de pago -->
+        <!-- ABONO -->
         <div class="form__radio-group">
           <input
             type="radio"
-            name="payment"
-            id="payment"
+            name="operationType"
+            value="payment"
+            v-bind:id="id + 'payment'"
+            v-model="operationType"
             class="form__radio"
           />
-          <label for="payment" class="form__radio">Abono</label>
+          <label v-bind:for="id + 'payment'" class="form__radio">Abono</label>
         </div>
       </div>
-      <!-- Campo para definir la fecha de la operacion -->
-      <label class="form__label">Fecha del credito/Abono</label>
+      <!-- DEFINIR LA FORMA DE PAGO -->
+      <transition name="fade">
+        <div v-show="!isCredit">
+          <label class="form__input">Selecciona la forma de pago</label>
+          <div class="form__group-flex m-b" >
+            <div class="form__radio-group">
+              <input
+                type="radio"
+                name="paymentType"
+                value="cash"
+                v-model="paymentType"
+                v-bind:id="id + 'cash'"
+                class="form__radio"
+              />
+              <label v-bind:for="id + 'cash'" class="form__radio">Efectivo</label>
+            </div>  
+            <!-- Seleccion de pago -->
+            <div class="form__radio-group">
+              <input
+                type="radio"
+                name="card"
+                value="card"
+                v-model="paymentType"
+                v-bind:id="id + 'card'"
+                class="form__radio"
+              />
+              <label v-bind:for="id + 'card'" class="form__radio">Tarjeta</label>
+            </div>
+          </div>
+        </div>
+      </transition>
+      <!-- Campo para definir el momento de la operacion -->
+      <label class="form__label">Fecha del {{isCredit ? 'credito' : 'abono'}}</label>
       <div class="form__group-flex m-b">
-        <!-- Seleccion de credito -->
+        <!-- Seleccionar ahora -->
         <div class="form__radio-group">
           <input
             type="radio"
-            name="credit"
-            id="now"
+            name="operationMoment"
+            :id="id + 'now'"
+            value="now"
+            v-model="operationMoment"
             class="form__radio"
           />
-          <label for="now" class="form__radio">Ahora</label>
+          <label :for="id + 'now'" class="form__radio">Ahora</label>
         </div>  
         <!-- Seleccion de pago -->
         <div class="form__radio-group">
           <input
             type="radio"
-            name="payment"
-            id="other"
+            name="operationMoment"
+            :id="id + 'other'"
+            value="other"
+            v-model="operationMoment"
             class="form__radio"
           />
-          <label for="other" class="form__radio">Otro Momento</label>
+          <label :for="id + 'other'" class="form__radio">Otra Fecha</label>
         </div>
       </div>
+      
       <!-- Campo opcional para seleccionar la fecha -->
-      <label for="date" class="form__label">Selecciona una fecha</label>
-      <input type="date" name="" id="date" class="form__input">
-      <p class="alert alert--danger show">Selecciona una fecha valida</p>
+      <transition name="fade">
+        <div v-show="operationMoment === 'other'">
+          <label :for="id + 'date'" class="form__label">Selecciona una fecha</label>
+          <input 
+            type="date" 
+            name="date" 
+            v-bind:min="minDate.format('YYYY-MM-DD')"
+            v-bind:max="maxDate"
+            v-bind:id="id + 'date'" 
+            :class="['form__input', {error: date.hasError}]"
+            v-model="date.value"
+            @blur="validateDate"
+            @change="validateDate"
+          />
+          <p :class="['alert', 'alert--danger', {show:date.hasError}]">{{date.message}}</p>
+        </div>
+      </transition>
       
       <!-- Campo para agregar la descripcion del credito -->
-      <label for="description" class="form__label text-bold text-center">Detalles del credito</label>
-      <textarea name="" id="description" cols="30" rows="3" class="form__input" placeholder="Escribe los detalles aquí"></textarea>
-      <p class="alert alert--danger show">Esta informacion es importante</p>
+      <transition name="fade">
+        <div v-show="isCredit">
+          <label for="description" class="form__label text-bold text-center">Detalles del credito</label>
+          <textarea 
+            name="description" 
+            v-bind:id="id + 'description'" 
+            v-model="description.value"
+            @focus="$event.target.select()"
+            @change="validateDescription"
+            @blur="validateDescription"
+            cols="30" rows="3" 
+            :class="['form__input', {error:description.hasError}]"
+            placeholder="Escribe los detalles aquí"
+          >
+          </textarea>
+          <p :class="['alert', 'alert--danger', {show:description.hasError}]">{{description.message}}</p>
+        </div>
+      </transition>
 
       <!-- Campo para el ingreso del importe -->
-      <label for="amount" class="form__label text-bold text-center">Valor del credito / Cantidad abonada</label>
-      <!-- Forma de pago -->
-      <div class="form__group-flex m-b">
-        <div class="form__radio-group">
-          <input
-            type="radio"
-            name="credit"
-            id="cash"
-            class="form__radio"
-          />
-          <label for="now" class="form__radio">Efectivo</label>
-        </div>  
-        <!-- Seleccion de pago -->
-        <div class="form__radio-group">
-          <input
-            type="radio"
-            name="payment"
-            id="card"
-            class="form__radio"
-          />
-          <label for="other" class="form__radio">Tarjetas</label>
-        </div>
-      </div>
-      <input type="text" name="" id="amount" class="form__input" placeholder="Ingrea el valor aquí">
-      <p class="alert alert--danger show">Campo obligatorio</p>
+      <label :for="id + 'amount'" class="form__label text-bold text-center">
+        {{isCredit ? 'Valor del credito' : 'Importe a abonar'}}
+      </label>
+
+      <input-money 
+        :id="id + 'amount'" 
+        required 
+        v-model="amount.value" 
+        @blur="validateAmount"
+        @change="validateAmount"
+      >
+      </input-money>
+      <p :class="['alert', 'alert--danger', {show: amount.hasError}]">{{amount.message}}</p>
+      <p :class="['alert', 'alert--warning', {show: exceedsTheQuota}]">
+        <span class="text-bold">Ojo</span>: Se supera el cupo maximo
+      </p>
     </div>
     <div class="form__actions">
-      <input type="submit" value="Registar Credito/Abono" class="btn btn--success">
+      <input type="submit" :value="isCredit ? 'Registar Credito' : 'Registrar Abono'" class="btn btn--success">
     </div>            
   </form>`
 })
 
 Vue.component('customer-credits', {
-  props:['customer', 'id'],
-  data:function(){
-    return{
+  props: ['customer', 'id'],
+  data: function () {
+    return {
       // creditType:"pending",
-      creditType:"pending",
+      creditType: "pending",
     }
   },//Fin de data
-  methods:{
+  methods: {
 
   },//Fin fr mrthods
-  computed:{
-    credits(){
+  computed: {
+    credits() {
       let credits = [];
-      if(this.customer){
-        switch(this.creditType){
-          case 'pending':{
+      if (this.customer) {
+        switch (this.creditType) {
+          case 'pending': {
             credits = this.customer.credits.filter(c => c.balance > 0);
-          }break;
+          } break;
           case 'all': {
             credits = this.customer.credits;
           }
         }
       }
-      
+
       return credits;
     },
-    creditsData(){
-      let data = [];      
+    creditsData() {
+      let data = [];
       //Ahora construyo los datos
       this.credits.forEach(c => {
         let id = c.id
@@ -1121,7 +1391,7 @@ Vue.component('customer-credits', {
       })
       return data
     },
-    totalAmount(){
+    totalAmount() {
       let amount = 0;
       this.credits.forEach(c => {
         amount += c.amount;
@@ -1129,7 +1399,7 @@ Vue.component('customer-credits', {
 
       return formatCurrencyLite(amount, 0);
     },
-    deliquentBalance(){
+    deliquentBalance() {
       let balance = 0;
       this.credits.forEach(c => {
         balance += c.balance;
@@ -1137,7 +1407,7 @@ Vue.component('customer-credits', {
       return formatCurrencyLite(balance, 0);
     }
   },//Fin de computed
-  template:`
+  template: `
   <div class="card-container">
     <h2 class="card-container__title text-bold">Historial de Creditos</h2>
     <div class="card-container__options">
@@ -1186,19 +1456,19 @@ Vue.component('customer-credits', {
 })
 
 Vue.component('customer-history', {
-  props:['customer'],
-  data:function(){
+  props: ['customer'],
+  data: function () {
     return {
 
     }
   },//Fin de data
-  methods:{
-    historyCompareByDate(history1, history2){
-      if(history1.date.isBefore(history2.date)){
+  methods: {
+    historyCompareByDate(history1, history2) {
+      if (history1.date.isBefore(history2.date)) {
         return -1;
-      }else if(history1.date.isSame(history2.date)){
+      } else if (history1.date.isSame(history2.date)) {
         return 0;
-      }else{
+      } else {
         return 1;
       }
 
@@ -1206,36 +1476,36 @@ Vue.component('customer-history', {
     },
 
   },//Fin de methods
-  computed:{
-    creditData(){
+  computed: {
+    creditData() {
       let result = [];
-      if(this.customer  && this.customer instanceof Customer){
+      if (this.customer && this.customer instanceof Customer) {
         let credits = this.customer.credits;
         credits.forEach(credit => {
           let date = moment(credit.date);
           let creditAmount = credit.amount;
           let paymentAmount = 0;
           let balance = 0;
-          result.push({date, creditAmount, paymentAmount, balance});
+          result.push({ date, creditAmount, paymentAmount, balance });
         })
       }//Fin de if
       return result;
     },
-    paymentData(){
+    paymentData() {
       let result = [];
-      if(this.customer && this.customer instanceof Customer){
+      if (this.customer && this.customer instanceof Customer) {
         let payments = this.customer.payments;
         payments.forEach(payment => {
           let date = moment(payment.date);
           let creditAmount = 0;
           let paymentAmount = payment.amount;
           let balance = 0;
-          result.push({date, creditAmount, paymentAmount, balance});
+          result.push({ date, creditAmount, paymentAmount, balance });
         })
       }
       return result;
     },
-    historyData(){
+    historyData() {
       let credits = this.creditData;
       let payments = this.paymentData;
       let historyData = credits.concat(payments);
@@ -1251,8 +1521,8 @@ Vue.component('customer-history', {
 
       //Ahora se retrnan los datos
       return historyData;
-    }, 
-    viewData(){
+    },
+    viewData() {
       let history = this.historyData;
       let data = [];
       history.forEach(h => {
@@ -1260,13 +1530,12 @@ Vue.component('customer-history', {
         let credit = h.creditAmount > 0 ? formatCurrencyLite(h.creditAmount, 0) : '';
         let payment = h.paymentAmount > 0 ? formatCurrencyLite(h.paymentAmount, 0) : '';
         let balance = formatCurrencyLite(h.balance, 0);
-        data.push({date, credit, payment, balance});
+        data.push({ date, credit, payment, balance });
       })
-      console.log(data)
       return data;
     }
   },//Fin de computed
-  template:`
+  template: `
   <div>
     <div class="history__header">
       <h2 class="history__title">Historial</h2>
@@ -1311,7 +1580,7 @@ const app = new Vue({
   el: '#app',
   data: {
     customers: [],
-    modals:{
+    modals: {
       waiting: new WaitingModal(),
     },
     // propiedades temporales
@@ -1368,7 +1637,7 @@ const app = new Vue({
       }
     },//Fin del metodo
 
-    onCustomerSelected(customer){
+    onCustomerSelected(customer) {
       this.customerSelected = customer;
     }
   },//Fin de methods
