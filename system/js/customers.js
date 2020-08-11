@@ -540,7 +540,7 @@ Vue.component('customer-register', {
       let email = this.email;
       if (email.value && typeof email.value === 'string') {
         console.log(email.value)
-        if (/^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(email.value)) {
+        if (/^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<ul>()[\]\.,;:\s@\"]{2,})$/i.test(email.value)) {
           let isAssigned = false;
 
           if (this.updatingCustomer) {
@@ -867,8 +867,8 @@ Vue.component('customer-register', {
               <tr class="table__row" :class="{selected: customerSelected && customerSelected.id === customer.id}" :key="customer.id"  @click="loadCustomer(customer)">
                 <td class="table__data table--25">{{customer.firstName}}</td>
                 <td class="table__data table--25">{{customer.lastName}}</td>
-                <td class="table__data table--25">{{customer.phone}}</td>
-                <td class="table__data table--25" @click.stop="">
+                <td class="table__data table--25 text-center">{{customer.phone}}</td>
+                <td class="table__data table--25 text-center" @click.stop="">
                   <input type="checkbox" name="" id="" style="zoom: 2;" />
                 </td>
               </tr>
@@ -1593,7 +1593,7 @@ Vue.component('customer-history', {
       let history = this.historyData;
       let data = [];
       history.forEach(h => {
-        let date = h.date.format('DD-MMM-YY');
+        let date = h.date.format('DD/MMM/YY');
         let credit = h.creditAmount > 0 ? formatCurrencyLite(h.creditAmount, 0) : '';
         let payment = h.paymentAmount > 0 ? formatCurrencyLite(h.paymentAmount, 0) : '';
         let balance = formatCurrencyLite(h.balance, 0);
@@ -1611,10 +1611,10 @@ Vue.component('customer-history', {
       <table class="table">
         <thead>
           <tr class="table__row-header">
-            <th class="table__header table--25">Fecha</th>
-            <th class="table__header table--25">Credito</th>
-            <th class="table__header table--25">Abono</th>
-            <th class="table__header table--25">Saldo</th>
+            <th class="table__header table--25 text-center">Fecha</th>
+            <th class="table__header table--25 text-center">Credito</th>
+            <th class="table__header table--25 text-center">Abono</th>
+            <th class="table__header table--25 text-center">Saldo</th>
           </tr>
         </thead>
       </table>
@@ -1624,10 +1624,10 @@ Vue.component('customer-history', {
         <tbody class="table__body">
           <template v-for="(data, index) in viewData">
             <tr class="table__row" :key="index">
-              <td class="table__data table--25">{{data.date}}</td>
-              <td class="table__data table--25">{{data.credit}}</td>
-              <td class="table__data table--25">{{data.payment}}</td>
-              <td class="table__data table--25">{{data.balance}}</td>
+              <td class="table__data table--25 text-center">{{data.date}}</td>
+              <td class="table__data table--25 text-right">{{data.credit}}</td>
+              <td class="table__data table--25 text-right">{{data.payment}}</td>
+              <td class="table__data table--25 text-right">{{data.balance}}</td>
             </tr>
           </template>        
         </tbody>
@@ -1668,6 +1668,7 @@ Vue.component('operation-register', {
         <!-- Modulo para la busqueda de cliente -->
         <search-box :customers="customers" @customer-selected="onCustomerSelected"></search-box>
         <!-- FORMULARIO DE REGISTRO O ACTUALIZACIÓN -->
+        
         <transition name="fade">
           <new-operation-form 
             v-if="customerSelected" 
