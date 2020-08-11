@@ -1593,7 +1593,7 @@ Vue.component('customer-history', {
       let history = this.historyData;
       let data = [];
       history.forEach(h => {
-        let date = h.date.format('MMM DD [de] YYYY');
+        let date = h.date.format('DD-MMM-YY');
         let credit = h.creditAmount > 0 ? formatCurrencyLite(h.creditAmount, 0) : '';
         let payment = h.paymentAmount > 0 ? formatCurrencyLite(h.paymentAmount, 0) : '';
         let balance = formatCurrencyLite(h.balance, 0);
@@ -1681,12 +1681,12 @@ Vue.component('operation-register', {
 
         <!-- Contenedor con las tarjetas de creditos -->
         <transition name="fade">
-          <customer-credits :customer="customerSelected" :id="id + 'creditHistoryMovil'" v-if="customerSelected"></customer-credits>
+          <customer-credits :customer="customerSelected" :id="id + 'creditHistoryMovil'" v-if="customerSelected" class="view-desktop-colapse"></customer-credits>
         </transition>
         
         <!-- Historial del cliente -->
         <transition name="fade">
-          <customer-history :customer="customerSelected" v-if="customerSelected"></customer-history>
+          <customer-history :customer="customerSelected" v-if="customerSelected" class="view-desktop-colapse"></customer-history>
         </transition>
       </div>
     </section>
