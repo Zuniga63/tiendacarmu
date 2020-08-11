@@ -4,7 +4,7 @@ $error = '';
 
 //Si la session del usuario está activa moevo al usuario al home
 if (session_active()) {
-    go_to_page('./home.php');
+    go_to_page('./customers.php');
 }
 
 //Ya se sabe que la sesion no está activa pero antes de cargar
@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = hash('sha512', $_POST['password']);
 
     if (login($username, $password)) {
-        go_to_page('./home.php');
+        go_to_page('./customers.php');
     } else {
         $error = "Contraseña o usuario incorrectos";
     }
