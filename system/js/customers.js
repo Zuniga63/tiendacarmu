@@ -1182,8 +1182,13 @@ Vue.component('new-operation-form', {
         }
       }
     },
-    onCustomerUpdated() {
+    resetFields() {
+      this.operationType = 'payment';
+      this.paymentType = 'cash';
+      this.operationMoment = 'now';
       this.description.resetInput();
+      this.amount.resetInput();
+      this.date.resetInput();
     }
   },//Fin de methods
   computed: {
@@ -1243,7 +1248,8 @@ Vue.component('new-operation-form', {
     }
   },//Fin de computed,
   mounted() {
-    this.$root.$on('customer-updated', this.onCustomerUpdated);
+    this.$root.$on('credit-was-created', this.resetFields);
+    this.$root.$on('payment-was-created', this.resetFields);
   },
   template: `
   <form class="form form--bg-light" @submit.prevent="onSubmit" :id="id + 'Form'">
@@ -1742,6 +1748,7 @@ const app = new Vue({
             this.updateCustomer(data.customer);
             this.waiting = false;
             this.processResult.isSuccess('Credito registrado con exito');
+            this.$root.$emit('credit-was-created');
           } else {
             this.waiting = false;
             this.processResult.isDanger('No se pudo registrar el credito');
@@ -1752,7 +1759,7 @@ const app = new Vue({
       } catch (error) {
         console.log(error)
       }
-      this.$root.$emit('customer-updated');
+      
     },
     async onNewPayment(formData) {
       const res = await fetch('./api/new_payment.php', { method: 'POST', body: formData });
@@ -1763,6 +1770,7 @@ const app = new Vue({
           this.updateCustomer(data.customer);
           this.waiting = false;
           this.processResult.isSuccess('Abono registrado con exito');
+          this.$root.$emit('payment-was-created');
         } else {
           this.waiting = false;
           this.processResult.isDanger('No se pudo registrar el abono');
