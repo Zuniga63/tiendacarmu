@@ -1,9 +1,9 @@
-window.addEventListener('load', () => {
+window.addEventListener("load", () => {
   //Se configura la librería de moment
-  moment.locale('es-do');
-  moment().format('DD/MM/YYYY hh:mm a');
+  moment.locale("es-do");
+  moment().format("DD/MM/YYYY hh:mm a");
   document.getElementById("preload").classList.remove("show");
-})
+});
 //--------------------------------------------------------------------------
 //	INTANCIAS DE VUE Y COMPONENTES
 //--------------------------------------------------------------------------
@@ -47,7 +47,7 @@ class RequesProcess {
   constructor() {
     this.visible = false;
     this.hasError = false;
-    this.message = '';
+    this.message = "";
   }
 
   isSuccess(message) {
@@ -77,17 +77,26 @@ class WaitingModal {
 }
 
 class Customer {
-	/**
-	 * @constructor
-	 * @param {number} id El identificador del cliente
-	 * @param {string} firstName Nombres del cliente
-	 * @param {string} lastName Apellido del cliente
-	 * @param {string} nit Cedula de ciudadanía o DNI
-	 * @param {string} phone Numero de telefono celular
-	 * @param {string} email Correo electronico
-	 * @param {number} points Puntos de fiabilidad del cliente
-	 */
-  constructor(id = 0, firstName, lastName = '', nit = '', phone = '', email = '', points = 0, archived = false) {
+  /**
+   * @constructor
+   * @param {number} id El identificador del cliente
+   * @param {string} firstName Nombres del cliente
+   * @param {string} lastName Apellido del cliente
+   * @param {string} nit Cedula de ciudadanía o DNI
+   * @param {string} phone Numero de telefono celular
+   * @param {string} email Correo electronico
+   * @param {number} points Puntos de fiabilidad del cliente
+   */
+  constructor(
+    id = 0,
+    firstName,
+    lastName = "",
+    nit = "",
+    phone = "",
+    email = "",
+    points = 0,
+    archived = false
+  ) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
@@ -98,47 +107,47 @@ class Customer {
     this.credits = [];
     this.payments = [];
     this.balance = 0;
-    this.state = '';
+    this.state = "";
     this.inactive = false;
     this.archived = archived;
     this.deliquentBalance = false;
     this.paymentFrecuency = 0;
   }
 
-	/**
-	 * Este metodo crea una instancia de Credito y lo agrega al arreglo de creditos,
-	 * tambien aumenta el saldo del cliente
-	 * @param {number} id Identificador del credito
-	 * @param {string} creditDate La fecha del credito en formato fecha
-	 * @param {string} description La descripcion del credito
-	 * @param {number} amount Es el monto del credito
-	 * @param {number} balance Es saldo del credito actual
-	 */
+  /**
+   * Este metodo crea una instancia de Credito y lo agrega al arreglo de creditos,
+   * tambien aumenta el saldo del cliente
+   * @param {number} id Identificador del credito
+   * @param {string} creditDate La fecha del credito en formato fecha
+   * @param {string} description La descripcion del credito
+   * @param {number} amount Es el monto del credito
+   * @param {number} balance Es saldo del credito actual
+   */
   addCredit(id, creditDate, description, amount, balance) {
     let credit = new Credit(id, creditDate, description, amount, balance);
     this.credits.push(credit);
     this.balance += amount;
   }
 
-	/**
-	 * Este metodo crea una instancia de Abono y lo agrega al arreglo de pagos,
-	 * tambien modifica el saldo del cliente disminuyendolo.
-	 * @param {number} id Identifcado de abono
-	 * @param {string} paymentDate Es la fecha del abono en formato texto
-	 * @param {float} amount Es el importe total del cliente
-	 * @param {bool} cash Si el pago fue en efectivo
-	 */
+  /**
+   * Este metodo crea una instancia de Abono y lo agrega al arreglo de pagos,
+   * tambien modifica el saldo del cliente disminuyendolo.
+   * @param {number} id Identifcado de abono
+   * @param {string} paymentDate Es la fecha del abono en formato texto
+   * @param {float} amount Es el importe total del cliente
+   * @param {bool} cash Si el pago fue en efectivo
+   */
   addPayment(id, paymentDate, amount, cash) {
     let payment = new Payment(id, paymentDate, amount, cash);
     this.payments.push(payment);
     this.balance -= amount;
   }
 
-	/**
-	 * Este metodo modifica los datos del cliente que por lo general sucede al hacer un abono,
-	 * un pago o se actualiza la tarjeta del cliente.
-	 * @param {JSON} customerData El el objeto devuelto cuando se modifican datos de un solo cliente 
-	 */
+  /**
+   * Este metodo modifica los datos del cliente que por lo general sucede al hacer un abono,
+   * un pago o se actualiza la tarjeta del cliente.
+   * @param {JSON} customerData El el objeto devuelto cuando se modifican datos de un solo cliente
+   */
   update(customerData) {
     this.credits = [];
     this.payments = [];
@@ -154,30 +163,41 @@ class Customer {
     this.points = customerData.points;
 
     //Agrego los creditos y los abonos
-    customerData.credits.forEach(credit => {
-      this.addCredit(credit.id, credit.creditDate, credit.description, credit.amount, credit.balance);
-    })
+    customerData.credits.forEach((credit) => {
+      this.addCredit(
+        credit.id,
+        credit.creditDate,
+        credit.description,
+        credit.amount,
+        credit.balance
+      );
+    });
 
-    customerData.payments.forEach(payment => {
-      this.addPayment(payment.id, payment.paymentDate, payment.amount, payment.cash);
-    })
+    customerData.payments.forEach((payment) => {
+      this.addPayment(
+        payment.id,
+        payment.paymentDate,
+        payment.amount,
+        payment.cash
+      );
+    });
 
     //Se actualiza el estado del cliente
     this.defineState();
   }
 
-	/**
-	 * Define si el cliente tiene saldo en mora o si esta inactivo y escribe un estado para
-	 * mostrar en patalla basandose en el hsitorial de pago y de credito
-	 */
+  /**
+   * Define si el cliente tiene saldo en mora o si esta inactivo y escribe un estado para
+   * mostrar en patalla basandose en el hsitorial de pago y de credito
+   */
   defineState() {
     //Se resetean las propiedades criticas
     this.inactive = false;
     this.deliquentBalance = false;
-    this.state = '';
+    this.state = "";
 
     //Se inicializan las variables temporales
-    let lastDate = '';
+    let lastDate = "";
     let lastDateIsAPayment = false;
     let balance = 0;
 
@@ -192,56 +212,65 @@ class Customer {
 
       do {
         //Se recupera el credito y el abono del indice actual
-        let credit = indexCredit < this.credits.length
-          ? this.credits[indexCredit]
-          : null;
+        let credit =
+          indexCredit < this.credits.length ? this.credits[indexCredit] : null;
 
-        let payment = indexPayment < this.payments.length
-          ? this.payments[indexPayment]
-          : null;
+        let payment =
+          indexPayment < this.payments.length
+            ? this.payments[indexPayment]
+            : null;
 
-				/**
-				 * Con las siguientes instrucciones se va actualizando la lastDate
-				 * y segun sea el saldo se va defininiendo si esa fecha es de un pago o
-				 * de un credito para tenerlo en cuenta al escribir el estado
-				 */
+        /**
+         * Con las siguientes instrucciones se va actualizando la lastDate
+         * y segun sea el saldo se va defininiendo si esa fecha es de un pago o
+         * de un credito para tenerlo en cuenta al escribir el estado
+         */
         if (credit && payment) {
           if (credit.date <= payment.date) {
             if (balance === 0) {
               lastDate = credit.date;
               lastDateIsAPayment = false;
-            }//Fin de if
+            } //Fin de if
 
             balance += credit.amount;
             indexCredit++;
           } else {
             //Se va actualizando la frecuencia de pago
-            this.paymentFrecuency += moment(payment.date).diff(moment(lastDate), 'days');
+            this.paymentFrecuency += moment(payment.date).diff(
+              moment(lastDate),
+              "days"
+            );
             lastDate = payment.date;
             lastDateIsAPayment = true;
             balance -= payment.amount;
             indexPayment++;
-          }//Fin de if else
+          } //Fin de if else
         } else {
           if (credit) {
             if (balance === 0) {
               lastDate = credit.date;
               lastDateIsAPayment = false;
-            }//Fin de if
+            } //Fin de if
 
             balance += credit.amount;
             indexCredit++;
           } else {
-            this.paymentFrecuency += moment(payment.date).diff(moment(lastDate), 'days');
+            this.paymentFrecuency += moment(payment.date).diff(
+              moment(lastDate),
+              "days"
+            );
             lastDate = payment.date;
             lastDateIsAPayment = true;
             balance -= payment.amount;
             indexPayment++;
           }
-        }//Fin de if-else
+        } //Fin de if-else
 
         //El proceso debe terminar cuando no hayan mas creditos o abonos
-      } while (indexCredit < this.credits.length || indexPayment < this.payments.length);
+      } while (
+        indexCredit < this.credits.length ||
+        indexPayment < this.payments.length
+      );
 
       //Se utiliza la librería moment.js para convertir la fecha y poder manipularla
       lastDate = moment(lastDate);
@@ -260,14 +289,15 @@ class Customer {
         }
 
         //Se define si el cliente está en mora
-        let diff = now.diff(moment(lastDate), 'days');
+        let diff = now.diff(moment(lastDate), "days");
         if (diff > 30) {
           this.deliquentBalance = true;
         }
 
         this.paymentFrecuency += diff;
         if (this.payments.length > 0) {
-          this.paymentFrecuency = this.paymentFrecuency / (this.payments.length + 1);
+          this.paymentFrecuency =
+            this.paymentFrecuency / (this.payments.length + 1);
         }
       } else {
         this.inactive = true;
@@ -277,38 +307,36 @@ class Customer {
           this.paymentFrecuency = this.paymentFrecuency / this.payments.length;
         }
       }
-
     } else {
       this.inactive = true;
       this.deliquentBalance = false;
-      this.state = 'Desde el origen de los tiempos';
-    }//Fin de if else
+      this.state = "Desde el origen de los tiempos";
+    } //Fin de if else
 
     this.setScore();
-
-  }//Fin del metodo
+  } //Fin del metodo
 
   setScore() {
     const utility = 0.1;
     let iea = utility * (55.0 / 20.0);
-    let iep = Math.pow((1 + iea), (1 / 365)) - 1;
+    let iep = Math.pow(1 + iea, 1 / 365) - 1;
     let creditVpn = 0;
     let paymentVpn = 0;
     let now = moment();
 
     if (this.credits.length > 0) {
       //Se calcula el vpn de los creditos
-      this.credits.forEach(credit => {
+      this.credits.forEach((credit) => {
         let capital = credit.amount / (1 + utility);
-        let days = now.diff(moment(credit.date), 'days');
-        creditVpn += capital * Math.pow((1 + iep), days);
+        let days = now.diff(moment(credit.date), "days");
+        creditVpn += capital * Math.pow(1 + iep, days);
       });
 
       //Se calcula el vpn de los pagos
-      this.payments.forEach(payment => {
-        let days = now.diff(moment(payment.date), 'days');
-        paymentVpn += payment.amount * Math.pow((1 + iep), days);
-      })
+      this.payments.forEach((payment) => {
+        let days = now.diff(moment(payment.date), "days");
+        paymentVpn += payment.amount * Math.pow(1 + iep, days);
+      });
     }
 
     this.points = Math.round((this.balance + paymentVpn - creditVpn) / 1000);
@@ -323,12 +351,12 @@ class Customer {
  * Una super clase para los creditos y abonos
  */
 class Transaction {
-	/**
-	 * @constructor
-	 * @param {number} id Es el identificador de la transaccion
-	 * @param {string} transactionDate La fecha de la transaccion en texto
-	 * @param {number} amount El valor de la transaccion
-	 */
+  /**
+   * @constructor
+   * @param {number} id Es el identificador de la transaccion
+   * @param {string} transactionDate La fecha de la transaccion en texto
+   * @param {number} amount El valor de la transaccion
+   */
   constructor(id, transactionDate, amount) {
     this.id = id;
     this.date = transactionDate;
@@ -340,14 +368,14 @@ class Transaction {
  * Es un credito que un cliente contrae con la empresa
  */
 class Credit extends Transaction {
-	/**
-	 * @constructor
-	 * @param {number} id Identificador unico
-	 * @param {string} creditDate Fecha del credito en texto
-	 * @param {string} description Descripcion del credito
-	 * @param {number} amount Es el valor del credito
-	 * @param {number} balance Es el saldo pendiente de este credito
-	 */
+  /**
+   * @constructor
+   * @param {number} id Identificador unico
+   * @param {string} creditDate Fecha del credito en texto
+   * @param {string} description Descripcion del credito
+   * @param {number} amount Es el valor del credito
+   * @param {number} balance Es el saldo pendiente de este credito
+   */
   constructor(id, creditDate, description, amount, balance) {
     super(id, creditDate, amount);
     this.balance = balance;
@@ -359,13 +387,13 @@ class Credit extends Transaction {
  * Un abono por parte del cliente
  */
 class Payment extends Transaction {
-	/**
-	 * @constructor
-	 * @param {number} id Indentificador unico del pago
-	 * @param {string} paymentDate Fecha del abono en formato texto
-	 * @param {number} amount Valor del abono realizado
-	 * @param {bool} cash Si el pago se realizó en efectivo
-	 */
+  /**
+   * @constructor
+   * @param {number} id Indentificador unico del pago
+   * @param {string} paymentDate Fecha del abono en formato texto
+   * @param {number} amount Valor del abono realizado
+   * @param {bool} cash Si el pago se realizó en efectivo
+   */
   constructor(id, paymentDate, amount, cash) {
     super(id, paymentDate, amount);
     this.cash = cash;
@@ -379,8 +407,8 @@ class Payment extends Transaction {
  * que la peticion fue enviada al servidor y se está esperando
  * una respuestas. Requiere que se le pasa la propiedad visible
  */
-Vue.component('waiting-modal', {
-  props: ['visible'],
+Vue.component("waiting-modal", {
+  props: ["visible"],
   template: `
   <div :class="['modal', {show:visible}]">
     <div class="modal__content" style="padding-top: 140px;">
@@ -388,18 +416,18 @@ Vue.component('waiting-modal', {
         <p class="modal__info" style="text-align: center;">Procesando Solicitud</p>
       </div>
     </div>
-  </div>    `
-})
+  </div>    `,
+});
 
 /**
- * Componente reutilizable para notificar al usuario el 
+ * Componente reutilizable para notificar al usuario el
  * resultado de la peticion al servidor. Requiere un objeto
  * process-result con los resultados de la peiicion.
  * Este componente emite un evento hidden-modal para que el estado visible
  * pueda ser cambiado desde la raiz
  */
-Vue.component('process-result', {
-  props: ['processResult'],
+Vue.component("process-result", {
+  props: ["processResult"],
   template: `
   <div
     class="modal"
@@ -418,41 +446,41 @@ Vue.component('process-result', {
 
     </div>
   </div>
-  `
-})
+  `,
+});
 
 /**
- * Componente no reutilizable de momento con la vista 
+ * Componente no reutilizable de momento con la vista
  * para agregar nuevos clientes o actualizar los datos
  */
-Vue.component('customer-register', {
-  props: ['customers', 'id'],
+Vue.component("customer-register", {
+  props: ["customers", "id"],
   data: function () {
     return {
       customerSelected: undefined,
       updatingCustomer: false,
       typeList: "active",
       waiting: false,
-      processResult: { visible: false, hasError: false, message: '' },
+      processResult: { visible: false, hasError: false, message: "" },
       //los campos para el formulario
       firstName: new DataInput(),
       lastName: new DataInput(),
       nit: new DataInput(),
       phone: new DataInput(),
       email: new DataInput(),
-    }
+    };
   },
   computed: {
     inactiveCustomers() {
-      const result = this.customers.filter(c => c.inactive && !c.archived);
+      const result = this.customers.filter((c) => c.inactive && !c.archived);
       return result;
     },
     activeCustomers() {
-      const result = this.customers.filter(c => !c.inactive && !c.archived);
+      const result = this.customers.filter((c) => !c.inactive && !c.archived);
       return result;
     },
     archivedCustomers() {
-      const result = this.customers.filter(c => c.archived);
+      const result = this.customers.filter((c) => c.archived);
       return result;
     },
     selectedList() {
@@ -478,12 +506,12 @@ Vue.component('customer-register', {
         }
       }
       return result;
-    }
+    },
   },
   methods: {
     validateFirstName() {
       let firstName = this.firstName;
-      if (firstName.value && typeof firstName.value === 'string') {
+      if (firstName.value && typeof firstName.value === "string") {
         firstName.isCorrect();
         return true;
       } else {
@@ -494,19 +522,21 @@ Vue.component('customer-register', {
     },
     validateNit() {
       let nit = this.nit;
-      if (nit.value && typeof nit.value === 'string') {
+      if (nit.value && typeof nit.value === "string") {
         let isAssigned = false;
         if (this.updatingCustomer) {
-          isAssigned = this.customers.some(c => c.nit === nit.value && c.id !== this.customerSelected.id);
+          isAssigned = this.customers.some(
+            (c) => c.nit === nit.value && c.id !== this.customerSelected.id
+          );
         } else {
-          isAssigned = this.customers.some(c => c.nit === nit.value);
+          isAssigned = this.customers.some((c) => c.nit === nit.value);
         }
 
         if (isAssigned) {
-          nit.isIncorrect('Esta identificación ya fue asignada')
+          nit.isIncorrect("Esta identificación ya fue asignada");
           return false;
         } else {
-          nit.isCorrect()
+          nit.isCorrect();
         }
       } else {
         nit.isCorrect();
@@ -516,16 +546,18 @@ Vue.component('customer-register', {
     },
     validatePhone() {
       let phone = this.phone;
-      if (phone.value && typeof phone.value === 'string') {
+      if (phone.value && typeof phone.value === "string") {
         let isAssigned = false;
         if (this.updatingCustomer) {
-          isAssigned = this.customers.some(c => c.phone === phone.value && c.id !== this.customerSelected.id);
+          isAssigned = this.customers.some(
+            (c) => c.phone === phone.value && c.id !== this.customerSelected.id
+          );
         } else {
-          isAssigned = this.customers.some(c => c.phone === phone.value);
+          isAssigned = this.customers.some((c) => c.phone === phone.value);
         }
 
         if (isAssigned) {
-          phone.isIncorrect('Este número ya fue asignado');
+          phone.isIncorrect("Este número ya fue asignado");
           return false;
         } else {
           phone.isCorrect();
@@ -538,25 +570,32 @@ Vue.component('customer-register', {
     },
     validateEmail() {
       let email = this.email;
-      if (email.value && typeof email.value === 'string') {
-        console.log(email.value)
-        if (/^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<ul>()[\]\.,;:\s@\"]{2,})$/i.test(email.value)) {
+      if (email.value && typeof email.value === "string") {
+        console.log(email.value);
+        if (
+          /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<ul>()[\]\.,;:\s@\"]{2,})$/i.test(
+            email.value
+          )
+        ) {
           let isAssigned = false;
 
           if (this.updatingCustomer) {
-            isAssigned = this.customers.some(c => c.email === email.value && c.id !== this.customerSelected.id);
+            isAssigned = this.customers.some(
+              (c) =>
+                c.email === email.value && c.id !== this.customerSelected.id
+            );
           } else {
-            isAssigned = this.customers.some(c => c.email === email.value);
+            isAssigned = this.customers.some((c) => c.email === email.value);
           }
 
           if (isAssigned) {
-            email.isIncorrect('Esta dirección de correo ya fue asignada');
+            email.isIncorrect("Esta dirección de correo ya fue asignada");
             return false;
           } else {
             email.isCorrect();
           }
         } else {
-          email.isIncorrect('Ingresa una dirección de correo valida');
+          email.isIncorrect("Ingresa una dirección de correo valida");
           return false;
         }
       } else {
@@ -573,18 +612,18 @@ Vue.component('customer-register', {
 
       if (firstNameVal && nitVal && phoneVal && emailVal) {
         const body = new FormData();
-        body.append('first_name', this.firstName.value);
-        body.append('last_name', this.lastName.value);
-        body.append('nit', this.nit.value);
-        body.append('phone', this.phone.value);
-        body.append('email', this.email.value);
+        body.append("first_name", this.firstName.value);
+        body.append("last_name", this.lastName.value);
+        body.append("nit", this.nit.value);
+        body.append("phone", this.phone.value);
+        body.append("email", this.email.value);
         this.waiting = true;
 
         if (this.updatingCustomer) {
-          body.append('customer_id', this.customerSelected.id);
+          body.append("customer_id", this.customerSelected.id);
           try {
-            const res = await fetch('./api/update_customer.php', {
-              method: 'POST',
+            const res = await fetch("./api/update_customer.php", {
+              method: "POST",
               body: body,
             });
             const data = await res.json();
@@ -596,7 +635,7 @@ Vue.component('customer-register', {
                 this.processResult.hasError = false;
                 this.processResult.message = "Cliente actualizado";
 
-                this.$emit('update-customer', data.customer);
+                this.$emit("update-customer", data.customer);
                 this.discardUpdate();
               } else {
                 this.waiting = false;
@@ -616,30 +655,29 @@ Vue.component('customer-register', {
           }
         } else {
           try {
-            const res = await fetch('./api/new_customer.php', {
-              method: 'POST',
-              body: body
-            })
+            const res = await fetch("./api/new_customer.php", {
+              method: "POST",
+              body: body,
+            });
 
             const data = await res.json();
 
             if (data.sessionActive) {
               if (data.request) {
                 let actualCount = this.customers.length;
-                this.$emit('new-customer');
+                this.$emit("new-customer");
                 let timerId = setInterval(() => {
                   if (actualCount < this.customers.length) {
                     this.waiting = false;
                     this.processResult.visible = true;
                     this.processResult.hasError = false;
-                    this.processResult.message = "Cliente Agregado satisfactoriamente";
+                    this.processResult.message =
+                      "Cliente Agregado satisfactoriamente";
                     this.resetForm();
                     clearInterval(timerId);
                   }
-                  console.log('Repitiendo: ' + actualCount)
+                  console.log("Repitiendo: " + actualCount);
                 }, 1000);
-
-
               } else {
                 this.processResult.visible = true;
                 this.processResult.hasError = true;
@@ -648,7 +686,6 @@ Vue.component('customer-register', {
             } else {
               location.reload();
             }
-
           } catch (error) {
             console.log(res.text);
             this.waiting = false;
@@ -656,13 +693,13 @@ Vue.component('customer-register', {
             this.processResult.hasError = true;
             this.processResult.message = "Solicitud Rechazada";
           }
-        }//Fin de if-else
-      }//Fin de if
-    },//Fin del metodo
-		/**
-		 * Este metodo carga al modulo los datos delcliente
-		 * @param {Customer} customer Instancia de customer
-		 */
+        } //Fin de if-else
+      } //Fin de if
+    }, //Fin del metodo
+    /**
+     * Este metodo carga al modulo los datos delcliente
+     * @param {Customer} customer Instancia de customer
+     */
     loadCustomer(customer) {
       this.customerSelected = customer;
       this.updatingCustomer = true;
@@ -685,7 +722,7 @@ Vue.component('customer-register', {
       this.phone.resetInput();
       this.email.resetInput();
     },
-  },//Fin de methods
+  }, //Fin de methods
   template: `
   <div class="view" :id="id">
     <section class="view__section">
@@ -887,8 +924,7 @@ Vue.component('customer-register', {
     <process-result v-bind:process-result="processResult" @hidden-modal="processResult.visible = false"></process-result>
   </div>
 	`,
-
-})
+});
 
 Vue.component("input-money", {
   props: ["value"],
@@ -934,8 +970,8 @@ Vue.component("input-money", {
   },
 });
 
-Vue.component('customer-card', {
-  props: ['customer'],
+Vue.component("customer-card", {
+  props: ["customer"],
   methods: {
     formatCurrency(value) {
       var formatted = new Intl.NumberFormat("es-Co", {
@@ -949,16 +985,16 @@ Vue.component('customer-card', {
   computed: {
     classState() {
       if (this.customer.inactive) {
-        return { 'customer-card--inactive': true };
+        return { "customer-card--inactive": true };
       } else if (this.customer.deliquentBalance) {
-        return { 'customer-card--late': true };
+        return { "customer-card--late": true };
       }
 
       return { success: false };
     },
     fullName() {
-      return this.customer.firstName + ' ' + this.customer.lastName;
-    }
+      return this.customer.firstName + " " + this.customer.lastName;
+    },
   },
   template: `
   <div class="customer-card" :class="classState" v-if="customer" @click="$emit('click')">
@@ -974,34 +1010,36 @@ Vue.component('customer-card', {
         Puntos: <span class="text-bold" :class="{'text-success': customer.points > 0, 'text-danger': customer.points < 0}">{{customer.points}}</span>
       </p>
     </div>
-  </div>`
-})
+  </div>`,
+});
 
-Vue.component('search-box', {
-  props: ['customers'],
+Vue.component("search-box", {
+  props: ["customers"],
   data: function () {
     return {
       customerSelected: undefined,
       showBox: false,
-      customerName: '',
-    }
-  },//Fin de data
+      customerName: "",
+    };
+  }, //Fin de data
   methods: {
     onCustomerSelected(customer) {
       this.customerSelected = customer;
-      this.$emit('customer-selected', customer);
-    }
-  },//Fin de methods
+      this.$emit("customer-selected", customer);
+    },
+  }, //Fin de methods
   computed: {
     customerResult() {
       let result = [];
       if (this.customerName) {
-        result = this.customers.filter(c => textInclude(`${c.firstName} ${c.lastName}`, this.customerName));
+        result = this.customers.filter((c) =>
+          textInclude(`${c.firstName} ${c.lastName}`, this.customerName)
+        );
       } else {
         result = this.customers;
       }
       return result;
-    }
+    },
   },
   template: `
   <div class="search-box">
@@ -1027,46 +1065,49 @@ Vue.component('search-box', {
     <div class="search-box__selected" v-show="customerSelected">
       <customer-card :customer="customerSelected"></customer-card>
     </div>
-  </div>`
-})
+  </div>`,
+});
 
-Vue.component('new-operation-form', {
-  props: ['customer', 'id'],
+Vue.component("new-operation-form", {
+  props: ["customer", "id"],
   data: function () {
     return {
-      operationType: 'payment',
-      operationMoment: 'now',
-      maxDate: moment().subtract(1, 'd').format('YYYY-MM-DD'),
+      operationType: "payment",
+      operationMoment: "now",
+      maxDate: moment().subtract(1, "d").format("YYYY-MM-DD"),
       date: new DataInput(),
       description: new DataInput(),
-      paymentType: 'cash',
+      paymentType: "cash",
       amount: new DataInput(),
       exceedsTheQuota: false,
-    }
-  },//Fin de data
+    };
+  }, //Fin de data
   methods: {
     validateDate() {
       let isOk = false;
       let value = this.date.value;
-      let message = ';'
-      if (this.operationMoment !== 'now') {
-        if (value && typeof value === 'string') {
+      let message = ";";
+      if (this.operationMoment !== "now") {
+        if (value && typeof value === "string") {
           if (moment(value).isValid()) {
             let date = moment(value);
-            if (date.isAfter(this.minDate) && date.isBefore(moment().startOf('day'))) {
+            if (
+              date.isAfter(this.minDate) &&
+              date.isBefore(moment().startOf("day"))
+            ) {
               isOk = true;
             } else {
               message = "Está fecha no está permitida";
             }
           } else {
-            message = 'Ingresa una fecha valida';
+            message = "Ingresa una fecha valida";
           }
         } else {
           message = "Selecciona o escribe una fecha valida";
         }
       } else {
         isOk = true;
-        message = '';
+        message = "";
       }
 
       if (isOk) {
@@ -1086,10 +1127,10 @@ Vue.component('new-operation-form', {
             isOk = true;
             this.description.isCorrect();
           } else {
-            this.description.isIncorrect('Descripción demasiado larga');
+            this.description.isIncorrect("Descripción demasiado larga");
           }
         } else {
-          this.description.isIncorrect('Este campo no puede estar en blanco');
+          this.description.isIncorrect("Este campo no puede estar en blanco");
         }
       } else {
         isOk = true;
@@ -1101,30 +1142,30 @@ Vue.component('new-operation-form', {
     validateAmount() {
       let isOk = false;
       let value = this.amount.value;
-      let message = '';
+      let message = "";
       if (value) {
         value = parseFloat(deleteCurrencyFormater(value));
         if (!isNaN(value) && value > 0) {
           if (value >= 1000) {
-            if(this.operationType === 'payment'){
+            if (this.operationType === "payment") {
               this.exceedsTheQuota = false;
-              if(this.customer.balance >= value){
+              if (this.customer.balance >= value) {
                 isOk = true;
-              }else{
+              } else {
                 message = "El abono supera la deuda";
               }
-            }else{
+            } else {
               this.verifyQuota(value);
               isOk = true;
             }
           } else {
-            message = 'La cifra es muy pequeña';
+            message = "La cifra es muy pequeña";
           }
         } else {
-          message = 'Ingresa un valor válido';
+          message = "Ingresa un valor válido";
         }
       } else {
-        message = 'Este campo es requerído';
+        message = "Este campo es requerído";
       }
 
       if (isOk) {
@@ -1138,7 +1179,7 @@ Vue.component('new-operation-form', {
     verifyQuota(value) {
       if (this.customer) {
         let customerBalance = this.customer.balance;
-        if ((customerBalance + value) > 250000) {
+        if (customerBalance + value > 250000) {
           this.exceedsTheQuota = true;
         } else {
           this.exceedsTheQuota = false;
@@ -1148,34 +1189,40 @@ Vue.component('new-operation-form', {
       }
     },
     onClick() {
-      console.log(this.date)
+      console.log(this.date);
     },
     onSubmit() {
       let dateIsOk = this.validateDate();
       let descriptionIsOk = this.validateDescription();
       let amountIsOk = this.validateAmount();
 
-      if (this.customer && this.customer instanceof Customer && dateIsOk && descriptionIsOk && amountIsOk) {
+      if (
+        this.customer &&
+        this.customer instanceof Customer &&
+        dateIsOk &&
+        descriptionIsOk &&
+        amountIsOk
+      ) {
         let customerId = this.customer.id;
-        let isNow = this.operationMoment === 'now' ? true : false;
+        let isNow = this.operationMoment === "now" ? true : false;
         let date = this.date.value;
         let description = this.description.value;
-        let cash = this.paymentType === 'cash' ? true : false;
+        let cash = this.paymentType === "cash" ? true : false;
         let amount = parseFloat(deleteCurrencyFormater(this.amount.value));
 
         let data = new FormData();
-        data.append('customer_id', customerId);
-        data.append('date', date);
-        data.append('description', description);
-        data.append('cash', cash);
-        data.append('amount', amount);
+        data.append("customer_id", customerId);
+        data.append("date", date);
+        data.append("description", description);
+        data.append("cash", cash);
+        data.append("amount", amount);
 
         switch (this.operationType) {
-          case 'credit':
-            this.$emit('new-credit', data)
+          case "credit":
+            this.$emit("new-credit", data);
             break;
-          case 'payment':
-            this.$emit('new-payment', data);
+          case "payment":
+            this.$emit("new-payment", data);
             break;
           default:
             break;
@@ -1183,60 +1230,69 @@ Vue.component('new-operation-form', {
       }
     },
     resetFields() {
-      this.operationType = 'payment';
-      this.paymentType = 'cash';
-      this.operationMoment = 'now';
+      this.operationType = "payment";
+      this.paymentType = "cash";
+      this.operationMoment = "now";
       this.description.resetInput();
       this.amount.resetInput();
       this.date.resetInput();
-    }
-  },//Fin de methods
+    },
+  }, //Fin de methods
   computed: {
     formTitle() {
-      let title = '';
+      let title = "";
       switch (this.operationType) {
-        case 'payment': title = "Registrar Abono";
+        case "payment":
+          title = "Registrar Abono";
           break;
-        case 'credit': title = "Registar Credito";
+        case "credit":
+          title = "Registar Credito";
           break;
-        default: title = "Selecciona una opción";
+        default:
+          title = "Selecciona una opción";
       }
 
       return title;
     },
     isCredit() {
-      return this.operationType === 'credit';
+      return this.operationType === "credit";
     },
     minDate() {
-      let minDate = moment().startOf('year');
+      let minDate = moment().startOf("year");
       //Si el cliente no tiene credito la fecha minima
       if (this.customer) {
         let creditCount = this.customer.credits.length;
         console.log(creditCount);
         if (creditCount > 0) {
-          let maxCreditDate = moment(this.customer.credits[creditCount - 1].date);
+          let maxCreditDate = moment(
+            this.customer.credits[creditCount - 1].date
+          );
           minDate = maxCreditDate;
           let paymentCount = this.customer.payments.length;
           if (paymentCount > 0) {
-            let maxPaymentDate = moment(this.customer.payments[paymentCount - 1].date);
-            minDate = maxPaymentDate.isSameOrAfter(maxCreditDate) ? maxPaymentDate : maxCreditDate;
+            let maxPaymentDate = moment(
+              this.customer.payments[paymentCount - 1].date
+            );
+            minDate = maxPaymentDate.isSameOrAfter(maxCreditDate)
+              ? maxPaymentDate
+              : maxCreditDate;
           }
         }
       }
       return minDate;
     },
-    disabledSubmit(){
+    disabledSubmit() {
       //by default the button is activated
       let result = false;
-      if(this.customer){
-        if(this.operationType === 'payment' && this.customer.balance <= 0){
+      if (this.customer) {
+        if (this.operationType === "payment" && this.customer.balance <= 0) {
           /**
-           * The button is disabled when 
-           * the customer's balance is zero 
+           * The button is disabled when
+           * the customer's balance is zero
            */
           result = true;
         }
-      }else{
+      } else {
         /**
          * The button is disables in all case when a
          * customer has not been selected
@@ -1245,11 +1301,11 @@ Vue.component('new-operation-form', {
       }
 
       return result;
-    }
-  },//Fin de computed,
+    },
+  }, //Fin de computed,
   mounted() {
-    this.$root.$on('credit-was-created', this.resetFields);
-    this.$root.$on('payment-was-created', this.resetFields);
+    this.$root.$on("credit-was-created", this.resetFields);
+    this.$root.$on("payment-was-created", this.resetFields);
   },
   template: `
   <form class="form form--bg-light" @submit.prevent="onSubmit" :id="id + 'Form'">
@@ -1409,29 +1465,29 @@ Vue.component('new-operation-form', {
         :disabled="disabledSubmit"
       >
     </div>            
-  </form>`
-})
+  </form>`,
+});
 
-Vue.component('customer-credits', {
-  props: ['customer', 'id'],
+Vue.component("customer-credits", {
+  props: ["customer", "id"],
   data: function () {
     return {
       // creditType:"pending",
       creditType: "pending",
-    }
-  },//Fin de data
-  methods: {
-
-  },//Fin fr mrthods
+    };
+  }, //Fin de data
+  methods: {}, //Fin fr mrthods
   computed: {
     credits() {
       let credits = [];
       if (this.customer) {
         switch (this.creditType) {
-          case 'pending': {
-            credits = this.customer.credits.filter(c => c.balance > 0);
-          } break;
-          case 'all': {
+          case "pending":
+            {
+              credits = this.customer.credits.filter((c) => c.balance > 0);
+            }
+            break;
+          case "all": {
             credits = this.customer.credits;
           }
         }
@@ -1442,8 +1498,8 @@ Vue.component('customer-credits', {
     creditsData() {
       let data = [];
       //Ahora construyo los datos
-      this.credits.forEach(c => {
-        let id = c.id
+      this.credits.forEach((c) => {
+        let id = c.id;
         let title = c.description;
         let date = `${moment(c.date).calendar()} (${moment(c.date).fromNow()})`;
         let amount = formatCurrencyLite(c.amount, 0);
@@ -1453,27 +1509,27 @@ Vue.component('customer-credits', {
           title,
           date,
           amount,
-          balance
-        })
-      })
-      return data
+          balance,
+        });
+      });
+      return data;
     },
     totalAmount() {
       let amount = 0;
-      this.credits.forEach(c => {
+      this.credits.forEach((c) => {
         amount += c.amount;
-      })
+      });
 
       return formatCurrencyLite(amount, 0);
     },
     deliquentBalance() {
       let balance = 0;
-      this.credits.forEach(c => {
+      this.credits.forEach((c) => {
         balance += c.balance;
-      })
+      });
       return formatCurrencyLite(balance, 0);
-    }
-  },//Fin de computed
+    },
+  }, //Fin de computed
   template: `
   <div class="card-container">
     <h2 class="card-container__title text-bold">Historial de Creditos</h2>
@@ -1519,16 +1575,14 @@ Vue.component('customer-credits', {
       <p>Creditos({{credits.length}}): <span class="text-bold">{{totalAmount}}</span></p>
       <p>Pendiente: <span class="text-bold">{{deliquentBalance}}</span></p>
     </div>
-  </div>`
-})
+  </div>`,
+});
 
-Vue.component('customer-history', {
-  props: ['customer'],
+Vue.component("customer-history", {
+  props: ["customer"],
   data: function () {
-    return {
-
-    }
-  },//Fin de data
+    return {};
+  }, //Fin de data
   methods: {
     historyCompareByDate(history1, history2) {
       if (history1.date.isBefore(history2.date)) {
@@ -1541,34 +1595,33 @@ Vue.component('customer-history', {
 
       return 0;
     },
-
-  },//Fin de methods
+  }, //Fin de methods
   computed: {
     creditData() {
       let result = [];
       if (this.customer && this.customer instanceof Customer) {
         let credits = this.customer.credits;
-        credits.forEach(credit => {
+        credits.forEach((credit) => {
           let date = moment(credit.date);
           let creditAmount = credit.amount;
           let paymentAmount = 0;
           let balance = 0;
           result.push({ date, creditAmount, paymentAmount, balance });
-        })
-      }//Fin de if
+        });
+      } //Fin de if
       return result;
     },
     paymentData() {
       let result = [];
       if (this.customer && this.customer instanceof Customer) {
         let payments = this.customer.payments;
-        payments.forEach(payment => {
+        payments.forEach((payment) => {
           let date = moment(payment.date);
           let creditAmount = 0;
           let paymentAmount = payment.amount;
           let balance = 0;
           result.push({ date, creditAmount, paymentAmount, balance });
-        })
+        });
       }
       return result;
     },
@@ -1581,10 +1634,10 @@ Vue.component('customer-history', {
 
       //Ahora se calcula el saldo
       let balance = 0;
-      historyData.forEach(data => {
-        balance += (data.creditAmount - data.paymentAmount);
+      historyData.forEach((data) => {
+        balance += data.creditAmount - data.paymentAmount;
         data.balance = balance;
-      })
+      });
 
       //Ahora se retrnan los datos
       return historyData;
@@ -1592,16 +1645,18 @@ Vue.component('customer-history', {
     viewData() {
       let history = this.historyData;
       let data = [];
-      history.forEach(h => {
-        let date = h.date.format('DD/MMM/YY');
-        let credit = h.creditAmount > 0 ? formatCurrencyLite(h.creditAmount, 0) : '';
-        let payment = h.paymentAmount > 0 ? formatCurrencyLite(h.paymentAmount, 0) : '';
+      history.forEach((h) => {
+        let date = h.date.format("DD/MMM/YY");
+        let credit =
+          h.creditAmount > 0 ? formatCurrencyLite(h.creditAmount, 0) : "";
+        let payment =
+          h.paymentAmount > 0 ? formatCurrencyLite(h.paymentAmount, 0) : "";
         let balance = formatCurrencyLite(h.balance, 0);
         data.push({ date, credit, payment, balance });
-      })
+      });
       return data;
-    }
-  },//Fin de computed
+    },
+  }, //Fin de computed
   template: `
   <div>
     <div class="history__header">
@@ -1637,26 +1692,24 @@ Vue.component('customer-history', {
       <p></p>
       <p class="history__info">Operaciones: {{viewData.length}}</p>
     </div>
-  </div>`
-})
+  </div>`,
+});
 
-Vue.component('operation-register', {
-  props: ['customers', 'id'],
+Vue.component("operation-register", {
+  props: ["customers", "id"],
   data: function () {
     return {
       customerSelected: undefined,
       waiting: false,
-      processResult: { visible: false, hasError: false, message: '' },
-    }
+      processResult: { visible: false, hasError: false, message: "" },
+    };
   },
   methods: {
     onCustomerSelected(customer) {
       this.customerSelected = customer;
     },
   },
-  computed: {
-
-  },
+  computed: {},
   template: `
   <div class="view" :id="id">
     <section class="view__section">
@@ -1699,20 +1752,20 @@ Vue.component('operation-register', {
     </aside>
     <waiting-modal v-bind:visible="waiting"></waiting-modal>
     <process-result v-bind:process-result="processResult" @hidden-modal="processResult.visible = false"></process-result>
-  </div>`
-})
+  </div>`,
+});
 
 //---------------------------------------------
 //  RAIZ DE LA APLICACION
 //---------------------------------------------
 const app = new Vue({
-  el: '#app',
+  el: "#app",
   data: {
     customers: [],
     // propiedades temporales
     waiting: false,
     processResult: new RequesProcess(),
-    actualView: 'newOperation',
+    actualView: "newOperation",
   },
   methods: {
     /**
@@ -1722,98 +1775,123 @@ const app = new Vue({
      * @param {object} data Objeto devuelto por l servidor con los datos del cliente actualizado
      */
     updateCustomer(data) {
-      if (this.customers.some(c => c.id === data.id)) {
-        let customer = this.customers.filter(c => c.id === data.id)[0];
+      if (this.customers.some((c) => c.id === data.id)) {
+        let customer = this.customers.filter((c) => c.id === data.id)[0];
         customer.update(data);
       }
     },
     /**
      * Cuando se recibe el evento de customer-update se encarga de vomver a peidor los datos
-     * del cliente al servidor. 
+     * del cliente al servidor.
      */
     newCustomer() {
       this.updateModel();
     },
     async onNewCredit(formData) {
-      console.log(formData);
-      //Se monta la espera
       this.waiting = true;
       try {
-        const res = await fetch('./api/new_credit.php', { method: 'POST', body: formData });
+        const res = await fetch("./api/new_credit.php", {
+          method: "POST",
+          body: formData,
+        });
         const data = await res.json();
-        console.log(data);
         if (data.sessionActive) {
           if (data.request) {
             this.updateCustomer(data.customer);
             this.waiting = false;
-            this.processResult.isSuccess('Credito registrado con exito');
-            this.$root.$emit('credit-was-created');
+            this.processResult.isSuccess("Credito registrado con exito");
+            this.$root.$emit("credit-was-created");
           } else {
             this.waiting = false;
-            this.processResult.isDanger('No se pudo registrar el credito');
+            this.processResult.isDanger("No se pudo registrar el credito");
           }
         } else {
           location.reload();
         }
       } catch (error) {
-        console.log(error)
+        this.waiting = false;
+        console.log(error);
       }
-      
     },
     async onNewPayment(formData) {
-      const res = await fetch('./api/new_payment.php', { method: 'POST', body: formData });
-      const data = await res.json();
-      console.log(data);
-      if (data.sessionActive) {
-        if (data.request) {
-          this.updateCustomer(data.customer);
-          this.waiting = false;
-          this.processResult.isSuccess('Abono registrado con exito');
-          this.$root.$emit('payment-was-created');
-        } else {
-          this.waiting = false;
-          this.processResult.isDanger('No se pudo registrar el abono');
-        }
-      } else {
-        location.reload();
-      }
-    },
-		/**
-		 * Solicita al servidor la informacion de todos los clientes
-		 */
-    async updateModel() {
+      this.waiting = true;
       try {
-        const res = await fetch('./api/all_customers.php');
+        const res = await fetch("./api/new_payment.php", {
+          method: "POST",
+          body: formData,
+        });
         const data = await res.json();
-        if (data.sessionActive) {
-          this.customers = [];
-          data.customers.forEach(c => {
-            const customer = new Customer(c.id, c.firstName, c.lastName, c.nit, c.phone, c.email, c.points);
-            //Ahora agrego los creditos del cliente
-            c.credits.forEach(credit => {
-              customer.addCredit(credit.id, credit.creditDate, credit.description, credit.amount, credit.balance);
-            })
-            //Se agregan los abonos
-            c.payments.forEach(payment => {
-              customer.addPayment(payment.id, payment.paymentDate, payment.amount, payment.cash);
-            })
 
-            customer.defineState();
-            this.customers.push(customer);
-          })
+        if (data.sessionActive) {
+          if (data.request) {
+            this.updateCustomer(data.customer);
+            this.waiting = false;
+            this.processResult.isSuccess("Abono registrado con exito");
+            this.$root.$emit("payment-was-created");
+          } else {
+            this.waiting = false;
+            this.processResult.isDanger("No se pudo registrar el abono");
+          }
         } else {
           location.reload();
         }
       } catch (error) {
-        console.log(error)
+        this.waiting = false;
+        console.log(error);
       }
-    },//Fin del metodo
+    },
+    /**
+     * Solicita al servidor la informacion de todos los clientes
+     */
+    async updateModel() {
+      try {
+        const res = await fetch("./api/all_customers.php");
+        const data = await res.json();
+        if (data.sessionActive) {
+          this.customers = [];
+          data.customers.forEach((c) => {
+            const customer = new Customer(
+              c.id,
+              c.firstName,
+              c.lastName,
+              c.nit,
+              c.phone,
+              c.email,
+              c.points
+            );
+            //Ahora agrego los creditos del cliente
+            c.credits.forEach((credit) => {
+              customer.addCredit(
+                credit.id,
+                credit.creditDate,
+                credit.description,
+                credit.amount,
+                credit.balance
+              );
+            });
+            //Se agregan los abonos
+            c.payments.forEach((payment) => {
+              customer.addPayment(
+                payment.id,
+                payment.paymentDate,
+                payment.amount,
+                payment.cash
+              );
+            });
 
-  },//Fin de methods
-  computed: {
-  },//Fin de compute
+            customer.defineState();
+            this.customers.push(customer);
+          });
+        } else {
+          location.reload();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }, //Fin del metodo
+  }, //Fin de methods
+  computed: {}, //Fin de compute
   created() {
     this.updateModel();
-  },//Fin de create
+  }, //Fin de create
 });
-
