@@ -61,10 +61,12 @@
               <nav class="dropdown__nav">
                 <ul class="dropdown__list">
                   <li class="dropdown__item">
-                    <a href="#" class="dropdown__link active">Operaciones e Historial</a>
+                    <a href="#" :class="['dropdown__link', {active: actualView === 'newOperation'}]" @click="actualView = 'newOperation'">
+                      Operaciones e Historial
+                    </a>
                   </li>
                   <li class="dropdown__item">
-                    <a href="#" class="dropdown__link">Nuevo y Actualización</a>
+                    <a href="#" :class="['dropdown__link', {active: actualView === 'newCustomerAndUpdate'}]" @click="actualView = 'newCustomerAndUpdate'">Nuevo y Actualización</a>
                   </li>
                   <li class="dropdown__item">
                     <a href="#" class="dropdown__link disabled">Historial de movimientos</a>
@@ -98,12 +100,11 @@
         </div>
       </nav>
     </header>
-
-    <customer-register :customers="customers" id="customerReg" @update-customer="updateCustomer" @new-customer="newCustomer">
+    
+    <customer-register :customers="customers" id="customerReg" @update-customer="updateCustomer" @new-customer="newCustomer" v-show="actualView === 'newCustomerAndUpdate'">
     </customer-register>
-
-    <operation-register :customers="customers" id="customerOperation" @new-credit="onNewCredit" @new-payment="onNewPayment"></operation-register>
-
+    <operation-register :customers="customers" id="customerOperation" @new-credit="onNewCredit" @new-payment="onNewPayment" v-show="actualView === 'newOperation'"></operation-register>
+    
     <waiting-modal v-bind:visible="waiting"></waiting-modal>
     <process-result v-bind:process-result="processResult" @hidden-modal="processResult.visible = false"></process-result>
   </div>

@@ -1709,12 +1709,10 @@ const app = new Vue({
   el: '#app',
   data: {
     customers: [],
-    modals: {
-      waiting: new WaitingModal(),
-    },
     // propiedades temporales
     waiting: false,
     processResult: new RequesProcess(),
+    actualView: 'newOperation',
   },
   methods: {
     /**
