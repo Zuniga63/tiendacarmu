@@ -2249,6 +2249,10 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   border-spacing: 0;
 }
 
+.table__body{
+  font-size: 0.9em;
+}
+
 .table__row {
   border: 1px solid #ddd;
   padding: 0.4em;
@@ -2414,6 +2418,10 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 
   .table__header,
   .table__data {
+    font-size: 1em;
+  }
+
+  .table__body{
     font-size: 1em;
   }
 
