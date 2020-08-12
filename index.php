@@ -227,7 +227,7 @@ $allItems = get_all_items();
             <i class="icon-instagram"></i>
             <span class="social__text__body">Instagram</span>
           </a>
-          <p class="social__txt"><i class="icon-whatsapp-bold"></i><span>320-555-5387</span></p>
+          <a href="https://api.whatsapp.com/send?phone=573213198846&text=Quiero%20mas%20informacion" class="social__link" target="blank"><i class="icon-whatsapp-bold"></i><span>320-555-5387</span></a>
         </div>
 
         <p class="copy">Tienda Carmú &copy; 2020</p>
