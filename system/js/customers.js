@@ -460,8 +460,6 @@ Vue.component("customer-register", {
       customerSelected: undefined,
       updatingCustomer: false,
       typeList: "active",
-      waiting: false,
-      processResult: { visible: false, hasError: false, message: "" },
       //los campos para el formulario
       firstName: new DataInput(),
       lastName: new DataInput(),
@@ -617,83 +615,14 @@ Vue.component("customer-register", {
         body.append("nit", this.nit.value);
         body.append("phone", this.phone.value);
         body.append("email", this.email.value);
-        this.waiting = true;
-
+        // this.waiting = true;
         if (this.updatingCustomer) {
           body.append("customer_id", this.customerSelected.id);
-          try {
-            const res = await fetch("./api/update_customer.php", {
-              method: "POST",
-              body: body,
-            });
-            const data = await res.json();
-
-            if (data.sessionActive) {
-              if (data.request) {
-                this.waiting = false;
-                this.processResult.visible = true;
-                this.processResult.hasError = false;
-                this.processResult.message = "Cliente actualizado";
-
-                this.$emit("update-customer", data.customer);
-                this.discardUpdate();
-              } else {
-                this.waiting = false;
-                this.processResult.visible = true;
-                this.processResult.hasError = true;
-                this.processResult.message = "No se pudo actualizar";
-              }
-            } else {
-              location.reload();
-            }
-          } catch (error) {
-            console.log(res.text);
-            this.waiting = false;
-            this.processResult.visible = true;
-            this.processResult.hasError = true;
-            this.processResult.message = "Solicitud Rechazada";
-          }
+          this.$emit("update-customer", body);
         } else {
-          try {
-            const res = await fetch("./api/new_customer.php", {
-              method: "POST",
-              body: body,
-            });
+          this.$emit('new-customer', body);
+        }
 
-            const data = await res.json();
-
-            if (data.sessionActive) {
-              if (data.request) {
-                let actualCount = this.customers.length;
-                this.$emit("new-customer");
-                let timerId = setInterval(() => {
-                  if (actualCount < this.customers.length) {
-                    this.waiting = false;
-                    this.processResult.visible = true;
-                    this.processResult.hasError = false;
-                    this.processResult.message =
-                      "Cliente Agregado satisfactoriamente";
-                    this.resetForm();
-                    clearInterval(timerId);
-                  }
-                  console.log("Repitiendo: " + actualCount);
-                }, 1000);
-              } else {
-                this.processResult.visible = true;
-                this.processResult.hasError = true;
-                this.processResult.message = "No se pudo crear al cliente";
-              }
-            } else {
-              location.reload();
-            }
-          } catch (error) {
-            console.log(res.text);
-            this.waiting = false;
-            this.processResult.visible = true;
-            this.processResult.hasError = true;
-            this.processResult.message = "Solicitud Rechazada";
-          }
-        } //Fin de if-else
       } //Fin de if
     }, //Fin del metodo
     /**
@@ -723,6 +652,10 @@ Vue.component("customer-register", {
       this.email.resetInput();
     },
   }, //Fin de methods
+  mounted() {
+    this.$root.$on("customer-was-updated", this.discardUpdate);
+    this.$root.$on("customer-was-created", this.resetForm);
+  },
   template: `
   <div class="view" :id="id">
     <section class="view__section">
@@ -919,9 +852,7 @@ Vue.component("customer-register", {
         <p class="history__info">Archivados: <span class="text-bold">{{archivedCustomers.length}}</span></p>
         <p class="history__info">Total: <span class="text-bold">{{customers.length}}</span></p>
       </div>
-    </aside>  
-    <waiting-modal v-bind:visible="waiting"></waiting-modal>
-    <process-result v-bind:process-result="processResult" @hidden-modal="processResult.visible = false"></process-result>
+    </aside>
   </div>
 	`,
 });
@@ -1772,20 +1703,78 @@ const app = new Vue({
      * Este metodo se ejecuta cuando se recibe el evento emitido por el modulo
      * para crear y actualizar clientes y se encarga de actualizar los
      * datos del cliente que el servidor ya procesó
-     * @param {object} data Objeto devuelto por l servidor con los datos del cliente actualizado
+     * @param {object} data a object FormData to make the request to server
      */
-    updateCustomer(data) {
-      if (this.customers.some((c) => c.id === data.id)) {
-        let customer = this.customers.filter((c) => c.id === data.id)[0];
-        customer.update(data);
+    async onUpdateCustomer(formData) {
+      this.waiting = true;
+      try {
+        const res = await fetch("./api/update_customer.php", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+
+        if (data.sessionActive) {
+          if (data.request) {
+            //Customer data is updated
+            if (this.customers.some((c) => c.id === data.customer.id)) {
+              let customer = this.customers.filter((c) => c.id === data.customer.id)[0];
+              customer.update(data.customer);
+            }
+
+            this.waiting = false;
+            this.processResult.isSuccess("Cliente actualizado");
+            this.$root.$emit('customer-was-updated');
+          } else {
+            this.waiting = false;
+            this.processResult.visible = true;
+            this.processResult.hasError = true;
+            this.processResult.message = "No se pudo actualizar";
+          }
+        } else {
+          location.reload();
+        }
+      } catch (error) {
+        console.log(error);
+        this.waiting = false;
+        this.processResult.isDanger("No se pudo hacer la peticion");
       }
+
     },
     /**
      * Cuando se recibe el evento de customer-update se encarga de vomver a peidor los datos
      * del cliente al servidor.
      */
-    newCustomer() {
-      this.updateModel();
+    async onNewCustomer(formData) {
+      this.waiting = true;
+      try {
+        const res = await fetch("./api/new_customer.php", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+
+        if (data.sessionActive) {
+          if (data.request) {
+            await this.updateModel();
+            this.waiting = false;
+            this.processResult.isSuccess('Cliente agregado');
+            this.$root.$emit('customer-was-created');
+          } else {
+            this.waiting = false;
+            this.processResult.isDanger('No se pudo crear el cliente');
+          }
+        } else {
+          location.reload();
+        }
+      } catch (error) {
+        console.log(error);
+        this.waiting = false;
+        this.processResult.isDanger("No se pudo hacer la peticion");
+      }
+
+
+      
     },
     async onNewCredit(formData) {
       this.waiting = true;

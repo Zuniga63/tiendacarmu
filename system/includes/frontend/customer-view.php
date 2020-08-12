@@ -100,9 +100,11 @@
         </div>
       </nav>
     </header>
-    
-    <customer-register :customers="customers" id="customerReg" @update-customer="updateCustomer" @new-customer="newCustomer" v-show="actualView === 'newCustomerAndUpdate'">
+    <!-- This module is used to register new customer or update customer data -->
+    <!-- this module emit two events (update-customer and new-customer) -->
+    <customer-register :customers="customers" id="customerReg" @update-customer="onUpdateCustomer" @new-customer="onNewCustomer" v-show="actualView === 'newCustomerAndUpdate'">
     </customer-register>
+
     <operation-register :customers="customers" id="customerOperation" @new-credit="onNewCredit" @new-payment="onNewPayment" v-show="actualView === 'newOperation'"></operation-register>
     
     <waiting-modal v-bind:visible="waiting"></waiting-modal>
