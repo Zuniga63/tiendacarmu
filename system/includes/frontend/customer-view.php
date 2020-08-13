@@ -106,13 +106,13 @@
     </header>
     <!-- This module is used to register new customer or update customer data -->
     <!-- this module emit two events (update-customer and new-customer) -->
-    <customer-register :customers="customers" id="customerReg" @update-customer="onUpdateCustomer" @new-customer="onNewCustomer" v-show="actualView === 'newCustomerAndUpdate'">
+    <customer-register id="customerReg" v-show="actualView === 'newCustomerAndUpdate'">
     </customer-register>
 
-    <operation-register :customers="customers" id="customerOperation" @new-credit="onNewCredit" @new-payment="onNewPayment" v-show="actualView === 'newOperation'"></operation-register>
+    <operation-register id="customerOperation" v-show="actualView === 'newOperation'"></operation-register>
     
-    <waiting-modal v-bind:visible="waiting"></waiting-modal>
-    <process-result v-bind:process-result="processResult" @hidden-modal="processResult.visible = false"></process-result>
+    <waiting-modal></waiting-modal>
+    <process-result></process-result>
   </div>
 
   <!-- Librería de Chart.js -->
