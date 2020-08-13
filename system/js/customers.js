@@ -408,9 +408,11 @@ class Payment extends Transaction {
  * una respuestas. Requiere que se le pasa la propiedad visible
  */
 Vue.component("waiting-modal", {
-  props: ["visible"],
-  template: `
-  <div :class="['modal', {show:visible}]">
+  computed: {
+    ...Vuex.mapState(['waiting']),
+  },
+  template: /*html*/`
+  <div :class="['modal', {show:waiting}]">
     <div class="modal__content" style="padding-top: 140px;">
       <div class="loader"></div>
         <p class="modal__info" style="text-align: center;">Procesando Solicitud</p>
@@ -427,15 +429,20 @@ Vue.component("waiting-modal", {
  * pueda ser cambiado desde la raiz
  */
 Vue.component("process-result", {
-  props: ["processResult"],
-  template: `
+  computed: {
+    ...Vuex.mapState(['processResult'])
+  },
+  methods: {
+    ...Vuex.mapMutations(['hiddenRequest'])
+  },
+  template:/*html*/ `
   <div
     class="modal"
     :class="{show: processResult.visible}"
-    @click.self="$emit('hidden-modal')"
+    @click.self="hiddenRequest"
   >
     <div class="modal__content">
-      <div class="modal__close" @click="$emit('hidden-modal')">
+      <div class="modal__close" @click="hiddenRequest">
         <i class="fas fa-times-circle"></i>
       </div>
 
@@ -454,7 +461,7 @@ Vue.component("process-result", {
  * para agregar nuevos clientes o actualizar los datos
  */
 Vue.component("customer-register", {
-  props: ["customers", "id"],
+  props: ["id"],
   data: function () {
     return {
       customerSelected: undefined,
@@ -469,6 +476,7 @@ Vue.component("customer-register", {
     };
   },
   computed: {
+    ...Vuex.mapState(['customers', 'eventHub']),
     inactiveCustomers() {
       const result = this.customers.filter((c) => c.inactive && !c.archived);
       return result;
@@ -507,6 +515,7 @@ Vue.component("customer-register", {
     },
   },
   methods: {
+    ...Vuex.mapActions(['updateCustomer', 'newCustomer']),
     validateFirstName() {
       let firstName = this.firstName;
       if (firstName.value && typeof firstName.value === "string") {
@@ -618,11 +627,10 @@ Vue.component("customer-register", {
         // this.waiting = true;
         if (this.updatingCustomer) {
           body.append("customer_id", this.customerSelected.id);
-          this.$emit("update-customer", body);
+          this.updateCustomer(body);
         } else {
-          this.$emit('new-customer', body);
+          this.newCustomer(body);
         }
-
       } //Fin de if
     }, //Fin del metodo
     /**
@@ -653,10 +661,10 @@ Vue.component("customer-register", {
     },
   }, //Fin de methods
   mounted() {
-    this.$root.$on("customer-was-updated", this.discardUpdate);
-    this.$root.$on("customer-was-created", this.resetForm);
+    this.eventHub.$on("customer-was-updated", this.discardUpdate);
+    this.eventHub.$on("customer-was-created", this.discardUpdate);
   },
-  template: `
+  template: /*html*/`
   <div class="view" :id="id">
     <section class="view__section">
       <div class="container">
@@ -945,7 +953,6 @@ Vue.component("customer-card", {
 });
 
 Vue.component("search-box", {
-  props: ["customers"],
   data: function () {
     return {
       customerSelected: undefined,
@@ -960,6 +967,7 @@ Vue.component("search-box", {
     },
   }, //Fin de methods
   computed: {
+    ...Vuex.mapState(['customers']),
     customerResult() {
       let result = [];
       if (this.customerName) {
@@ -1014,6 +1022,7 @@ Vue.component("new-operation-form", {
     };
   }, //Fin de data
   methods: {
+    ...Vuex.mapActions(['newPayment', 'newCredit']),
     validateDate() {
       let isOk = false;
       let value = this.date.value;
@@ -1150,10 +1159,10 @@ Vue.component("new-operation-form", {
 
         switch (this.operationType) {
           case "credit":
-            this.$emit("new-credit", data);
+            this.newCredit(data);
             break;
           case "payment":
-            this.$emit("new-payment", data);
+            this.newPayment(data);
             break;
           default:
             break;
@@ -1170,6 +1179,7 @@ Vue.component("new-operation-form", {
     },
   }, //Fin de methods
   computed: {
+    ...Vuex.mapState(['eventHub']),
     formTitle() {
       let title = "";
       switch (this.operationType) {
@@ -1235,8 +1245,9 @@ Vue.component("new-operation-form", {
     },
   }, //Fin de computed,
   mounted() {
-    this.$root.$on("credit-was-created", this.resetFields);
-    this.$root.$on("payment-was-created", this.resetFields);
+    // this.$root.$on("credit-was-created", this.resetFields);
+    this.eventHub.$on("credit-was-created", this.resetFields);
+    this.eventHub.$on("payment-was-created", this.resetFields);
   },
   template: `
   <form class="form form--bg-light" @submit.prevent="onSubmit" :id="id + 'Form'">
@@ -1589,7 +1600,7 @@ Vue.component("customer-history", {
     },
   }, //Fin de computed
   template: `
-  <div>
+  <div class="m-b-1">
     <div class="history__header">
       <h2 class="history__title">Historial</h2>
     </div>
@@ -1627,7 +1638,7 @@ Vue.component("customer-history", {
 });
 
 Vue.component("operation-register", {
-  props: ["customers", "id"],
+  props: ["id"],
   data: function () {
     return {
       customerSelected: undefined,
@@ -1640,8 +1651,10 @@ Vue.component("operation-register", {
       this.customerSelected = customer;
     },
   },
-  computed: {},
-  template: `
+  computed: {
+    ...Vuex.mapState(['customers']),
+  },
+  template: /*html*/`
   <div class="view" :id="id">
     <section class="view__section">
       <div class="container">
@@ -1650,7 +1663,7 @@ Vue.component("operation-register", {
           <p class="container__subtitle">Registrar Operaciones</p>
         </div>
         <!-- Modulo para la busqueda de cliente -->
-        <search-box :customers="customers" @customer-selected="onCustomerSelected"></search-box>
+        <search-box @customer-selected="onCustomerSelected"></search-box>
         <!-- FORMULARIO DE REGISTRO O ACTUALIZACIÓN -->
         
         <transition name="fade">
@@ -1663,90 +1676,157 @@ Vue.component("operation-register", {
           >
           </new-operation-form>
         </transition>
+        
+        <!-- Historial del cliente -->
+        <transition name="fade">
+          <customer-history :customer="customerSelected" v-if="customerSelected" class="view-desktop-colapse"></customer-history>
+        </transition>
 
         <!-- Contenedor con las tarjetas de creditos -->
         <transition name="fade">
           <customer-credits :customer="customerSelected" :id="id + 'creditHistoryMovil'" v-if="customerSelected" class="view-desktop-colapse"></customer-credits>
         </transition>
         
-        <!-- Historial del cliente -->
-        <transition name="fade">
-          <customer-history :customer="customerSelected" v-if="customerSelected" class="view-desktop-colapse"></customer-history>
-        </transition>
       </div>
     </section>
     <aside class="view__sidebar">
       <!-- Contenedor con las tarjetas de creditos -->
-      <customer-credits :customer="customerSelected" :id="id + 'creditHistoryDesktop'"></customer-credits>
-
       <customer-history :customer="customerSelected"></customer-history>
+      <customer-credits :customer="customerSelected" :id="id + 'creditHistoryDesktop'"></customer-credits>
     </aside>
-    <waiting-modal v-bind:visible="waiting"></waiting-modal>
-    <process-result v-bind:process-result="processResult" @hidden-modal="processResult.visible = false"></process-result>
   </div>`,
 });
 
 //---------------------------------------------
 //  RAIZ DE LA APLICACION
 //---------------------------------------------
-const app = new Vue({
-  el: "#app",
-  data: {
+const store = new Vuex.Store({
+  state: {
     customers: [],
-    // propiedades temporales
     waiting: false,
     processResult: new RequesProcess(),
-    actualView: "newOperation",
+    eventHub: new Vue(),
   },
-  methods: {
-    /**
-     * Este metodo se ejecuta cuando se recibe el evento emitido por el modulo
-     * para crear y actualizar clientes y se encarga de actualizar los
-     * datos del cliente que el servidor ya procesó
-     * @param {object} data a object FormData to make the request to server
-     */
-    async onUpdateCustomer(formData) {
-      this.waiting = true;
+  mutations: {
+    updateCustomer(state, data) {
+      if (state.customers.some((c) => c.id === data.id)) {
+        let customer = state.customers.filter((c) => c.id === data.id)[0];
+        customer.update(data);
+      }
+    },
+    updateCustomerList(state, data) {
+      this.commit('waitingRequest', true);
+      if (data.sessionActive) {
+        state.customers = [];
+        data.customers.forEach((c) => {
+          const customer = new Customer(
+            c.id,
+            c.firstName,
+            c.lastName,
+            c.nit,
+            c.phone,
+            c.email,
+            c.points
+          );
+          //Ahora agrego los creditos del cliente
+          c.credits.forEach((credit) => {
+            customer.addCredit(
+              credit.id,
+              credit.creditDate,
+              credit.description,
+              credit.amount,
+              credit.balance
+            );
+          });
+          //Se agregan los abonos
+          c.payments.forEach((payment) => {
+            customer.addPayment(
+              payment.id,
+              payment.paymentDate,
+              payment.amount,
+              payment.cash
+            );
+          });
+
+          customer.defineState();
+          state.customers.push(customer);
+        });
+      } else {
+        location.reload();
+      }
+      this.commit('waitingRequest', false);
+    },
+    waitingRequest(state, value) {
+      state.waiting = value;
+    },
+    requestResult(state, {isSuccess, message}) {
+      console.log(isSuccess);
+      if (isSuccess) {
+        state.processResult.isSuccess(message);
+      } else {
+        state.processResult.isDanger(message);
+      }
+    },
+    hiddenRequest(state) {
+      state.processResult.visible = false;
+    },
+    emitEvent(state, eventName){
+      state.eventHub.$emit(eventName);
+    }
+  },
+  actions: {
+    async getCustomers({ commit }) {
+      commit('waitingRequest', true);
+      try {
+        const res = await fetch("./api/all_customers.php");
+        const data = await res.json();;
+        commit('waitingRequest', true);
+        commit('updateCustomerList', data);
+      } catch (error) {
+        console.log(error);
+        commit('waitingRequest', true);
+        commit('requestResult', false, "No se pudo recuperar los datos de los clientes");
+      }
+    },
+    async updateCustomer({commit}, formData) {
+      commit('waitingRequest', true);
+      isSuccess = false;
+      let eventName = 'customer-was-updated';
+      message = "";
       try {
         const res = await fetch("./api/update_customer.php", {
           method: "POST",
           body: formData,
         });
         const data = await res.json();
-
+        console.log(data);
         if (data.sessionActive) {
           if (data.request) {
             //Customer data is updated
-            if (this.customers.some((c) => c.id === data.customer.id)) {
-              let customer = this.customers.filter((c) => c.id === data.customer.id)[0];
-              customer.update(data.customer);
-            }
-
-            this.waiting = false;
-            this.processResult.isSuccess("Cliente actualizado");
-            this.$root.$emit('customer-was-updated');
+            commit('updateCustomer', data.customer);
+            isSuccess = true;
+            message = "Cliente actualizado";
+            commit('emitEvent', eventName)
           } else {
-            this.waiting = false;
-            this.processResult.visible = true;
-            this.processResult.hasError = true;
-            this.processResult.message = "No se pudo actualizar";
+            message = "No se pudo actualizar"
           }
         } else {
           location.reload();
         }
       } catch (error) {
         console.log(error);
-        this.waiting = false;
-        this.processResult.isDanger("No se pudo hacer la peticion");
+        message = "Error al conectar!";
       }
-
+      commit('waitingRequest', false);
+      commit('requestResult', {isSuccess, message});
+      // return false;
     },
-    /**
-     * Cuando se recibe el evento de customer-update se encarga de vomver a peidor los datos
-     * del cliente al servidor.
-     */
-    async onNewCustomer(formData) {
-      this.waiting = true;
+    async newCustomer({commit, dispatch}, formData) {
+      commit('waitingRequest', true);
+      isSuccess = false;
+      message = "";
+      let eventName = "customer-was-created";
+
       try {
         const res = await fetch("./api/new_customer.php", {
           method: "POST",
@@ -1756,54 +1836,28 @@ const app = new Vue({
 
         if (data.sessionActive) {
           if (data.request) {
-            await this.updateModel();
-            this.waiting = false;
-            this.processResult.isSuccess('Cliente agregado');
-            this.$root.$emit('customer-was-created');
+            await dispatch('getCustomers');
+            isSuccess = true;
+            message = "Cliente agregado";
+            commit('emitEvent', eventName);
           } else {
-            this.waiting = false;
-            this.processResult.isDanger('No se pudo crear el cliente');
+            message = "No se pudo agregar el cliente";
           }
         } else {
           location.reload();
         }
       } catch (error) {
         console.log(error);
-        this.waiting = false;
-        this.processResult.isDanger("No se pudo hacer la peticion");
+        message = "No se pudo hacer la petición";
       }
-
-
-      
+      commit('waitingRequest', false);
+      commit('requestResult', {isSuccess, message});
     },
-    async onNewCredit(formData) {
-      this.waiting = true;
-      try {
-        const res = await fetch("./api/new_credit.php", {
-          method: "POST",
-          body: formData,
-        });
-        const data = await res.json();
-        if (data.sessionActive) {
-          if (data.request) {
-            this.updateCustomer(data.customer);
-            this.waiting = false;
-            this.processResult.isSuccess("Credito registrado con exito");
-            this.$root.$emit("credit-was-created");
-          } else {
-            this.waiting = false;
-            this.processResult.isDanger("No se pudo registrar el credito");
-          }
-        } else {
-          location.reload();
-        }
-      } catch (error) {
-        this.waiting = false;
-        console.log(error);
-      }
-    },
-    async onNewPayment(formData) {
-      this.waiting = true;
+    async newPayment({commit}, formData) {
+      commit('waitingRequest', true);
+      let isSuccess = false;
+      let message = "";
+      let eventName = "payment-was-created";
       try {
         const res = await fetch("./api/new_payment.php", {
           method: "POST",
@@ -1813,74 +1867,67 @@ const app = new Vue({
 
         if (data.sessionActive) {
           if (data.request) {
-            this.updateCustomer(data.customer);
-            this.waiting = false;
-            this.processResult.isSuccess("Abono registrado con exito");
-            this.$root.$emit("payment-was-created");
+            commit('updateCustomer', data.customer);
+            commit('emitEvent', eventName);
+            message = "Abono registrado con exito";
+            isSuccess = true;
           } else {
-            this.waiting = false;
-            this.processResult.isDanger("No se pudo registrar el abono");
+            message = "No se pudo registrar el abono";
           }
         } else {
           location.reload();
         }
       } catch (error) {
-        this.waiting = false;
+        message = "La petición falló";
         console.log(error);
       }
+      commit('waitingRequest', false);
+      commit('requestResult', {isSuccess, message});
     },
-    /**
-     * Solicita al servidor la informacion de todos los clientes
-     */
-    async updateModel() {
+    async newCredit({commit}, formData){
+      commit('waitingRequest', true);
+      let isSuccess = false;
+      let message = "";
+      let eventName = "credit-was-created";
       try {
-        const res = await fetch("./api/all_customers.php");
+        const res = await fetch("./api/new_credit.php", {
+          method: "POST",
+          body: formData,
+        });
         const data = await res.json();
         if (data.sessionActive) {
-          this.customers = [];
-          data.customers.forEach((c) => {
-            const customer = new Customer(
-              c.id,
-              c.firstName,
-              c.lastName,
-              c.nit,
-              c.phone,
-              c.email,
-              c.points
-            );
-            //Ahora agrego los creditos del cliente
-            c.credits.forEach((credit) => {
-              customer.addCredit(
-                credit.id,
-                credit.creditDate,
-                credit.description,
-                credit.amount,
-                credit.balance
-              );
-            });
-            //Se agregan los abonos
-            c.payments.forEach((payment) => {
-              customer.addPayment(
-                payment.id,
-                payment.paymentDate,
-                payment.amount,
-                payment.cash
-              );
-            });
-
-            customer.defineState();
-            this.customers.push(customer);
-          });
+          if (data.request) {
+            commit('updateCustomer', data.customer);
+            commit('emitEvent', eventName);
+            message = "Credito registrado con exito";
+            isSuccess = true;
+          } else {
+            message = "No se pudo registrar el credito";
+          }
         } else {
           location.reload();
         }
       } catch (error) {
+        message = "La petición falló";
         console.log(error);
       }
-    }, //Fin del metodo
+      commit('waitingRequest', false);
+      commit('requestResult', {isSuccess, message});
+    },
+  }
+})
+
+const app = new Vue({
+  el: "#app",
+  store,
+  data: {
+    actualView: "newOperation",
+  },
+  methods: {
+    ...Vuex.mapActions(['getCustomers']),
   }, //Fin de methods
   computed: {}, //Fin de compute
   created() {
-    this.updateModel();
+    this.getCustomers();
   }, //Fin de create
 });

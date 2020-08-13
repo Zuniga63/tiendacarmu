@@ -14,6 +14,10 @@
   <!-- SE CARGAN LOS ESTILOS GENERALES -->
   <link rel="stylesheet" href=<?= "../css/normalize.css?v=" . VERSION ?> />
   <link rel="stylesheet" href=<?= "../css/main.css?v=" . VERSION ?> />
+  <!-- Librería de Vue.js -->
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <!-- Librería de Vuex -->
+  <script src="https://unpkg.com/vuex@3.5.1/dist/vuex.js"></script>
 </head>
 
 <body class="customers-view">
@@ -102,22 +106,20 @@
     </header>
     <!-- This module is used to register new customer or update customer data -->
     <!-- this module emit two events (update-customer and new-customer) -->
-    <customer-register :customers="customers" id="customerReg" @update-customer="onUpdateCustomer" @new-customer="onNewCustomer" v-show="actualView === 'newCustomerAndUpdate'">
+    <customer-register id="customerReg" v-show="actualView === 'newCustomerAndUpdate'">
     </customer-register>
 
-    <operation-register :customers="customers" id="customerOperation" @new-credit="onNewCredit" @new-payment="onNewPayment" v-show="actualView === 'newOperation'"></operation-register>
+    <operation-register id="customerOperation" v-show="actualView === 'newOperation'"></operation-register>
     
-    <waiting-modal v-bind:visible="waiting"></waiting-modal>
-    <process-result v-bind:process-result="processResult" @hidden-modal="processResult.visible = false"></process-result>
+    <waiting-modal></waiting-modal>
+    <process-result></process-result>
   </div>
 
   <!-- Librería de Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
   <!-- Libería de Moment.js -->
   <script src="../js/moment.js"></script>
-  <!-- Librería de Vue.js -->
-  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-
+  
   <!-- Scripts Personalizados -->
   <script src=<?= "../js/app.js?v=" . VERSION ?>></script>
   <script src=<?= "./js/customers.js?v=" . VERSION ?>></script>

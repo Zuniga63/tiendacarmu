@@ -51,6 +51,7 @@
   --z-tooltip: 10;
   --z-fixed: 100;
   --z-modal: 1000;
+  --z-preload:1100;
 }
 
 /********************************************************************************************/
@@ -103,6 +104,10 @@ body {
 
 .m-b {
   margin-bottom: 0.5em;
+}
+
+.m-b-1{
+  margin-bottom: 1em;
 }
 
 .container-flex {
@@ -247,7 +252,7 @@ body {
 .preloader {
   display: none;
   position: fixed;
-  z-index: var(--z-modal);
+  z-index: var(--z-preload);
   /* padding-top: 100px; */
   left: 0;
   top: 0;
