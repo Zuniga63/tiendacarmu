@@ -14,6 +14,10 @@
   <!-- SE CARGAN LOS ESTILOS GENERALES -->
   <link rel="stylesheet" href=<?= "../css/normalize.css?v=" . VERSION ?> />
   <link rel="stylesheet" href=<?= "../css/main.css?v=" . VERSION ?> />
+  <!-- Librería de Vue.js -->
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <!-- Librería de Vuex -->
+  <script src="https://unpkg.com/vuex@3.5.1/dist/vuex.js"></script>
 </head>
 
 <body class="customers-view">
@@ -115,9 +119,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
   <!-- Libería de Moment.js -->
   <script src="../js/moment.js"></script>
-  <!-- Librería de Vue.js -->
-  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-
+  
   <!-- Scripts Personalizados -->
   <script src=<?= "../js/app.js?v=" . VERSION ?>></script>
   <script src=<?= "./js/customers.js?v=" . VERSION ?>></script>

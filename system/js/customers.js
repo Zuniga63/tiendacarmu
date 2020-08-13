@@ -1689,8 +1689,162 @@ Vue.component("operation-register", {
 //---------------------------------------------
 //  RAIZ DE LA APLICACION
 //---------------------------------------------
+const store = new Vuex.Store({
+  state: {
+    customers: [],
+    waiting: false,
+    processResult: new RequesProcess(),
+  },
+  mutations: {
+    async getCustomers(state) {
+      try {
+        const res = await fetch("./api/all_customers.php");
+        const data = await res.json();
+        if (data.sessionActive) {
+          state.customers = [];
+          data.customers.forEach((c) => {
+            const customer = new Customer(
+              c.id,
+              c.firstName,
+              c.lastName,
+              c.nit,
+              c.phone,
+              c.email,
+              c.points
+            );
+            //Ahora agrego los creditos del cliente
+            c.credits.forEach((credit) => {
+              customer.addCredit(
+                credit.id,
+                credit.creditDate,
+                credit.description,
+                credit.amount,
+                credit.balance
+              );
+            });
+            //Se agregan los abonos
+            c.payments.forEach((payment) => {
+              customer.addPayment(
+                payment.id,
+                payment.paymentDate,
+                payment.amount,
+                payment.cash
+              );
+            });
+
+            customer.defineState();
+            state.customers.push(customer);
+          });
+        } else {
+          location.reload();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async updateCustomer(state, formData) {
+      state.waiting = true;
+      try {
+        const res = await fetch("./api/update_customer.php", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+
+        if (data.sessionActive) {
+          if (data.request) {
+            //Customer data is updated
+            if (state.customers.some((c) => c.id === data.customer.id)) {
+              let customer = this.customers.filter((c) => c.id === data.customer.id)[0];
+              customer.update(data.customer);
+            }
+
+            state.waiting = false;
+            state.processResult.isSuccess("Cliente actualizado");
+            // this.$root.$emit('customer-was-updated');
+            return true;
+          } else {
+            state.waiting = false;
+            state.processResult.isDanger('No se pudo actualizar')
+          }
+        } else {
+          location.reload();
+        }
+      } catch (error) {
+        console.log(error);
+        state.waiting = false;
+        state.processResult.isDanger("No se pudo hacer la peticion");
+      }
+      return false;
+    },
+    async newCustomer(state, formData){
+      state.waiting = true;
+      try {
+        const res = await fetch("./api/new_customer.php", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+
+        if (data.sessionActive) {
+          if (data.request) {
+            await this.updateModel();
+            state.waiting = false;
+            state.processResult.isSuccess('Cliente agregado');
+            // this.$root.$emit('customer-was-created');
+            return true;
+          } else {
+            state.waiting = false;
+            state.processResult.isDanger('No se pudo crear el cliente');
+          }
+        } else {
+          location.reload();
+        }
+      } catch (error) {
+        console.log(error);
+        state.waiting = false;
+        state.processResult.isDanger("No se pudo hacer la peticion");
+      }
+
+      return false;
+    },
+    async newPayment(state, formData){
+      state.waiting = true;
+      try {
+        const res = await fetch("./api/new_payment.php", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+
+        if (data.sessionActive) {
+          if (data.request) {
+            this.updateCustomer(data.customer);
+            this.waiting = false;
+            this.processResult.isSuccess("Abono registrado con exito");
+            this.$root.$emit("payment-was-created");
+          } else {
+            this.waiting = false;
+            this.processResult.isDanger("No se pudo registrar el abono");
+          }
+        } else {
+          location.reload();
+        }
+      } catch (error) {
+        this.waiting = false;
+        console.log(error);
+      }
+    },
+
+
+  },
+  actions: {
+
+  }
+})
 const app = new Vue({
   el: "#app",
+  store,
   data: {
     customers: [],
     // propiedades temporales
@@ -1772,9 +1926,6 @@ const app = new Vue({
         this.waiting = false;
         this.processResult.isDanger("No se pudo hacer la peticion");
       }
-
-
-      
     },
     async onNewCredit(formData) {
       this.waiting = true;
