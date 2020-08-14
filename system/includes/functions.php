@@ -843,6 +843,7 @@ function get_all_customers()
 			$nit = htmlspecialchars_decode($row['nit'] === 'NULL' ? '' : $row['nit']);
 			$phone = htmlspecialchars_decode($row['phone'] === 'NULL' ? '' : $row['phone']);
 			$email = htmlspecialchars_decode($row['email'] === 'NULL' ? '' : $row['email']);
+			$archived = $row['archived']  === '1' ? TRUE : FALSE;
 			$balance = 0;
 
 			//Para cada cliente se recuperan los creditos y los abonos
@@ -893,7 +894,8 @@ function get_all_customers()
 				'balance' => $balance,
 				'credits' => $credits['credits'],
 				'payments' => $payments['payments'],
-				'points' => 0
+				'points' => 0,
+				'archived' => $archived,
 			];
 		}
 	} catch (PDOException $e) {
@@ -927,6 +929,7 @@ function get_customer($customer_id)
 				$phone = htmlspecialchars_decode($row['phone'] === 'NULL' ? '' : $row['phone']);
 				$email = htmlspecialchars_decode($row['email'] === 'NULL' ? '' : $row['email']);
 				$balance = 0;
+				$archived = $row['archived']  === '1' ? TRUE : FALSE;
 
 				//Se recuperan los creditos y los abono **POSIBLE CANDIDATO PARA ENCAPSULACION
 				$credits = get_customer_credits($customer_id);
@@ -968,7 +971,8 @@ function get_customer($customer_id)
 					'balance' => $balance,
 					'credits' => $credits['credits'],
 					'payments' => $payments['payments'],
-					'points' => 0
+					'points' => 0,
+					'archived' => $archived,
 				];
 			} //Fin de while
 		} else {
@@ -1079,7 +1083,7 @@ function get_customer_payments($customer_id)
  * @param {float} $amount El valor total de la deuda.
  * @return {bool} True si fue satisfactorio
  */
-function create_new_credit($customer_id, $description, $amount, $date='')
+function create_new_credit($customer_id, $description, $amount, $date = '')
 {
 	$result = false;
 
@@ -1091,14 +1095,14 @@ function create_new_credit($customer_id, $description, $amount, $date='')
 		if (!empty($description) && $amount > 0) {
 			$query = "";
 			$date_is_ok = false;
-			if(!empty($date) && validate_date($date)){
+			if (!empty($date) && validate_date($date)) {
 				$date_is_ok = true;
 				$query = "INSERT INTO customer_credit(customer_id, credit_date, description, amount) ";
 				$query .= "VALUES (:customer_id, :credit_date, :description, :amount)";
-			}else{
+			} else {
 				$query = "INSERT INTO customer_credit(customer_id, description, amount) VALUES (:customer_id, :description, :amount)";
 			}
-			
+
 			try {
 				$conn = get_connection();
 				$conn->beginTransaction();
@@ -1109,7 +1113,7 @@ function create_new_credit($customer_id, $description, $amount, $date='')
 					$stmt->bindParam(':customer_id', $customer_id, PDO::PARAM_INT);
 					$stmt->bindParam(':description', $description, PDO::PARAM_STR);
 					$stmt->bindParam(':amount', $amount, PDo::PARAM_STR);
-					if($date_is_ok){
+					if ($date_is_ok) {
 						$stmt->bindParam(':credit_date', $date, PDO::PARAM_STR);
 					}
 					$stmt->execute();
@@ -1150,7 +1154,7 @@ function create_new_credit($customer_id, $description, $amount, $date='')
  * @param {bool} $cash True cuando la transaccion fu en efectivo
  * @param {float} $amount El valor del abono
  */
-function create_new_payment($customer_id, $cash, $amount, $date="")
+function create_new_payment($customer_id, $cash, $amount, $date = "")
 {
 	$result = false;
 
@@ -1189,7 +1193,7 @@ function create_new_payment($customer_id, $cash, $amount, $date="")
 			if ($customer_balance > 0 && $amount <= $customer_balance) {
 				$query = "INSERT INTO customer_payment(customer_id, cash, amount) VALUES (:customer_id, :cash, :amount)";
 				$date_is_ok = false;
-				if(!empty($date) && validate_date($date)){
+				if (!empty($date) && validate_date($date)) {
 					$date_is_ok = true;
 					$query = "INSERT INTO customer_payment(customer_id, payment_date, cash, amount) VALUES (:customer_id, :payment_date, :cash, :amount)";
 				}
@@ -1197,7 +1201,7 @@ function create_new_payment($customer_id, $cash, $amount, $date="")
 				$stmt->bindParam(':customer_id', $customer_id, PDO::PARAM_INT);
 				$stmt->bindParam(':cash', $cash, PDO::PARAM_BOOL);
 				$stmt->bindParam(':amount', $amount, PDO::PARAM_STR);
-				if($date_is_ok){
+				if ($date_is_ok) {
 					$stmt->bindParam(':payment_date', $date, PDO::PARAM_STR);
 				}
 				$stmt->execute();
@@ -1224,6 +1228,41 @@ function create_new_payment($customer_id, $cash, $amount, $date="")
 
 	return $result;
 } //Fin del metodo
+
+function archived_unarchived_customer($customer_id, $archived)
+{
+	$result = false;
+	$message = "";
+	if (isset($customer_id, $archived) && is_numeric($customer_id)) {
+		$archived = $archived === 'true' ? 1 : 0;
+		$customer_id = intval($customer_id);
+		try {
+			//En primer lugar trato de recuperar los datos del cliente
+			$customer = get_customer($customer_id);
+			if ($customer) {
+				$query = "UPDATE customer SET archived = :archived WHERE customer_id = :customer_id";
+				$conn = get_connection();
+				$stmt = $conn->prepare($query);
+				if ($stmt) {
+					$stmt->bindParam(':archives', $archived, PDO::PARAM_BOOL);
+					$stmt->bindParam(':customer_id', $archived, PDO::PARAM_INT);
+					$stmt->execute();
+					$result = true;
+				} else {
+					$message = "La sentencia no se preparó al tratar de archivar el cliente";
+					write_error($message);
+				}
+			} else {
+				$message = "El cliente que se quiere archivar no existe";
+				write_error($message);
+			}
+		} catch (PDOException $e) {
+			$message = "Error al intentar archivar el cliente: {$e->getMessage()}";
+			write_error($message);
+		}
+		return $result;
+	}
+}
 
 function get_credit_cash_flow_report()
 {
@@ -1438,9 +1477,9 @@ function create_new_sale($moment, $sale_date, $description, $amount, $category_i
 	$query = '';
 
 	if (!empty($description) && !empty($amount) && is_numeric($amount) && is_numeric($category_id) && !empty($moment)) {
-		if($moment === 'now'){
+		if ($moment === 'now') {
 			$query = "INSERT INTO sale(description, amount) VALUES (:description, :amount)";
-		}else{
+		} else {
 			$query = "INSERT INTO sale(sale_date, description, amount) VALUES (:sale_date, :description, :amount)";
 		}
 
@@ -1456,7 +1495,7 @@ function create_new_sale($moment, $sale_date, $description, $amount, $category_i
 			if ($stmt) {
 				$stmt->bindParam(':description', $description, PDO::PARAM_STR);
 				$stmt->bindParam(':amount', $amount, PDO::PARAM_STR);
-				if($moment !== 'now'){
+				if ($moment !== 'now') {
 					$stmt->bindParam(':sale_date', $sale_date, PDO::PARAM_STR);
 				}
 
@@ -1518,7 +1557,7 @@ function get_category_sales()
 				$saleCount++;
 			}
 
-			if($saleCount > 0){
+			if ($saleCount > 0) {
 				$averageSale = $totalAmount / $saleCount;
 			}
 
@@ -1572,7 +1611,7 @@ function get_sales()
 	try {
 		$conn = get_connection();
 		$stmt = $conn->query("SELECT * FROM sale ORDER BY sale_date DESC");
-		while($row = $stmt->fetch()){
+		while ($row = $stmt->fetch()) {
 			$sale_id = intval($row['sale_id']);
 			$date = $row['sale_date'];
 			$description = htmlspecialchars_decode($row['description']);
@@ -1626,9 +1665,10 @@ function go_to_page($page)
 	}
 }
 
-function validate_date($date){
+function validate_date($date)
+{
 	$values = explode('-', $date);
-	if(3 === count($values) && checkdate($values[1], $values[2], $values[0])){
+	if (3 === count($values) && checkdate($values[1], $values[2], $values[0])) {
 		return true;
 	}
 
