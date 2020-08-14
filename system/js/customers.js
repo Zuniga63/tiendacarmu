@@ -495,7 +495,14 @@ Vue.component("customer-list", {
     }
   },
   methods:{
+    ...Vuex.mapActions(['archiveUnarchiveCustomer']),
     formatCurrency: formatCurrencyLite,
+    onArchivedUnarchiveCustomer(customer){
+      let formData = new FormData();
+      formData.append('customer_id', customer.id);
+      formData.append('archive', !customer.archived);
+      this.archiveUnarchiveCustomer(formData);
+    }
   },
   template: /*html*/
     `
@@ -561,7 +568,7 @@ Vue.component("customer-list", {
               <td class="table__data table--20 text-center" @click.stop="">
                 <div class="table__data--actions">
                   <a class="table__data--actions__link" @click="$emit('customer-selected', customer)" title="Editar"><i class="fas fa-user-edit text-success"></i></a>
-                  <a class="table__data--actions__link">
+                  <a class="table__data--actions__link" @click="onArchivedUnarchiveCustomer(customer)">
                     <i 
                       class="fas fa-archive text-secundary"
                       :class="{'fa-folder': !customer.archived, 'fa-folder-open':customer.archived}" 
@@ -1833,7 +1840,8 @@ const store = new Vuex.Store({
             c.nit,
             c.phone,
             c.email,
-            c.points
+            c.points,
+            c.archived
           );
           //Ahora agrego los creditos del cliente
           c.credits.forEach((credit) => {
@@ -1867,7 +1875,6 @@ const store = new Vuex.Store({
       state.waiting = value;
     },
     requestResult(state, { isSuccess, message }) {
-      console.log(isSuccess);
       if (isSuccess) {
         state.processResult.isSuccess(message);
       } else {
@@ -1879,6 +1886,20 @@ const store = new Vuex.Store({
     },
     emitEvent(state, eventName) {
       state.eventHub.$emit(eventName);
+    },
+    archiveCustomer(state, customerId){
+      let customerExist = state.customers.some(c => c.id === customerId);
+      if(customerExist){
+        const customer = state.customers.filter(c => c.id === customerId)[0];
+        customer.archived = true;
+      }
+    },
+    unarchiveCustomer(state, customerId){
+      let customerExist = state.customers.some(c => c.id === customerId);
+      if(customerExist){
+        const customer = state.customers.filter(c => c.id === customerId)[0];
+        customer.archived = false;
+      }
     }
   },
   actions: {
@@ -2021,6 +2042,44 @@ const store = new Vuex.Store({
       commit('waitingRequest', false);
       commit('requestResult', { isSuccess, message });
     },
+    async archiveUnarchiveCustomer({commit}, formData){
+      commit('waitingRequest', true);
+      let isSuccess = false;
+      let message = "";
+      let customerId = parseInt(formData.get('customer_id'));
+      try {
+        const res = await fetch('./api/customers/archived_unarchived_customer.php', {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await res.json();
+        if(data.sessionActive){
+          if(data.request){
+            isSuccess = true;
+            if(formData.get('archive')==='true'){
+              commit('archiveCustomer', customerId);
+              message = "Cliente archivado";
+            }else{
+              commit('unarchiveCustomer', customerId)
+              message = "Cliente desarchivado";
+            }
+          }else{
+            if(formData.get('archive')){
+              message = "No se pudo archivar el cliente";
+            }else{
+              message = "No se pudo desarchviar el cliente";
+            }
+          }
+        }else{
+          location.reload();
+        }
+      } catch (error) {
+        console.log(error);
+        message = "No se pudo hacer la petición";
+      }
+      commit('waitingRequest', false);
+      commit('requestResult', { isSuccess, message });
+    }
   }
 })
 

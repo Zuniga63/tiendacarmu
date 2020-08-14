@@ -2,14 +2,13 @@
 require '../../includes/functions.php';
 if (session_active()) {
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['customer_id'], $_POST['archived'])) {
+    if (isset($_POST['customer_id'], $_POST['archive'])) {
       $customer_id = htmlspecialchars($_POST['customer_id']);
-      $archived = htmlspecialchars($_POST['archived']);
-      $reques = archived_unarchived_customer($customer_id, $archived);
+      $archive = htmlspecialchars($_POST['archive']);
+      $request = archived_unarchived_customer($customer_id, $archive);
       $result = [
         'sessionActive' => true,
         'request' => $request,
-        'customer' => $customer
       ];
       echo json_encode($result);
     } else {

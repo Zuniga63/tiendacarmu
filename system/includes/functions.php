@@ -1229,12 +1229,12 @@ function create_new_payment($customer_id, $cash, $amount, $date = "")
 	return $result;
 } //Fin del metodo
 
-function archived_unarchived_customer($customer_id, $archived)
+function archived_unarchived_customer($customer_id, $archive)
 {
 	$result = false;
 	$message = "";
-	if (isset($customer_id, $archived) && is_numeric($customer_id)) {
-		$archived = $archived === 'true' ? 1 : 0;
+	if (isset($customer_id, $archive) && is_numeric($customer_id)) {
+		$archive = $archive === 'true' ? 1 : 0;
 		$customer_id = intval($customer_id);
 		try {
 			//En primer lugar trato de recuperar los datos del cliente
@@ -1244,8 +1244,8 @@ function archived_unarchived_customer($customer_id, $archived)
 				$conn = get_connection();
 				$stmt = $conn->prepare($query);
 				if ($stmt) {
-					$stmt->bindParam(':archives', $archived, PDO::PARAM_BOOL);
-					$stmt->bindParam(':customer_id', $archived, PDO::PARAM_INT);
+					$stmt->bindParam(':archived', $archive, PDO::PARAM_BOOL);
+					$stmt->bindParam(':customer_id', $customer_id, PDO::PARAM_INT);
 					$stmt->execute();
 					$result = true;
 				} else {
