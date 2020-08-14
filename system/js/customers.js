@@ -62,6 +62,7 @@ class RequesProcess {
     this.message = message;
   }
 }
+
 class WaitingModal {
   constructor() {
     this.visible = false;
@@ -100,6 +101,7 @@ class Customer {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
+    this.fullName = `${this.firstName} ${this.lastName}`;
     this.nit = nit;
     this.phone = phone;
     this.email = email;
@@ -157,6 +159,7 @@ class Customer {
     this.id = customerData.id;
     this.firstName = customerData.firstName;
     this.lastName = customerData.lastName;
+    this.fullName = `${this.firstName} ${this.lastName}`;
     this.nit = customerData.nit;
     this.phone = customerData.phone;
     this.email = customerData.email;
@@ -456,6 +459,131 @@ Vue.component("process-result", {
   `,
 });
 
+Vue.component("customer-list", {
+  props: ['id', 'customerSelected'],
+  data() {
+    return {
+      listName: "active",
+    }
+  },
+  computed: {
+    ...Vuex.mapState(['customers']),
+    ...Vuex.mapGetters(['inactiveCustomerList', 'activeCustomerList', 'archivedCustomerList']),
+    customerList() {
+      let list = [];
+      switch (this.listName) {
+        case 'active':
+          list = this.activeCustomerList;
+          break;
+        case 'inactive':
+          list = this.inactiveCustomerList;
+          break;
+        case 'archived':
+          list = this.archivedCustomerList;
+          break;
+      }
+
+      return list;
+    },
+    customerListBalance(){
+      let amount = 0;
+      this.customerList.forEach(c => {
+        amount += c.balance;
+      })
+
+      return amount;
+    }
+  },
+  methods:{
+    formatCurrency: formatCurrencyLite,
+  },
+  template: /*html*/
+    `
+  <div class="m-b-1">
+    <div class="form__group-flex m-b-1">
+      <div class="form__radio-group">
+        <input
+          type="radio"
+          value="active"
+          v-bind:id="id+'Active'"
+          v-model="listName"
+          class="form__radio"
+        />
+        <label v-bind:for="id+'Active'" class="form__radio">Clientes Act</label>
+      </div>
+
+      <div class="form__radio-group">
+        <input
+          type="radio"
+          value="inactive"
+          v-bind:id="id +'Inactive'"
+          v-model="listName"
+          class="form__radio"
+        />
+        <label v-bind:for="id +'Inactive'" class="form__radio">Clientes Inact</label>
+      </div>
+
+      <div class="form__radio-group">
+        <input
+          type="radio"
+          value="archived"
+          v-bind:id="id +'Archived'"
+          v-model="listName"
+          class="form__radio"
+        />
+        <label v-bind:for="id +'Archived'" class="form__radio">Clientes Arch</label>
+      </div>
+    </div>
+
+    <div class="history__header">
+      <h2 class="history__title">Listado de clientes</h2>
+    </div>
+    <div class="history__head">
+      <table class="table">
+        <thead>
+          <tr class="table__row-header">
+            <th class="table__header table--40">Nombres y Apellidos</th>
+            <th class="table__header table--20">Telefono</th>
+            <th class="table__header table--20">Saldo</th>
+            <th class="table__header table--20">Acción</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+    <div class="history__body scroll">
+      <table class="table">
+        <tbody class="table__body">
+          <template v-for="customer in customerList">
+            <tr class="table__row" :class = "{selected: customerSelected && customerSelected.id === customer.id}">
+              <td class="table__data table--40">{{customer.fullName}}</td>
+              <td class="table__data table--20">{{customer.phone}}</td>
+              <td class="table__data table--20 text-right">{{formatCurrency(customer.balance,0)}}</td>
+              <td class="table__data table--20 text-center" @click.stop="">
+                <div class="table__data--actions">
+                  <a class="table__data--actions__link" @click="$emit('customer-selected', customer)" title="Editar"><i class="fas fa-user-edit text-success"></i></a>
+                  <a class="table__data--actions__link">
+                    <i 
+                      class="fas fa-archive text-secundary"
+                      :class="{'fa-folder': !customer.archived, 'fa-folder-open':customer.archived}" 
+                      :title="customer.archived ? 'Desarchivar' : 'Archivar'"></i>
+                  </a>
+                  <a class="table__data--actions__link"><i class="fas fa-trash-alt text-danger" title="Eliminar"></i></a>
+                </div>
+              </td>
+            </tr>
+          </template v-for="customer">
+        </tbody>
+      </table>
+    </div>
+    <div class="history__footer">
+      <p class="history__info">Total Clientes: <span class="text-bold">{{customerList.length}}</span></p>
+      <p class="history__info">Importe: <span class="text-bold">{{formatCurrency(customerListBalance)}}</span></p>
+    </div>
+  </div>
+  `
+
+});
+
 /**
  * Componente no reutilizable de momento con la vista
  * para agregar nuevos clientes o actualizar los datos
@@ -611,7 +739,7 @@ Vue.component("customer-register", {
 
       return true;
     },
-    async onSubmit() {
+    onSubmit() {
       let firstNameVal = this.validateFirstName();
       let nitVal = this.validateNit();
       let phoneVal = this.validatePhone();
@@ -823,43 +951,10 @@ Vue.component("customer-register", {
       </div>
     </section>
     <aside class="view__sidebar">
-      <div class="history__header">
-        <h2 class="history__title">Listado de clientes</h2>
-      </div>
-      <div class="history__head">
-        <table class="table">
-          <thead>
-            <tr class="table__row-header">
-              <th class="table__header table--25">Nombres</th>
-              <th class="table__header table--25">Apellidos</th>
-              <th class="table__header table--25">Telefono</th>
-              <th class="table__header table--25">Archivado</th>
-            </tr>
-          </thead>
-        </table>
-      </div>
-      <div class="history__body scroll">
-        <table class="table">
-          <tbody class="table__body">
-            <template v-for="customer in customers">
-              <tr class="table__row" :class="{selected: customerSelected && customerSelected.id === customer.id}" :key="customer.id"  @click="loadCustomer(customer)">
-                <td class="table__data table--25">{{customer.firstName}}</td>
-                <td class="table__data table--25">{{customer.lastName}}</td>
-                <td class="table__data table--25 text-center">{{customer.phone}}</td>
-                <td class="table__data table--25 text-center" @click.stop="">
-                  <input type="checkbox" name="" id="" style="zoom: 2;" />
-                </td>
-              </tr>
-            </template v-for="customer">
-          </tbody>
-        </table>
-      </div>
-      <div class="history__footer">
-        <p class="history__info">Activos: <span class="text-bold">{{activeCustomers.length}}</span></p>
-        <p class="history__info">Inactivos: <span class="text-bold">{{inactiveCustomers.length}}</span></p>
-        <p class="history__info">Archivados: <span class="text-bold">{{archivedCustomers.length}}</span></p>
-        <p class="history__info">Total: <span class="text-bold">{{customers.length}}</span></p>
-      </div>
+      <customer-list :id="id + 'CustumerList'" @customer-selected="loadCustomer" :customer-selected="customerSelected"></customer-list>
+      <transition name="fade">
+        <customer-history :customer = "customerSelected" v-show = "customerSelected"></customer-history>
+      </transition>
     </aside>
   </div>
 	`,
@@ -1707,6 +1802,18 @@ const store = new Vuex.Store({
     processResult: new RequesProcess(),
     eventHub: new Vue(),
   },
+  getters: {
+    inactiveCustomerList: state => {
+      return state.customers.filter((c) => c.inactive && !c.archived);
+    },
+    activeCustomerList: state => {
+      return state.customers.filter((c) => !c.inactive && !c.archived);
+    },
+    archivedCustomerList: state => {
+      return state.customers.filter((c) => c.archived);
+    }
+
+  },
   mutations: {
     updateCustomer(state, data) {
       if (state.customers.some((c) => c.id === data.id)) {
@@ -1759,7 +1866,7 @@ const store = new Vuex.Store({
     waitingRequest(state, value) {
       state.waiting = value;
     },
-    requestResult(state, {isSuccess, message}) {
+    requestResult(state, { isSuccess, message }) {
       console.log(isSuccess);
       if (isSuccess) {
         state.processResult.isSuccess(message);
@@ -1770,7 +1877,7 @@ const store = new Vuex.Store({
     hiddenRequest(state) {
       state.processResult.visible = false;
     },
-    emitEvent(state, eventName){
+    emitEvent(state, eventName) {
       state.eventHub.$emit(eventName);
     }
   },
@@ -1788,7 +1895,7 @@ const store = new Vuex.Store({
         commit('requestResult', false, "No se pudo recuperar los datos de los clientes");
       }
     },
-    async updateCustomer({commit}, formData) {
+    async updateCustomer({ commit }, formData) {
       commit('waitingRequest', true);
       isSuccess = false;
       let eventName = 'customer-was-updated';
@@ -1818,10 +1925,10 @@ const store = new Vuex.Store({
         message = "Error al conectar!";
       }
       commit('waitingRequest', false);
-      commit('requestResult', {isSuccess, message});
+      commit('requestResult', { isSuccess, message });
       // return false;
     },
-    async newCustomer({commit, dispatch}, formData) {
+    async newCustomer({ commit, dispatch }, formData) {
       commit('waitingRequest', true);
       isSuccess = false;
       message = "";
@@ -1851,9 +1958,9 @@ const store = new Vuex.Store({
         message = "No se pudo hacer la petición";
       }
       commit('waitingRequest', false);
-      commit('requestResult', {isSuccess, message});
+      commit('requestResult', { isSuccess, message });
     },
-    async newPayment({commit}, formData) {
+    async newPayment({ commit }, formData) {
       commit('waitingRequest', true);
       let isSuccess = false;
       let message = "";
@@ -1882,9 +1989,9 @@ const store = new Vuex.Store({
         console.log(error);
       }
       commit('waitingRequest', false);
-      commit('requestResult', {isSuccess, message});
+      commit('requestResult', { isSuccess, message });
     },
-    async newCredit({commit}, formData){
+    async newCredit({ commit }, formData) {
       commit('waitingRequest', true);
       let isSuccess = false;
       let message = "";
@@ -1912,7 +2019,7 @@ const store = new Vuex.Store({
         console.log(error);
       }
       commit('waitingRequest', false);
-      commit('requestResult', {isSuccess, message});
+      commit('requestResult', { isSuccess, message });
     },
   }
 })

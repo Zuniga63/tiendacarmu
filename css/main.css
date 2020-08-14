@@ -94,6 +94,10 @@ body {
   color: red;
 }
 
+.text-secundary{
+  color:var(--secondary)
+}
+
 .text-small {
   font-size: 0.8em;
 }
@@ -2220,7 +2224,7 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   /* text-align: center; */
   /* text-transform: uppercase; */
   /* margin-bottom: 0.5em; */
-  /* padding: 0.5em; */
+  padding: 0.25em;
   font-size: 1.3em;
   /* border: 1px solid #ccc;
   border-top-left-radius: 5px;
@@ -2263,7 +2267,7 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 
 .table__row {
   border: 1px solid #ddd;
-  padding: 0.4em;
+  padding: 0.5em;
 }
 
 .table__row:nth-child(even) {
@@ -2289,8 +2293,22 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 
 .table__header,
 .table__data {
-  padding: 0.2em;
+  padding: 0.5em 0 0.5em 0.2em;
   font-size: 0.9em;
+  letter-spacing: 1px;
+}
+
+.table__data+.table__data{
+  border-left: 1px dashed var(--secondary);
+}
+
+.table__data--actions{
+  display: flex;
+  justify-content: space-around;
+}
+
+.table__data--actions__link:hover{
+  cursor: pointer;
 }
 
 .table--25 {
@@ -2308,6 +2326,11 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 .table--33 {
   width: 33%;
 }
+
+.table--40{
+  width: 40%;
+}
+
 .table--50 {
   width: 50%;
 }
