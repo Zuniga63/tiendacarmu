@@ -1282,7 +1282,8 @@ function delete_customer($customer_id)
 						$stmt->execute();
 						//Ahora se actualiza el registo de usuario
 						$user_id = $_SESSION['user_id'];
-						$conn->query("INSERT INTO user_log (user_id, log_description) VALUES ($user_id, 'Se eliminó al cliente: {$customer['firtName']}')");
+						$fullName = $customer['firstName'] . ' ' . $customer['lastName'];
+						$conn->query("INSERT INTO user_log (user_id, log_description) VALUES ($user_id, 'Se eliminó al cliente: $fullName')");
 						$isOk = true;
 						$conn->commit();
 					} else {

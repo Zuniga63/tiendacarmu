@@ -495,13 +495,24 @@ Vue.component("customer-list", {
     }
   },
   methods:{
-    ...Vuex.mapActions(['archiveUnarchiveCustomer']),
+    ...Vuex.mapActions(['archiveUnarchiveCustomer', 'deleteCustomer']),
     formatCurrency: formatCurrencyLite,
     onArchivedUnarchiveCustomer(customer){
       let formData = new FormData();
       formData.append('customer_id', customer.id);
       formData.append('archive', !customer.archived);
       this.archiveUnarchiveCustomer(formData);
+    },
+    onDeleteCustomer(customer){
+      let message1 = `Se va a eliminar al cliente: ${customer.fullName}`;
+      let message2 = "Está seguro que desea eliminar al cliente";
+      if(confirm(message1)){
+        if(confirm(message2)){
+          let formData = new FormData();
+          formData.append('customer_id', customer.id);
+          this.deleteCustomer(formData);
+        }
+      }
     }
   },
   template: /*html*/
@@ -574,7 +585,12 @@ Vue.component("customer-list", {
                       :class="{'fa-folder': !customer.archived, 'fa-folder-open':customer.archived}" 
                       :title="customer.archived ? 'Desarchivar' : 'Archivar'"></i>
                   </a>
-                  <a class="table__data--actions__link"><i class="fas fa-trash-alt text-danger" title="Eliminar"></i></a>
+                  <a 
+                    class="table__data--actions__link" 
+                    v-if="customer.balance <= 0"
+                    @click="onDeleteCustomer(customer)">
+                    <i class="fas fa-trash-alt text-danger" title="Eliminar"></i>
+                  </a>
                 </div>
               </td>
             </tr>
@@ -798,6 +814,7 @@ Vue.component("customer-register", {
   mounted() {
     this.eventHub.$on("customer-was-updated", this.discardUpdate);
     this.eventHub.$on("customer-was-created", this.discardUpdate);
+    this.eventHub.$on("customer-was-deleted", this.discardUpdate);
   },
   template: /*html*/`
   <div class="view" :id="id">
@@ -1752,9 +1769,21 @@ Vue.component("operation-register", {
     onCustomerSelected(customer) {
       this.customerSelected = customer;
     },
+    onCustomerDeleted(){
+      if(this.customerSelected){
+        console.log(this.customers.length);
+        console.log(this.customers.some(c => c.id === this.customerSelected.id))
+        if(!this.customers.some(c => c.id === this.customerSelected.id)){
+          this.customerSelected = undefined;
+        }
+      }
+    }
   },
   computed: {
-    ...Vuex.mapState(['customers']),
+    ...Vuex.mapState(['customers', 'eventHub']),
+  },
+  mounted() {
+    this.eventHub.$on("customer-was-deleted", this.onCustomerDeleted);
   },
   template: /*html*/`
   <div class="view" :id="id">
@@ -2076,6 +2105,36 @@ const store = new Vuex.Store({
       } catch (error) {
         console.log(error);
         message = "No se pudo hacer la petición";
+      }
+      commit('waitingRequest', false);
+      commit('requestResult', { isSuccess, message });
+    },
+    async deleteCustomer({ commit, dispatch }, formData){
+      commit('waitingRequest', true);
+      isSuccess = false;
+      message = "";
+      eventName = "customer-was-deleted";
+      try {
+        const res = await fetch('./api/customers/delete_customer.php', {
+          method:'POST',
+          body:formData
+        });
+        const data = await res.json();
+        if(data.sessionActive){
+          if(data.request){
+            await dispatch('getCustomers');
+            commit('emitEvent', eventName);
+            isSuccess = true;
+            message = "Cliente Eliminado";
+          }else{
+            message = "No se pudo eliminar";
+          }
+        }else{
+          location.reload();
+        }
+      } catch (error) {
+        console.log(error);
+        message = "No se pudo hacer la peticion"
       }
       commit('waitingRequest', false);
       commit('requestResult', { isSuccess, message });
