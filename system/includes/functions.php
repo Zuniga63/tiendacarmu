@@ -1264,6 +1264,51 @@ function archived_unarchived_customer($customer_id, $archive)
 	}
 }
 
+function delete_customer($customer_id)
+{
+	$isOk = false;
+	if (isset($customer_id) && is_numeric($customer_id)) {
+		$customer_id = intval($customer_id);
+		try {
+			$customer = get_customer($customer_id);
+			if ($customer) {
+				if ($customer['balance'] === 0) {
+					$query = "DELETE FROM customer WHERE customer_id = :customer_id";
+					$conn = get_connection();
+					$conn->beginTransaction();
+					$stmt = $conn->prepare($query);
+					if ($stmt) {
+						$stmt->bindParam(':customer_id', $customer_id, PDO::PARAM_INT);
+						$stmt->execute();
+						//Ahora se actualiza el registo de usuario
+						$user_id = $_SESSION['user_id'];
+						$conn->query("INSERT INTO user_log (user_id, log_description) VALUES ($user_id, 'Se eliminó al cliente: {$customer['firtName']}')");
+						$isOk = true;
+						$conn->commit();
+					} else {
+						$message = "Error al eliminar el cliente: La sentencia no se preparó";
+						write_error($message);
+						$conn->rollBack();
+					}
+				} else {
+					$message = "Error al eliminar el cliente: El cliente no tiene saldo cero";
+					write_error($message);
+				}
+			} else {
+				$message = "Error al eliminar el cliente: El cliente no existe";
+				write_error($message);
+			}
+		} catch (PDOException $e) {
+			$message = "Error al eliminar el cliente: {$e->getMessage()}";
+			write_error($message);
+		}
+	} else {
+		$message = "Error al eliminar el cliente: El id no es valido";
+		write_error($message);
+	}
+	return $isOk;
+}
+
 function get_credit_cash_flow_report()
 {
 	$max_month = getdate()['mon'];
