@@ -1272,7 +1272,7 @@ function delete_customer($customer_id)
 		try {
 			$customer = get_customer($customer_id);
 			if ($customer) {
-				if ($customer['balance'] === 0.0) {
+				if ($customer['balance'] <= 0.0) {
 					$query = "DELETE FROM customer WHERE customer_id = :customer_id";
 					$conn = get_connection();
 					$conn->beginTransaction();
