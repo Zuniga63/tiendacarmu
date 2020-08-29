@@ -120,38 +120,7 @@
         <section class="view__section">
           <div class="container">
             <container-header :title="title" subtitle="Gestion de Categorías"></container-header>
-
-            <form class="form form--bg-light" @submit.prevent="onNewCategorySubmit">
-              <h2 class="form__title">Nueva categoría</h2>
-
-              <!-- Campo para agregar el nombre -->
-              <div class="form__group">
-                <!-- Cuerpo del formulario -->
-                <div class="form__group__body">
-                  <label for="newCategoryName" class="form__label">Nombre</label>
-                  <input type="text" name="category-name" id="newCategoryName" :class="['form__input', {error : views.newCategory.categoryNameError}]" placeholder="Ingresa la nueva categoría" v-model="views.newCategory.categoryName" @focus="$event.target.select()" @blur="validateCategoryName" required>
-                </div>
-
-                <!-- Seccion para mostrar alertas e informacion adicional -->
-                <div class="form__group__footer">
-                  <span :class="['alert', 'alert--danger', {show: views.newCategory.categoryNameError}]">
-                    {{views.newCategory.errorMessage}}
-                  </span>
-                  <span class="form__input__length">
-                    {{newCategoryNameLength}}
-                  </span>
-                </div>
-
-              </div>
-              <!-- Fin del campo -->
-
-              <p :class="['alert', 'alert--big', {'alert--success' : views.newCategory.response, 'alert--danger' : !views.newCategory.response, show : views.newCategory.responseMessageShow}]">
-                {{views.newCategory.responseMessage}}
-              </p>
-              <input type="submit" v-model="views.newCategory.buttomMessage" :disabled="views.newCategory.requestStart" class="btn btn--success">
-
-            </form>
-
+            <new-category-form id="newCategory"></new-category-form>
             <category-module :categories="categories" v-on:category-selected="onCategorySelected"></category-module>
           </div>
         </section>
@@ -333,6 +302,8 @@
       </div>
 
     </main>
+    <waiting-modal></waiting-modal>
+    <process-result></process-result>
 
     <!-- Modal para confirmar la venta -->
     <div class="modal" :class="{show: modals.newSale.visible}" @click.self="modals.newSale.hiddenModal()">
