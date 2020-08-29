@@ -16,6 +16,11 @@
   <!-- SE CARGAN LOS ESTILOS GENERALES -->
   <link rel="stylesheet" href=<?= "../css/normalize.css?v=" . VERSION ?> />
   <link rel="stylesheet" href=<?= "../css/main.css?v=" . VERSION ?> />
+
+  <!-- Librería de Vue.js -->
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <!-- Librería de Vuex -->
+  <script src="https://unpkg.com/vuex@3.5.1/dist/vuex.js"></script>
 </head>
 
 <!-- Se agrega esta clase para traerme todas las caracteristicas basicas de esa page -->
@@ -370,9 +375,6 @@
 
   <!-- Script general con las utilidades basicas -->
   <script src=<?= "../js/app.js?v=" . VERSION ?>></script>
-
-  <!-- Librería de Vue.js -->
-  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
   <!-- Librería personal para reportes de ventas-->
   <script src=<?= "./js/reports.js?v=" . VERSION ?>></script>
