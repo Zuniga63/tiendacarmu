@@ -412,9 +412,9 @@ class Payment extends Transaction {
  */
 Vue.component("waiting-modal", {
   computed: {
-    ...Vuex.mapState(['waiting']),
+    ...Vuex.mapState(["waiting"]),
   },
-  template: /*html*/`
+  template: /*html*/ `
   <div :class="['modal', {show:waiting}]">
     <div class="modal__content" style="padding-top: 140px;">
       <div class="loader"></div>
@@ -433,12 +433,12 @@ Vue.component("waiting-modal", {
  */
 Vue.component("process-result", {
   computed: {
-    ...Vuex.mapState(['processResult'])
+    ...Vuex.mapState(["processResult"]),
   },
   methods: {
-    ...Vuex.mapMutations(['hiddenRequest'])
+    ...Vuex.mapMutations(["hiddenRequest"]),
   },
-  template:/*html*/ `
+  template: /*html*/ `
   <div
     class="modal"
     :class="{show: processResult.visible}"
@@ -460,63 +460,67 @@ Vue.component("process-result", {
 });
 
 Vue.component("customer-list", {
-  props: ['id', 'customerSelected'],
+  props: ["id", "customerSelected"],
   data() {
     return {
       listName: "active",
-    }
+    };
   },
   computed: {
-    ...Vuex.mapState(['customers']),
-    ...Vuex.mapGetters(['inactiveCustomerList', 'activeCustomerList', 'archivedCustomerList']),
+    ...Vuex.mapState(["customers"]),
+    ...Vuex.mapGetters([
+      "inactiveCustomerList",
+      "activeCustomerList",
+      "archivedCustomerList",
+    ]),
     customerList() {
       let list = [];
       switch (this.listName) {
-        case 'active':
+        case "active":
           list = this.activeCustomerList;
           break;
-        case 'inactive':
+        case "inactive":
           list = this.inactiveCustomerList;
           break;
-        case 'archived':
+        case "archived":
           list = this.archivedCustomerList;
           break;
       }
 
       return list;
     },
-    customerListBalance(){
+    customerListBalance() {
       let amount = 0;
-      this.customerList.forEach(c => {
+      this.customerList.forEach((c) => {
         amount += c.balance;
-      })
+      });
 
       return amount;
-    }
+    },
   },
-  methods:{
-    ...Vuex.mapActions(['archiveUnarchiveCustomer', 'deleteCustomer']),
+  methods: {
+    ...Vuex.mapActions(["archiveUnarchiveCustomer", "deleteCustomer"]),
     formatCurrency: formatCurrencyLite,
-    onArchivedUnarchiveCustomer(customer){
+    onArchivedUnarchiveCustomer(customer) {
       let formData = new FormData();
-      formData.append('customer_id', customer.id);
-      formData.append('archive', !customer.archived);
+      formData.append("customer_id", customer.id);
+      formData.append("archive", !customer.archived);
       this.archiveUnarchiveCustomer(formData);
     },
-    onDeleteCustomer(customer){
+    onDeleteCustomer(customer) {
       let message1 = `Se va a eliminar al cliente: ${customer.fullName}`;
       let message2 = "Está seguro que desea eliminar al cliente";
-      if(confirm(message1)){
-        if(confirm(message2)){
+      if (confirm(message1)) {
+        if (confirm(message2)) {
           let formData = new FormData();
-          formData.append('customer_id', customer.id);
+          formData.append("customer_id", customer.id);
           this.deleteCustomer(formData);
         }
       }
-    }
+    },
   },
-  template: /*html*/
-    `
+  /*html*/
+  template: `
   <div class="m-b-1">
     <div class="form__group-flex m-b-1">
       <div class="form__radio-group">
@@ -603,8 +607,7 @@ Vue.component("customer-list", {
       <p class="history__info">Importe: <span class="text-bold">{{formatCurrency(customerListBalance)}}</span></p>
     </div>
   </div>
-  `
-
+  `,
 });
 
 /**
@@ -627,7 +630,7 @@ Vue.component("customer-register", {
     };
   },
   computed: {
-    ...Vuex.mapState(['customers', 'eventHub']),
+    ...Vuex.mapState(["customers", "eventHub"]),
     inactiveCustomers() {
       const result = this.customers.filter((c) => c.inactive && !c.archived);
       return result;
@@ -666,7 +669,7 @@ Vue.component("customer-register", {
     },
   },
   methods: {
-    ...Vuex.mapActions(['updateCustomer', 'newCustomer']),
+    ...Vuex.mapActions(["updateCustomer", "newCustomer"]),
     validateFirstName() {
       let firstName = this.firstName;
       if (firstName.value && typeof firstName.value === "string") {
@@ -816,7 +819,7 @@ Vue.component("customer-register", {
     this.eventHub.$on("customer-was-created", this.discardUpdate);
     this.eventHub.$on("customer-was-deleted", this.discardUpdate);
   },
-  template: /*html*/`
+  template: /*html*/ `
   <div class="view" :id="id">
     <section class="view__section">
       <div class="container">
@@ -1086,7 +1089,7 @@ Vue.component("search-box", {
     },
   }, //Fin de methods
   computed: {
-    ...Vuex.mapState(['customers']),
+    ...Vuex.mapState(["customers"]),
     customerResult() {
       let result = [];
       if (this.customerName) {
@@ -1141,7 +1144,7 @@ Vue.component("new-operation-form", {
     };
   }, //Fin de data
   methods: {
-    ...Vuex.mapActions(['newPayment', 'newCredit']),
+    ...Vuex.mapActions(["newPayment", "newCredit"]),
     validateDate() {
       let isOk = false;
       let value = this.date.value;
@@ -1298,7 +1301,7 @@ Vue.component("new-operation-form", {
     },
   }, //Fin de methods
   computed: {
-    ...Vuex.mapState(['eventHub']),
+    ...Vuex.mapState(["eventHub"]),
     formTitle() {
       let title = "";
       switch (this.operationType) {
@@ -1368,7 +1371,7 @@ Vue.component("new-operation-form", {
     this.eventHub.$on("credit-was-created", this.resetFields);
     this.eventHub.$on("payment-was-created", this.resetFields);
   },
-  template: `
+  template: /*html*/ `
   <form class="form form--bg-light" @submit.prevent="onSubmit" :id="id + 'Form'">
     <div class="form__header">
       <h2 class="form__title">{{formTitle}}</h2>
@@ -1769,23 +1772,25 @@ Vue.component("operation-register", {
     onCustomerSelected(customer) {
       this.customerSelected = customer;
     },
-    onCustomerDeleted(){
-      if(this.customerSelected){
+    onCustomerDeleted() {
+      if (this.customerSelected) {
         console.log(this.customers.length);
-        console.log(this.customers.some(c => c.id === this.customerSelected.id))
-        if(!this.customers.some(c => c.id === this.customerSelected.id)){
+        console.log(
+          this.customers.some((c) => c.id === this.customerSelected.id)
+        );
+        if (!this.customers.some((c) => c.id === this.customerSelected.id)) {
           this.customerSelected = undefined;
         }
       }
-    }
+    },
   },
   computed: {
-    ...Vuex.mapState(['customers', 'eventHub']),
+    ...Vuex.mapState(["customers", "eventHub"]),
   },
   mounted() {
     this.eventHub.$on("customer-was-deleted", this.onCustomerDeleted);
   },
-  template: /*html*/`
+  template: /*html*/ `
   <div class="view" :id="id">
     <section class="view__section">
       <div class="container">
@@ -1839,16 +1844,15 @@ const store = new Vuex.Store({
     eventHub: new Vue(),
   },
   getters: {
-    inactiveCustomerList: state => {
+    inactiveCustomerList: (state) => {
       return state.customers.filter((c) => c.inactive && !c.archived);
     },
-    activeCustomerList: state => {
+    activeCustomerList: (state) => {
       return state.customers.filter((c) => !c.inactive && !c.archived);
     },
-    archivedCustomerList: state => {
+    archivedCustomerList: (state) => {
       return state.customers.filter((c) => c.archived);
-    }
-
+    },
   },
   mutations: {
     updateCustomer(state, data) {
@@ -1858,7 +1862,7 @@ const store = new Vuex.Store({
       }
     },
     updateCustomerList(state, data) {
-      this.commit('waitingRequest', true);
+      this.commit("waitingRequest", true);
       if (data.sessionActive) {
         state.customers = [];
         data.customers.forEach((c) => {
@@ -1898,7 +1902,7 @@ const store = new Vuex.Store({
       } else {
         location.reload();
       }
-      this.commit('waitingRequest', false);
+      this.commit("waitingRequest", false);
     },
     waitingRequest(state, value) {
       state.waiting = value;
@@ -1916,39 +1920,43 @@ const store = new Vuex.Store({
     emitEvent(state, eventName) {
       state.eventHub.$emit(eventName);
     },
-    archiveCustomer(state, customerId){
-      let customerExist = state.customers.some(c => c.id === customerId);
-      if(customerExist){
-        const customer = state.customers.filter(c => c.id === customerId)[0];
+    archiveCustomer(state, customerId) {
+      let customerExist = state.customers.some((c) => c.id === customerId);
+      if (customerExist) {
+        const customer = state.customers.filter((c) => c.id === customerId)[0];
         customer.archived = true;
       }
     },
-    unarchiveCustomer(state, customerId){
-      let customerExist = state.customers.some(c => c.id === customerId);
-      if(customerExist){
-        const customer = state.customers.filter(c => c.id === customerId)[0];
+    unarchiveCustomer(state, customerId) {
+      let customerExist = state.customers.some((c) => c.id === customerId);
+      if (customerExist) {
+        const customer = state.customers.filter((c) => c.id === customerId)[0];
         customer.archived = false;
       }
-    }
+    },
   },
   actions: {
     async getCustomers({ commit }) {
-      commit('waitingRequest', true);
+      commit("waitingRequest", true);
       try {
         const res = await fetch("./api/all_customers.php");
-        const data = await res.json();;
-        commit('waitingRequest', true);
-        commit('updateCustomerList', data);
+        const data = await res.json();
+        commit("waitingRequest", true);
+        commit("updateCustomerList", data);
       } catch (error) {
         console.log(error);
-        commit('waitingRequest', true);
-        commit('requestResult', false, "No se pudo recuperar los datos de los clientes");
+        commit("waitingRequest", true);
+        commit(
+          "requestResult",
+          false,
+          "No se pudo recuperar los datos de los clientes"
+        );
       }
     },
     async updateCustomer({ commit }, formData) {
-      commit('waitingRequest', true);
+      commit("waitingRequest", true);
       isSuccess = false;
-      let eventName = 'customer-was-updated';
+      let eventName = "customer-was-updated";
       message = "";
       try {
         const res = await fetch("./api/update_customer.php", {
@@ -1960,12 +1968,12 @@ const store = new Vuex.Store({
         if (data.sessionActive) {
           if (data.request) {
             //Customer data is updated
-            commit('updateCustomer', data.customer);
+            commit("updateCustomer", data.customer);
             isSuccess = true;
             message = "Cliente actualizado";
-            commit('emitEvent', eventName)
+            commit("emitEvent", eventName);
           } else {
-            message = "No se pudo actualizar"
+            message = "No se pudo actualizar";
           }
         } else {
           location.reload();
@@ -1974,12 +1982,12 @@ const store = new Vuex.Store({
         console.log(error);
         message = "Error al conectar!";
       }
-      commit('waitingRequest', false);
-      commit('requestResult', { isSuccess, message });
+      commit("waitingRequest", false);
+      commit("requestResult", { isSuccess, message });
       // return false;
     },
     async newCustomer({ commit, dispatch }, formData) {
-      commit('waitingRequest', true);
+      commit("waitingRequest", true);
       isSuccess = false;
       message = "";
       let eventName = "customer-was-created";
@@ -1993,10 +2001,10 @@ const store = new Vuex.Store({
 
         if (data.sessionActive) {
           if (data.request) {
-            await dispatch('getCustomers');
+            await dispatch("getCustomers");
             isSuccess = true;
             message = "Cliente agregado";
-            commit('emitEvent', eventName);
+            commit("emitEvent", eventName);
           } else {
             message = "No se pudo agregar el cliente";
           }
@@ -2007,11 +2015,11 @@ const store = new Vuex.Store({
         console.log(error);
         message = "No se pudo hacer la petición";
       }
-      commit('waitingRequest', false);
-      commit('requestResult', { isSuccess, message });
+      commit("waitingRequest", false);
+      commit("requestResult", { isSuccess, message });
     },
     async newPayment({ commit }, formData) {
-      commit('waitingRequest', true);
+      commit("waitingRequest", true);
       let isSuccess = false;
       let message = "";
       let eventName = "payment-was-created";
@@ -2024,8 +2032,8 @@ const store = new Vuex.Store({
 
         if (data.sessionActive) {
           if (data.request) {
-            commit('updateCustomer', data.customer);
-            commit('emitEvent', eventName);
+            commit("updateCustomer", data.customer);
+            commit("emitEvent", eventName);
             message = "Abono registrado con exito";
             isSuccess = true;
           } else {
@@ -2038,11 +2046,11 @@ const store = new Vuex.Store({
         message = "La petición falló";
         console.log(error);
       }
-      commit('waitingRequest', false);
-      commit('requestResult', { isSuccess, message });
+      commit("waitingRequest", false);
+      commit("requestResult", { isSuccess, message });
     },
     async newCredit({ commit }, formData) {
-      commit('waitingRequest', true);
+      commit("waitingRequest", true);
       let isSuccess = false;
       let message = "";
       let eventName = "credit-was-created";
@@ -2054,8 +2062,8 @@ const store = new Vuex.Store({
         const data = await res.json();
         if (data.sessionActive) {
           if (data.request) {
-            commit('updateCustomer', data.customer);
-            commit('emitEvent', eventName);
+            commit("updateCustomer", data.customer);
+            commit("emitEvent", eventName);
             message = "Credito registrado con exito";
             isSuccess = true;
           } else {
@@ -2068,79 +2076,82 @@ const store = new Vuex.Store({
         message = "La petición falló";
         console.log(error);
       }
-      commit('waitingRequest', false);
-      commit('requestResult', { isSuccess, message });
+      commit("waitingRequest", false);
+      commit("requestResult", { isSuccess, message });
     },
-    async archiveUnarchiveCustomer({commit}, formData){
-      commit('waitingRequest', true);
+    async archiveUnarchiveCustomer({ commit }, formData) {
+      commit("waitingRequest", true);
       let isSuccess = false;
       let message = "";
-      let customerId = parseInt(formData.get('customer_id'));
+      let customerId = parseInt(formData.get("customer_id"));
       try {
-        const res = await fetch('./api/customers/archived_unarchived_customer.php', {
-          method: 'POST',
-          body: formData,
-        });
+        const res = await fetch(
+          "./api/customers/archived_unarchived_customer.php",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
         const data = await res.json();
-        if(data.sessionActive){
-          if(data.request){
+        if (data.sessionActive) {
+          if (data.request) {
             isSuccess = true;
-            if(formData.get('archive')==='true'){
-              commit('archiveCustomer', customerId);
+            if (formData.get("archive") === "true") {
+              commit("archiveCustomer", customerId);
               message = "Cliente archivado";
-            }else{
-              commit('unarchiveCustomer', customerId)
+            } else {
+              commit("unarchiveCustomer", customerId);
               message = "Cliente desarchivado";
             }
-          }else{
-            if(formData.get('archive')){
+          } else {
+            if (formData.get("archive")) {
               message = "No se pudo archivar el cliente";
-            }else{
+            } else {
               message = "No se pudo desarchviar el cliente";
             }
           }
-        }else{
+        } else {
           location.reload();
         }
       } catch (error) {
         console.log(error);
         message = "No se pudo hacer la petición";
       }
-      commit('waitingRequest', false);
-      commit('requestResult', { isSuccess, message });
+      commit("waitingRequest", false);
+      commit("requestResult", { isSuccess, message });
     },
-    async deleteCustomer({ commit, dispatch }, formData){
-      commit('waitingRequest', true);
+    async deleteCustomer({ commit, dispatch }, formData) {
+      commit("waitingRequest", true);
       isSuccess = false;
       message = "";
       eventName = "customer-was-deleted";
       try {
-        const res = await fetch('./api/customers/delete_customer.php', {
-          method:'POST',
-          body:formData
+        const res = await fetch("./api/customers/delete_customer.php", {
+          method: "POST",
+          body: formData,
         });
         const data = await res.json();
-        if(data.sessionActive){
-          if(data.request){
-            await dispatch('getCustomers');
-            commit('emitEvent', eventName);
+        if (data.sessionActive) {
+          if (data.request) {
+            await dispatch("getCustomers");
+            commit("emitEvent", eventName);
             isSuccess = true;
             message = "Cliente Eliminado";
-          }else{
+          } else {
             message = "No se pudo eliminar";
           }
-        }else{
+        } else {
           location.reload();
         }
       } catch (error) {
         console.log(error);
-        message = "No se pudo hacer la peticion"
+        message = "No se pudo hacer la peticion";
       }
-      commit('waitingRequest', false);
-      commit('requestResult', { isSuccess, message });
-    }
-  }
-})
+      commit("waitingRequest", false);
+      commit("requestResult", { isSuccess, message });
+    },
+  },
+});
 
 const app = new Vue({
   el: "#app",
@@ -2149,7 +2160,7 @@ const app = new Vue({
     actualView: "newOperation",
   },
   methods: {
-    ...Vuex.mapActions(['getCustomers']),
+    ...Vuex.mapActions(["getCustomers"]),
   }, //Fin de methods
   computed: {}, //Fin de compute
   created() {
