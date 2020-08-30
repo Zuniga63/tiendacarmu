@@ -73,9 +73,6 @@
                     <a href="#" :class="['dropdown__link', {active: actualView === 'newCustomerAndUpdate'}]" @click="actualView = 'newCustomerAndUpdate'">Nuevo y Actualización</a>
                   </li>
                   <li class="dropdown__item">
-                    <a href="#" :class="['dropdown__link', {active: actualView === 'newCustomerAndUpdate'}]" @click="actualView = 'customerList'">Listado de Clientes</a>
-                  </li>
-                  <li class="dropdown__item">
                     <a href="#" class="dropdown__link disabled">Historial de movimientos</a>
                   </li>
                   <li class="dropdown__item">

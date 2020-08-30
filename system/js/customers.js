@@ -1117,7 +1117,7 @@ Vue.component("customer-card", {
         <i class="btn__prepend fas fa-trash-alt"></i>
         <span class="btn__content">Eliminar</span>
       </button>
-      <a :href="'tel:+57'+customer.phone" class="btn btn--success btn--small customer-card__actions--extends view-desktop-colapse" v-if="canCall">
+      <a :href="'tel:'+customer.phone" class="btn btn--success btn--small customer-card__actions--extends view-desktop-colapse" v-if="canCall">
         <i class="btn__prepend fas fa-phone-alt"></i>
         <span class="btn__content">Llamar</span>
       </a>
