@@ -1142,7 +1142,7 @@ Vue.component("search-box", {
     },
     onCustomerWasDeleted() {
       this.customerSelected = undefined;
-    }
+    },
   }, //Fin de methods
   computed: {
     ...Vuex.mapState(["customers", "eventHub"]),
@@ -1165,15 +1165,24 @@ Vue.component("search-box", {
           break;
         case 'archived':
           list = this.customers.filter(c => c.archived);
+          list = list.sort((c1,c2) => c1.paymentFrecuency - c2.paymentFrecuency);
           break;
         case 'active':
           list = this.customers.filter(c => c.balance > 0 && !c.archived);
+          list = list.sort((c1,c2) => c1.paymentFrecuency - c2.paymentFrecuency);
           break;
         case 'inactive':
           list = this.customers.filter(c => c.balance <= 0 && !c.archived);
           break;
       }
-      return list.sort((c1,c2) => c1.paymentFrecuency - c2.paymentFrecuency);
+      return list;
+    }, 
+    customersAmount(){
+      let amount = 0;
+      this.customerList.forEach(customer => {
+        amount += customer.balance;
+      })
+      return formatCurrencyLite(amount, 0);
     }
   },
   mounted() {
@@ -1245,7 +1254,7 @@ Vue.component("search-box", {
         >
         </customer-card>
       </div>
-      <p class="search-box__count" :class="{show: showBox}">Clientes: <span class="text-bold">{{customerResult.length}}</span></p>
+      <p class="search-box__count" :class="{show: showBox}">Clientes: <span class="text-bold">{{customerResult.length}} ({{customersAmount}})</span></p>
     </div>
     <div class="search-box__selected">
       <customer-card :customer="customerSelected" v-show="customerSelected" :actions="true" :call="true"></customer-card>
@@ -1958,9 +1967,6 @@ Vue.component("operation-register", {
   </div>`,
 });
 
-Vue.component("view-customer-list", {
-
-})
 
 //---------------------------------------------
 //  RAIZ DE LA APLICACION
