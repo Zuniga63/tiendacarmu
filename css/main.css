@@ -302,28 +302,38 @@ body {
 /********************************************************************************************/
 .btn {
   display: block;
+  padding: 0.375rem;
+  border: 1px solid #7f8c8d;
+  border-radius: 0.25rem;
   width: 100%;
-  font-weight: 900;
-  letter-spacing: 3px;
-  font-size: 1.2em;
+  background-color: transparent;
   color: white;
-  text-align: center;
   cursor: pointer;
+  font-size: 1em;
+  font-weight: 900;
+  letter-spacing: 2px;
+  line-height: 1.5;
+  outline: none;
+  text-align: center;
+  text-decoration: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  background-color: transparent;
-  border: 1px solid #7f8c8d;
-  padding: 0.375rem 0.75rem;
-  font-size: 1rem;
-  line-height: 1.5;
-  border-radius: 0.25rem;
+  /* font-size: 1rem; */
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
     border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-  text-decoration: none;
-  outline: none;
 }
+
+.btn--small{
+  font-size: 0.75em;
+}
+
+.btn__prepend{
+  margin-right: 0.5em;
+}
+
+
 
 .btn:hover {
   background-color: #e2e6ea;
@@ -1827,17 +1837,25 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 /*  TARJETAS DE CLIENTES                           */
 /***************************************************/
 .customer-card {
-  width: 95%;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 5px;
-  background-color: #28a74634;
-  border: 2px solid var(--success);
-  border-radius: 5px;
+  position: relative;
   display: grid;
   grid-template-columns: 3fr 2fr;
+  width: 95%;
+  padding: 5px;
+  border: 2px solid var(--success);
+  border-radius: 5px;
+  margin-right: auto;
   margin-bottom: 0.8rem;
+  margin-left: auto;
+  background-color: #28a74634;
   cursor: pointer;
+}
+
+.customer-card__archived{
+  position: absolute;
+  top:5px;
+  left: 5px;
+  color: var(--dark)
 }
 
 .customer-card--late {
@@ -1863,6 +1881,7 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   font-style: italic;
 }
 .customer-card__name {
+  margin-left: 1em;
   font-size: 1em;
   text-transform: uppercase;
 }
@@ -1888,6 +1907,18 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   font-weight: 600;
   letter-spacing: 1px;
   line-height: 1.5;
+}
+
+.customer-card__actions{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1em;
+  row-gap: 0.5em;
+}
+
+.customer-card__actions,
+.customer-card__actions--extends{
+  grid-column: 1/-1;
 }
 
 .customer-sumary__container {

@@ -1032,8 +1032,9 @@ Vue.component("input-money", {
 });
 
 Vue.component("customer-card", {
-  props: ["customer"],
+  props: ["customer", "actions", "call"],
   methods: {
+    ...Vuex.mapActions(["archiveUnarchiveCustomer", "deleteCustomer"]),
     formatCurrency(value) {
       var formatted = new Intl.NumberFormat("es-Co", {
         style: "currency",
@@ -1041,7 +1042,28 @@ Vue.component("customer-card", {
         minimumFractionDigits: 0,
       }).format(value);
       return formatted;
-    }, //Fin del metodo,
+    }, //Fin del metodo
+    onArchivedUnarchiveCustomer() {
+      if (this.customer && this.customer.id > 0) {
+        let formData = new FormData();
+        formData.append("customer_id", this.customer.id);
+        formData.append("archive", !this.customer.archived);
+        this.archiveUnarchiveCustomer(formData);
+      }
+    },
+    onDeleteCustomer() {
+      if (this.customer && this.customer.id > 0) {
+        let message1 = `Se va a eliminar al cliente: ${this.customer.fullName}`;
+        let message2 = "Está seguro que desea eliminar al cliente";
+        if (confirm(message1)) {
+          if (confirm(message2)) {
+            let formData = new FormData();
+            formData.append("customer_id", this.customer.id);
+            this.deleteCustomer(formData);
+          }
+        }
+      }
+    },
   },
   computed: {
     classState() {
@@ -1056,9 +1078,17 @@ Vue.component("customer-card", {
     fullName() {
       return this.customer.firstName + " " + this.customer.lastName;
     },
+    canCall(){
+      return this.call && this.customer && this.customer.phone;
+    }
   },
-  template: `
+  template:
+  /*html*/`
   <div class="customer-card" :class="classState" v-if="customer" @click="$emit('click')">
+    <div class="customer-card__archived">
+      <i class="fas fa-folder-open" v-show="!customer.archived"></i>
+      <i class="fas fa-folder" v-show="customer.archived"></i>
+    </div>
     <div class="customer-card__header">
       <h3 class="customer-card__name">{{fullName}}</h3>
       <p class="customer-card__info">{{customer.state}}</p>
@@ -1070,6 +1100,27 @@ Vue.component("customer-card", {
       <p class="customer-card__points">
         Puntos: <span class="text-bold" :class="{'text-success': customer.points > 0, 'text-danger': customer.points < 0}">{{customer.points}}</span>
       </p>
+    </div>
+    <div class="customer-card__actions" v-if="actions">
+      <button class="btn btn--primary btn--small" @click="onArchivedUnarchiveCustomer">
+        <i class="btn__prepend fas fa-folder" v-show="!customer.archived"></i>
+        <i class="btn__prepend fas fa-folder-open" v-show="customer.archived"></i>
+        <span class="btn__content" v-show="!customer.archived">Archivar</span>
+        <span class="btn__content" v-show="customer.archived">Desarch</span>
+      </button>
+      <button 
+        class="btn btn--small"
+        :class="{'btn--danger': customer.balance <= 0, 'btn--disabled': customer.balance > 0}"
+        :disabled="customer.balance > 0"
+        @click="onDeleteCustomer"
+      >
+        <i class="btn__prepend fas fa-trash-alt"></i>
+        <span class="btn__content">Eliminar</span>
+      </button>
+      <a :href="'tel:+57'+customer.phone" class="btn btn--success btn--small customer-card__actions--extends view-desktop-colapse" v-if="canCall">
+        <i class="btn__prepend fas fa-phone-alt"></i>
+        <span class="btn__content">Llamar</span>
+      </a>
     </div>
   </div>`,
 });
@@ -1087,9 +1138,12 @@ Vue.component("search-box", {
       this.customerSelected = customer;
       this.$emit("customer-selected", customer);
     },
+    onCustomerWasDeleted(){
+      this.customerSelected = undefined;
+    }
   }, //Fin de methods
   computed: {
-    ...Vuex.mapState(["customers"]),
+    ...Vuex.mapState(["customers", "eventHub"]),
     customerResult() {
       let result = [];
       if (this.customerName) {
@@ -1102,7 +1156,11 @@ Vue.component("search-box", {
       return result;
     },
   },
-  template: `
+  mounted(){
+    this.eventHub.$on("customer-was-deleted", this.onCustomerWasDeleted);
+  },
+  template:
+  /*html*/`
   <div class="search-box">
     <input 
       type="text" 
@@ -1123,8 +1181,9 @@ Vue.component("search-box", {
       </div>
       <p class="search-box__count" :class="{show: showBox}">Clientes: <span class="text-bold">{{customerResult.length}}</span></p>
     </div>
-    <div class="search-box__selected" v-show="customerSelected">
-      <customer-card :customer="customerSelected"></customer-card>
+    <div class="search-box__selected">
+      <customer-card :customer="customerSelected" v-show="customerSelected" :actions="true" :call="true"></customer-card>
+      <p v-show="!customerSelected">Selecciona a un cliente para poder agregar un abono o un credito</p>
     </div>
   </div>`,
 });
@@ -1832,6 +1891,10 @@ Vue.component("operation-register", {
     </aside>
   </div>`,
 });
+
+Vue.component("view-customer-list", {
+
+})
 
 //---------------------------------------------
 //  RAIZ DE LA APLICACION
