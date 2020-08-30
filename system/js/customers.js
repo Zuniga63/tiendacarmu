@@ -1078,7 +1078,7 @@ Vue.component("customer-card", {
     fullName() {
       return this.customer.firstName + " " + this.customer.lastName;
     },
-    canCall(){
+    canCall() {
       return this.call && this.customer && this.customer.phone;
     }
   },
@@ -1126,11 +1126,13 @@ Vue.component("customer-card", {
 });
 
 Vue.component("search-box", {
+  props: ['id'],
   data: function () {
     return {
       customerSelected: undefined,
       showBox: false,
       customerName: "",
+      typeList: 'all'
     };
   }, //Fin de data
   methods: {
@@ -1138,7 +1140,7 @@ Vue.component("search-box", {
       this.customerSelected = customer;
       this.$emit("customer-selected", customer);
     },
-    onCustomerWasDeleted(){
+    onCustomerWasDeleted() {
       this.customerSelected = undefined;
     }
   }, //Fin de methods
@@ -1147,21 +1149,85 @@ Vue.component("search-box", {
     customerResult() {
       let result = [];
       if (this.customerName) {
-        result = this.customers.filter((c) =>
+        result = this.customerList.filter((c) =>
           textInclude(`${c.firstName} ${c.lastName}`, this.customerName)
         );
       } else {
-        result = this.customers;
+        result = this.customerList;
       }
       return result;
     },
+    customerList() {
+      let list = [];
+      switch (this.typeList) {
+        case 'all':
+          list = this.customers;
+          break;
+        case 'archived':
+          list = this.customers.filter(c => c.archived);
+          break;
+        case 'active':
+          list = this.customers.filter(c => c.balance > 0 && !c.archived);
+          break;
+        case 'inactive':
+          list = this.customers.filter(c => c.balance <= 0 && !c.archived);
+          break;
+      }
+      return list.sort((c1,c2) => c1.paymentFrecuency - c2.paymentFrecuency);
+    }
   },
-  mounted(){
+  mounted() {
     this.eventHub.$on("customer-was-deleted", this.onCustomerWasDeleted);
   },
   template:
   /*html*/`
   <div class="search-box">
+    <div class="card-container__options">
+      <div class="form__group-flex--small">
+        <div class="form__radio-group">
+          <input
+            type="radio"
+            value="all"
+            v-bind:id="id +'All'"
+            class="form__radio"
+            v-model="typeList"
+          />
+          <label v-bind:for="id +'All'" class="form__radio">Todos</label>
+        </div>
+        <div class="form__radio-group">
+          <input
+            type="radio"
+            value="active"
+            v-bind:id="id+'Active'"
+            class="form__radio"
+            v-model="typeList"
+          />
+          <label v-bind:for="id+'Active'" class="form__radio">Act</label>
+        </div>
+
+        <div class="form__radio-group">
+          <input
+            type="radio"
+            value="inactive"
+            v-bind:id="id +'Inactive'"
+            class="form__radio"
+            v-model="typeList"
+          />
+          <label v-bind:for="id +'Inactive'" class="form__radio">Inact</label>
+        </div>
+
+        <div class="form__radio-group">
+          <input
+            type="radio"
+            value="archived"
+            v-bind:id="id +'Archived'"
+            class="form__radio"
+            v-model="typeList"
+          />
+          <label v-bind:for="id +'Archived'" class="form__radio">Arch</label>
+        </div>
+      </div>
+    </div>
     <input 
       type="text" 
       class="search-box__search" 

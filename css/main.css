@@ -533,7 +533,8 @@ body {
   gap: 0.5em;
 }
 
-.form__group-flex {
+.form__group-flex, 
+.form__group-flex--small{
   /* font-size: 0.8em; */
   display: flex;
   justify-content: space-between;
@@ -544,6 +545,11 @@ body {
   background-color: var(--wetasphalt);
   flex-wrap: wrap;
   letter-spacing: 2px;
+}
+
+.form__group-flex--small{
+  font-size: 0.8em;
+  padding: 0.5rem;
 }
 
 .form__container {
