@@ -949,6 +949,33 @@ Vue.component("category-view", {
   </div>`,
 });
 
+Vue.component("sales-view", {
+  data(){
+    return {
+      title: "Sistema de ventas"
+    }
+  },
+  computed:{
+    ...Vuex.mapState(['sales']),
+  },
+  template: /*html*/`
+  <div class="view" id="newSale">
+    <section class="view__section">
+      <div class="container">
+        <container-header :title="title" subtitle="Gestion de Ventas"></container-header>
+        <new-sale-form id="saleForm"></new-sale-form>
+        <sales-module id="salesMovil" class="view-desktop-colapse" :sales="sales"></sales-module>
+
+        <category-module class="view-movil-colapse"></category-module>
+      </div>
+    </section>
+
+    <aside class="view__sidebar">
+      <sales-module id="salesDesktop" :sales="sales"></sales-module>
+    </aside>
+  </div>`
+})
+
 const store = new Vuex.Store({
   state: {
     categories: [],
@@ -1123,7 +1150,7 @@ const vm = new Vue({
     categories: [], //Fin de categories
     sales: [],
     salesAmount: 0,
-    actualView: "sales",
+    actualView: "newSaleView", //newSaleView, categoryView
     views: {
       newCategory: {
         visible: false,

@@ -48,12 +48,12 @@
         <div class="main-navbar__nav" id="navbar-collapse">
           <ul class="main-navbar__list">
 
-            <li class="main-navbar__item">
+            <!-- <li class="main-navbar__item">
               <a href="./home.php" class="main-navbar__link">
                 <i class="main-navbar__link__prepend icon-home"></i>
                 <span class="main-navbar__link__body">Principal</span>
               </a>
-            </li>
+            </li> -->
 
             <li class="main-navbar__item dropdown">
               <a href="#" class="main-navbar__link main-navbar__link--active">
@@ -92,12 +92,12 @@
               </a>
             </li>
 
-            <li class="main-navbar__item">
+            <!-- <li class="main-navbar__item">
               <a href="products.php" class="main-navbar__link link__active">
                 <i class="main-navbar__link__prepend icon-home"></i>
                 <span class="main-navbar__link__body">Productos</span>
               </a>
-            </li>
+            </li> -->
           </ul>
 
           <a href="./logout.php" class="btn btn--red">Cerrar sesión</a>

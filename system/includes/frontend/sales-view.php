@@ -50,12 +50,12 @@
         <div class="main-navbar__nav" id="navbar-collapse">
           <ul class="main-navbar__list">
 
-            <li class="main-navbar__item">
+            <!-- <li class="main-navbar__item">
               <a href="./home.php" class="main-navbar__link">
                 <i class="main-navbar__link__prepend icon-home"></i>
                 <span class="main-navbar__link__body">Principal</span>
               </a>
-            </li>
+            </li> -->
             <!-- Fin del elemento -->
 
             <li class="main-navbar__item dropdown">
@@ -69,11 +69,23 @@
                 <ul class="dropdown__list">
 
                   <li class="dropdown__item">
-                    <a href="#" :class="['dropdown__link', {'dropdown__link--active' : views.newCategory.visible}]" id="sumaryLink" @click="showView('newCategory')">Categorías <span class="dropdown__link__new">New</span></a>
+                    <a 
+                      href="#" 
+                      :class="['dropdown__link', {'dropdown__link--active' : actualView === 'categoryView'}]" 
+                      @click="actualView='categoryView'"
+                    >
+                    Categorías <!--span class="dropdown__link__new">New</span-->
+                  </a>
                   </li>
 
                   <li class="dropdown__item">
-                    <a href="#" :class="['dropdown__link', {'dropdown__link--active' : views.newSale.visible}]" id="sumaryLink" @click="showView('newSale')">Registrar Venta <span class="dropdown__link__new">New</span></a>
+                    <a 
+                      href="#" 
+                      :class="['dropdown__link', {'dropdown__link--active' : actualView === 'salesView'}]" 
+                      @click="actualView='salesView'"
+                    >
+                      Registrar Venta <!--span class="dropdown__link__new">New</span-->
+                    </a>
                   </li>
 
                   <!-- <li class="dropdown__item">
@@ -94,12 +106,12 @@
             </li>
             <!-- Fin del elemento -->
 
-            <li class="main-navbar__item">
+            <!-- <li class="main-navbar__item">
               <a href="products.php" class="main-navbar__link link__active">
                 <i class="main-navbar__link__prepend icon-home"></i>
                 <span class="main-navbar__link__body">Productos</span>
               </a>
-            </li>
+            </li> -->
             <!-- Fin del elemento -->
 
 
@@ -129,7 +141,7 @@
           <sales-module :sales="views.newCategory.categorySales" :amount="views.newCategory.categorySelected ? views.newCategory.categorySelected.totalAmount : 0" :subtitle="views.newCategory.categorySelected ? views.newCategory.categorySelected.name : ''"></sales-module>
         </aside>
       </div>
-      
+
 
       <div class="view" id="newSale" v-show="views.newSale.visible">
         <section class="view__section">
@@ -145,83 +157,85 @@
 
         <aside class="view__sidebar">
           <sales-module id="salesDesktop" :sales="sales"></sales-module>
-          <div class="report">
-            <h2 class="report__title">Informe Semanal</h2>
-            <figure class="report__fig">
-              <canvas class="report__graph" id="biweeklyChart"></canvas>
-            </figure>
-            <div class="report__statistics">
-              <div class="report__statistics__section">
-                <h3 class="report__statistics__title">Estadisticas Por Ventas</h3>
-                <p class="report__statistics__statistic">
-                  Registros: <span class="text-bold">{{biweeklyReports.thisWeekReport.sales.length}}</span> /
-                  <span>{{biweeklyReports.lastWeekReport.sales.length}}</span>
-                </p>
-                <p class="report__statistics__statistic">
-                  Importe: <span class="text-bold">{{formatCurrency(biweeklyReports.thisWeekReport.amount)}}</span> /
-                  <span>{{formatCurrency(biweeklyReports.lastWeekReport.amount)}}</span>
-                </p>
-                <p class="report__statistics__statistic">
-                  Promedio: <span class="text-bold">{{formatCurrency(Math.floor(biweeklyReports.thisWeekReport.average))}}</span>
-                  <span class="text-bold text-small" :class="{'text-danger':biweeklyReports.thisWeekReport.upperBound*100 <=50, 'text-success': biweeklyReports.thisWeekReport.upperBound*100 >50}">
-                    ({{Math.ceil(biweeklyReports.thisWeekReport.upperBound*100)}}%)
-                  </span> /
-                  <span>{{formatCurrency(Math.floor(biweeklyReports.lastWeekReport.average))}}</span>
-                  <span class="text-small" :class="{'text-danger':biweeklyReports.lastWeekReport.upperBound*100 <=50, 'text-success': biweeklyReports.lastWeekReport.upperBound*100 > 50}">
-                    ({{Math.ceil(biweeklyReports.lastWeekReport.upperBound*100)}}%)
-                  </span>
-                </p>
-                <p class="report__statistics__statistic">
-                  Vta. Max:
-                  <span class="text-bold">
-                    {{biweeklyReports.thisWeekReport.maxSale ? formatCurrency(biweeklyReports.thisWeekReport.maxSale.amount) : formatCurrency(0)}}
-                  </span>/
-                  <span>
-                    {{biweeklyReports.lastWeekReport.maxSale ? formatCurrency(biweeklyReports.lastWeekReport.maxSale.amount) : formatCurrency(0)}}
-                  </span>
-                </p>
-                <p class="report__statistics__statistic">
-                  Vta. Min: <span class="text-bold">{{biweeklyReports.thisWeekReport.minSale ? formatCurrency(biweeklyReports.thisWeekReport.minSale.amount) : formatCurrency(0)}}</span>/
-                  <span>
-                    {{biweeklyReports.lastWeekReport.minSale ? formatCurrency(biweeklyReports.lastWeekReport.minSale.amount) : formatCurrency(0)}}
-                  </span>
-                </p>
-              </div>
-              <div class="report__statistics__section">
-                <h3 class="report__statistics__title">Estadisticas Diarias</h3>
-                <p class="report__statistics__statistic">
-                  Promedio:
-                  <span class="text-bold">{{formatCurrency(biweeklyReports.thisWeekReport.averageDailySale)}}</span> /
-                  <span>{{formatCurrency(biweeklyReports.lastWeekReport.averageDailySale)}}</span>
-                </p>
-                <p class="report__statistics__statistic">
-                  Vta. Max:
-                  <span class="text-bold">
-                    {{biweeklyReports.thisWeekReport.maxDailySale ? formatCurrency(biweeklyReports.thisWeekReport.maxDailySale.amount) : formatCurrency(0)}}
-                  </span>/
-                  <span>
-                    {{biweeklyReports.lastWeekReport.maxDailySale ? formatCurrency(biweeklyReports.lastWeekReport.maxDailySale.amount) : formatCurrency(0)}}
-                  </span>
-                </p>
-                <p class="report__statistics__statistic">
-                  Vta. Min:
-                  <span class="text-bold">
-                    {{biweeklyReports.thisWeekReport.minDailySale ? formatCurrency(biweeklyReports.thisWeekReport.minDailySale.amount) : formatCurrency(0)}}
-                  </span>/
-                  <span>
-                    {{biweeklyReports.lastWeekReport.minDailySale ? formatCurrency(biweeklyReports.lastWeekReport.minDailySale.amount) : formatCurrency(0)}}
-                  </span>
-                </p>
 
-                <p class="report__statistics__statistic">
-                  Dias en blanco: <span class="text-bold">{{biweeklyReports.thisWeekReport.dayInWhite}}</span>/
-                  <span>{{biweeklyReports.lastWeekReport.dayInWhite}}</span>
-                </p>
-              </div>
-            </div>
-          </div>
         </aside>
       </div>
+
+      <!-- <div class="report">
+        <h2 class="report__title">Informe Semanal</h2>
+        <figure class="report__fig">
+          <canvas class="report__graph" id="biweeklyChart"></canvas>
+        </figure>
+        <div class="report__statistics">
+          <div class="report__statistics__section">
+            <h3 class="report__statistics__title">Estadisticas Por Ventas</h3>
+            <p class="report__statistics__statistic">
+              Registros: <span class="text-bold">{{biweeklyReports.thisWeekReport.sales.length}}</span> /
+              <span>{{biweeklyReports.lastWeekReport.sales.length}}</span>
+            </p>
+            <p class="report__statistics__statistic">
+              Importe: <span class="text-bold">{{formatCurrency(biweeklyReports.thisWeekReport.amount)}}</span> /
+              <span>{{formatCurrency(biweeklyReports.lastWeekReport.amount)}}</span>
+            </p>
+            <p class="report__statistics__statistic">
+              Promedio: <span class="text-bold">{{formatCurrency(Math.floor(biweeklyReports.thisWeekReport.average))}}</span>
+              <span class="text-bold text-small" :class="{'text-danger':biweeklyReports.thisWeekReport.upperBound*100 <=50, 'text-success': biweeklyReports.thisWeekReport.upperBound*100 >50}">
+                ({{Math.ceil(biweeklyReports.thisWeekReport.upperBound*100)}}%)
+              </span> /
+              <span>{{formatCurrency(Math.floor(biweeklyReports.lastWeekReport.average))}}</span>
+              <span class="text-small" :class="{'text-danger':biweeklyReports.lastWeekReport.upperBound*100 <=50, 'text-success': biweeklyReports.lastWeekReport.upperBound*100 > 50}">
+                ({{Math.ceil(biweeklyReports.lastWeekReport.upperBound*100)}}%)
+              </span>
+            </p>
+            <p class="report__statistics__statistic">
+              Vta. Max:
+              <span class="text-bold">
+                {{biweeklyReports.thisWeekReport.maxSale ? formatCurrency(biweeklyReports.thisWeekReport.maxSale.amount) : formatCurrency(0)}}
+              </span>/
+              <span>
+                {{biweeklyReports.lastWeekReport.maxSale ? formatCurrency(biweeklyReports.lastWeekReport.maxSale.amount) : formatCurrency(0)}}
+              </span>
+            </p>
+            <p class="report__statistics__statistic">
+              Vta. Min: <span class="text-bold">{{biweeklyReports.thisWeekReport.minSale ? formatCurrency(biweeklyReports.thisWeekReport.minSale.amount) : formatCurrency(0)}}</span>/
+              <span>
+                {{biweeklyReports.lastWeekReport.minSale ? formatCurrency(biweeklyReports.lastWeekReport.minSale.amount) : formatCurrency(0)}}
+              </span>
+            </p>
+          </div>
+          <div class="report__statistics__section">
+            <h3 class="report__statistics__title">Estadisticas Diarias</h3>
+            <p class="report__statistics__statistic">
+              Promedio:
+              <span class="text-bold">{{formatCurrency(biweeklyReports.thisWeekReport.averageDailySale)}}</span> /
+              <span>{{formatCurrency(biweeklyReports.lastWeekReport.averageDailySale)}}</span>
+            </p>
+            <p class="report__statistics__statistic">
+              Vta. Max:
+              <span class="text-bold">
+                {{biweeklyReports.thisWeekReport.maxDailySale ? formatCurrency(biweeklyReports.thisWeekReport.maxDailySale.amount) : formatCurrency(0)}}
+              </span>/
+              <span>
+                {{biweeklyReports.lastWeekReport.maxDailySale ? formatCurrency(biweeklyReports.lastWeekReport.maxDailySale.amount) : formatCurrency(0)}}
+              </span>
+            </p>
+            <p class="report__statistics__statistic">
+              Vta. Min:
+              <span class="text-bold">
+                {{biweeklyReports.thisWeekReport.minDailySale ? formatCurrency(biweeklyReports.thisWeekReport.minDailySale.amount) : formatCurrency(0)}}
+              </span>/
+              <span>
+                {{biweeklyReports.lastWeekReport.minDailySale ? formatCurrency(biweeklyReports.lastWeekReport.minDailySale.amount) : formatCurrency(0)}}
+              </span>
+            </p>
+
+            <p class="report__statistics__statistic">
+              Dias en blanco: <span class="text-bold">{{biweeklyReports.thisWeekReport.dayInWhite}}</span>/
+              <span>{{biweeklyReports.lastWeekReport.dayInWhite}}</span>
+            </p>
+          </div>
+        </div>
+      </div> -->
 
     </main>
     <waiting-modal></waiting-modal>
