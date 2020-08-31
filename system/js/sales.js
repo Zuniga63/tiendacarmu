@@ -145,62 +145,61 @@ Vue.component("waiting-modal", {
 });
 
 Vue.component("confirm-new-sale", {
-  data(){
-    return{
+  data() {
+    return {
       title: "Registrar Venta",
-    }
+    };
   },
-  computed:{
-    ...Vuex.mapState(['confirmSaleModal', 'categories']),
-    date(){
+  computed: {
+    ...Vuex.mapState(["confirmSaleModal", "categories"]),
+    date() {
       let value = "";
-      if(this.confirmSaleModal.formData){
-        value = this.confirmSaleModal.formData.get('date');
-        if(value){
-          value = moment(value).format('ll');
-        }else{
-          value = moment().format('lll');
+      if (this.confirmSaleModal.formData) {
+        value = this.confirmSaleModal.formData.get("date");
+        if (value) {
+          value = moment(value).format("ll");
+        } else {
+          value = moment().format("lll");
         }
       }
       return value;
     },
-    description(){
+    description() {
       let value = "";
-      if(this.confirmSaleModal.formData){
-        value = this.confirmSaleModal.formData.get('description');
+      if (this.confirmSaleModal.formData) {
+        value = this.confirmSaleModal.formData.get("description");
       }
       return value;
     },
-    category(){
+    category() {
       let value = "";
-      if(this.confirmSaleModal.formData){
-        value = this.confirmSaleModal.formData.get('category_id');
+      if (this.confirmSaleModal.formData) {
+        value = this.confirmSaleModal.formData.get("category_id");
         value = parseInt(value);
-        value = this.categories.filter(c => c.id === value);
+        value = this.categories.filter((c) => c.id === value);
         value = value[0].name;
       }
       return value;
     },
-    amount(){
+    amount() {
       let value = "";
-      if(this.confirmSaleModal.formData){
-        value = this.confirmSaleModal.formData.get('amount');
+      if (this.confirmSaleModal.formData) {
+        value = this.confirmSaleModal.formData.get("amount");
         value = parseFloat(value);
         value = formatCurrencyLite(value, 0);
       }
       return value;
-    }
-
+    },
   },
-  methods:{
-    ...Vuex.mapMutations(['hiddenConfirmSaleModal']),
-    ...Vuex.mapActions(['addNewSale']),
-    onClick(){
+  methods: {
+    ...Vuex.mapMutations(["hiddenConfirmSaleModal"]),
+    ...Vuex.mapActions(["addNewSale"]),
+    onClick() {
       this.addNewSale(this.confirmSaleModal.formData);
       this.hiddenConfirmSaleModal();
-    }
+    },
   },
-  template: /*template*/`
+  template: /*template*/ `
   <div
     class="modal"
     :class="{show: confirmSaleModal.visible}"
@@ -228,8 +227,8 @@ Vue.component("confirm-new-sale", {
       </button>
     </div>
   </div>
-  `
-})
+  `,
+});
 
 /**
  * Componente reutilizable para notificar al usuario el
@@ -405,7 +404,7 @@ Vue.component("new-category-form", {
     ...Vuex.mapActions(["addNewCategory"]),
     onSubmit() {
       categoryNameIsOk = this.validateCategoryName();
-      if(categoryNameIsOk){
+      if (categoryNameIsOk) {
         const data = new FormData();
         data.append("category_name", this.categoryName.value);
         this.addNewCategory(data);
@@ -451,14 +450,14 @@ Vue.component("new-category-form", {
 
       return isOk;
     }, //Fin del metodo
-    resetFields(){
+    resetFields() {
       this.categoryName.resetInput();
-    }
+    },
   },
-  mounted(){
+  mounted() {
     this.eventHub.$on("category-was-created", this.resetFields);
   },
-  template: /*html*/`
+  template: /*html*/ `
   <form class="form form--bg-light" @submit.prevent="onSubmit">
     <h2 class="form__title">Nueva categoría</h2>
 
@@ -516,39 +515,41 @@ Vue.component("container-header", {
 });
 
 Vue.component("sales-module", {
-  props: ["subtitle", "id"],
-  data(){
-    return{
+  props: ["subtitle", "id", "sales"],
+  data() {
+    return {
       periods: [
-        {id: 0, value: "thisMonth", name: "Este mes"},
-        {id: 1, value: "thisBiweekly", name: "Esta quincena"},
-        {id: 2, value: "thisWeek", name: "Esta semana"},
-        {id: 3, value: "thisYear", name: "Este año"},
-        {id: 4, value: "fromTheOriginOfTheTime", name: "Desde el origen de los tiempos"},
+        { id: 0, value: "thisMonth", name: "Este mes" },
+        { id: 1, value: "thisBiweekly", name: "Esta quincena" },
+        { id: 2, value: "thisWeek", name: "Esta semana" },
+        { id: 3, value: "thisYear", name: "Este año" },
+        {
+          id: 4,
+          value: "fromTheOriginOfTheTime",
+          name: "Desde el origen de los tiempos",
+        },
       ],
       period: "thisMonth",
-
-    }
+    };
   },
-  computed:{
-    ...Vuex.mapState(['sales']),
-    salesList(){
+  computed: {
+    salesList() {
       let list = [];
       let start, end;
       switch (this.period) {
         case "thisMonth":
-          start = moment().startOf('month');
-          end = moment().endOf('month');
+          start = moment().startOf("month");
+          end = moment().endOf("month");
           list = this.getSales(start, end);
           break;
         case "thisWeek":
-          start = moment().startOf('week');
-          end = moment().endOf('week');
+          start = moment().startOf("week");
+          end = moment().endOf("week");
           list = this.getSales(start, end);
           break;
         case "thisYear":
-          start = moment().startOf('year');
-          end = moment().endOf('year');
+          start = moment().startOf("year");
+          end = moment().endOf("year");
           list = this.getSales(start, end);
           break;
         case "thisBiweekly":
@@ -556,31 +557,31 @@ Vue.component("sales-module", {
           let year = now.year();
           let month = now.month();
           let dayOfMonth = now.date();
-          if(dayOfMonth > 15){
+          if (dayOfMonth > 15) {
             start = moment([year, month, 16]);
-            end = moment().endOf('month');
-          }else{
-            start = moment().startOf('month');
-            end = moment([year, month, 15]).endOf('day');
+            end = moment().endOf("month");
+          } else {
+            start = moment().startOf("month");
+            end = moment([year, month, 15]).endOf("day");
           }
-          console.log(start.format('ll'));
+          console.log(start.format("ll"));
           list = this.getSales(start, end);
           break;
         default:
           list = this.sales;
           break;
-      }//Fin de swith
+      } //Fin de swith
 
       return list;
     },
-    saleListAmount(){
+    saleListAmount() {
       let amount = 0;
-      this.salesList.forEach(sale => {
+      this.salesList.forEach((sale) => {
         amount += sale.amount;
       });
 
       return amount;
-    }
+    },
   },
   methods: {
     formatCurrency(value) {
@@ -591,19 +592,21 @@ Vue.component("sales-module", {
       }).format(value);
       return formatted;
     }, //Fin del metodo
-    getSales(since, until){
+    getSales(since, until) {
       let list = [];
       for (let index = 0; index < this.sales.length; index++) {
         const sale = this.sales[index];
-        if(sale.saleDate.isSameOrAfter(since) && sale.saleDate.isSameOrBefore(until)){
+        if (
+          sale.saleDate.isSameOrAfter(since) &&
+          sale.saleDate.isSameOrBefore(until)
+        ) {
           list.push(sale);
         }
       }
       return list;
-    }
+    },
   },
-  template: 
-  /*html*/`
+  template: /*html*/ `
   <div class="history">
     <div class="history__header">
       <h2 class="history__title">Historial de ventas</h2>
@@ -642,23 +645,22 @@ Vue.component("sales-module", {
     </footer>
   </div>
   `,
-  
 });
 
 Vue.component("new-sale-form", {
-  props:['id'],
-  data(){
-    return{
+  props: ["id"],
+  data() {
+    return {
       saleMoment: "now",
       saleDate: new DataInput(),
       maxDate: moment().format("yyyy-MM-DD"),
       categoryID: new DataInput(),
       description: new DataInput(),
       amount: new DataInput(),
-    }
+    };
   },
-  computed:{
-    ...Vuex.mapState(['categories', 'eventHub']),
+  computed: {
+    ...Vuex.mapState(["categories", "eventHub"]),
     newSaleDescriptionLength() {
       let length = this.description.value.length;
       const maxLength = 45;
@@ -667,9 +669,9 @@ Vue.component("new-sale-form", {
       return availableLength;
     },
   },
-  methods:{
-    ...Vuex.mapMutations(['showConfirmSaleModal']),
-    onSubmit(){
+  methods: {
+    ...Vuex.mapMutations(["showConfirmSaleModal"]),
+    onSubmit() {
       let dateVal = this.validateSaleDate();
       let categoryVal = this.validateSaleCategory();
       let descriptionVal = this.validateSaleDescription();
@@ -686,7 +688,7 @@ Vue.component("new-sale-form", {
         this.showConfirmSaleModal(data);
       }
     },
-    validateSaleDate(){
+    validateSaleDate() {
       let isOk = false;
       let date = this.saleDate;
 
@@ -707,7 +709,7 @@ Vue.component("new-sale-form", {
 
       return isOk;
     },
-    validateSaleCategory(){
+    validateSaleCategory() {
       let isOk = false;
       let categoryID = this.categoryID;
       let categoryExist = this.categories.some(
@@ -723,7 +725,7 @@ Vue.component("new-sale-form", {
 
       return isOk;
     },
-    validateSaleDescription(){
+    validateSaleDescription() {
       let description = this.description;
 
       if (description.value) {
@@ -738,7 +740,7 @@ Vue.component("new-sale-form", {
 
       return !description.hasError;
     },
-    validateSaleAmount(){
+    validateSaleAmount() {
       let amount = this.amount;
 
       //Elimino el formato de moneda y trato de convertir a numero
@@ -763,19 +765,18 @@ Vue.component("new-sale-form", {
 
       return value;
     },
-    resetFields(){
+    resetFields() {
       this.saleMoment = "now";
       this.saleDate.resetInput();
       this.categoryID.resetInput();
       this.description.resetInput();
       this.amount.resetInput();
-    }
+    },
   },
-  mounted(){
-    this.eventHub.$on('sale-was-created', this.resetFields);
+  mounted() {
+    this.eventHub.$on("sale-was-created", this.resetFields);
   },
-  template:
-  /*html*/`
+  template: /*html*/ `
   <form class="form form--bg-light" @submit.prevent="onSubmit">
     <h2 class="form__title">Registrar Venta</h2>
     <div class="form__group">
@@ -900,8 +901,53 @@ Vue.component("new-sale-form", {
 
       <input type="submit" value="Registrar Venta" class="btn btn--success">
   </form>
-  `
-})
+  `,
+});
+
+Vue.component("category-view", {
+  data() {
+    return {
+      categorySelected: undefined,
+      title: ""
+    };
+  },
+  computed: {
+    ...Vuex.mapState(["categories"]),
+    sales() {
+      let sales = [];
+      if (this.categorySelected) {
+        sales = this.categorySelected.sales;
+      }
+      return sales;
+    },
+    subtitle() {
+      let value = "";
+      if (this.categorySelected) {
+        value = this.categorySelected.name;
+      }
+      return value;
+    },
+  },
+  methods: {
+    onCategorySelected(category) {
+      this.categorySelected = category;
+    },
+  },
+  template: /*html*/ `
+  <div class="view" id="categories">
+    <section class="view__section">
+      <div class="container">
+        <container-header :title="title" subtitle="Gestion de Categorías"></container-header>
+        <new-category-form id="newCategory"></new-category-form>
+        <category-module v-on:category-selected="onCategorySelected"></category-module>
+      </div>
+    </section>
+
+    <aside class="view__sidebar">
+      <sales-module :sales="sales" :subtitle="subtitle"></sales-module>
+    </aside>
+  </div>`,
+});
 
 const store = new Vuex.Store({
   state: {
@@ -923,11 +969,11 @@ const store = new Vuex.Store({
       state.waiting = false;
       state.waitingMessage = "";
     },
-    showConfirmSaleModal(state, payload){
+    showConfirmSaleModal(state, payload) {
       state.confirmSaleModal.visible = true;
       state.confirmSaleModal.formData = payload;
     },
-    hiddenConfirmSaleModal(state){
+    hiddenConfirmSaleModal(state) {
       state.confirmSaleModal.visible = false;
       state.confirmSaleModal.formData = undefined;
     },
@@ -1034,7 +1080,7 @@ const store = new Vuex.Store({
 
       commit("requestResult", { isSuccess, message });
     },
-    async addNewSale({commit, dispatch}, formData){
+    async addNewSale({ commit, dispatch }, formData) {
       let isSuccess = false;
       let message = "";
       let eventName = "sale-was-created";
@@ -1046,17 +1092,17 @@ const store = new Vuex.Store({
         });
         const data = await res.json();
 
-        if(data.sessionActive){
+        if (data.sessionActive) {
           commit("hiddenWaitingRequest");
-          if(data.request){
+          if (data.request) {
             await dispatch("getModel");
             message = "¡Venta creada con exito!";
             isSuccess = true;
             commit("emitEvent", eventName);
-          }else{
+          } else {
             message = "¡No se pudo registrar la venta!";
           }
-        }else{
+        } else {
           location.reload();
         }
       } catch (error) {
@@ -1077,6 +1123,7 @@ const vm = new Vue({
     categories: [], //Fin de categories
     sales: [],
     salesAmount: 0,
+    actualView: "sales",
     views: {
       newCategory: {
         visible: false,

@@ -129,6 +129,7 @@
           <sales-module :sales="views.newCategory.categorySales" :amount="views.newCategory.categorySelected ? views.newCategory.categorySelected.totalAmount : 0" :subtitle="views.newCategory.categorySelected ? views.newCategory.categorySelected.name : ''"></sales-module>
         </aside>
       </div>
+      
 
       <div class="view" id="newSale" v-show="views.newSale.visible">
         <section class="view__section">
@@ -136,14 +137,14 @@
             <container-header :title="title" subtitle="Gestion de Ventas"></container-header>
             <!-- Formulario de nueva venta -->
             <new-sale-form id="saleForm"></new-sale-form>
-            <sales-module id="salesMovil" class="view-desktop-colapse"></sales-module>
+            <sales-module id="salesMovil" class="view-desktop-colapse" :sales="sales"></sales-module>
 
             <category-module class="view-movil-colapse"></category-module>
           </div>
         </section>
 
         <aside class="view__sidebar">
-          <sales-module id="salesDesktop"></sales-module>
+          <sales-module id="salesDesktop" :sales="sales"></sales-module>
           <div class="report">
             <h2 class="report__title">Informe Semanal</h2>
             <figure class="report__fig">

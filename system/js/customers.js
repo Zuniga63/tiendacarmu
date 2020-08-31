@@ -2297,7 +2297,9 @@ const app = new Vue({
   methods: {
     ...Vuex.mapActions(["getCustomers"]),
   }, //Fin de methods
-  computed: {}, //Fin de compute
+  computed: {
+    ...Vuex.mapState(['sales']),
+  }, //Fin de compute
   created() {
     this.getCustomers();
   }, //Fin de create
