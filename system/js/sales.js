@@ -1,6 +1,6 @@
 window.addEventListener("load", () => {
   document.getElementById("preload").classList.remove("show");
-  vm.updateBiweeklyChart();
+  // vm.updateBiweeklyChart();
 });
 
 //---------------------------------------------------------------------------
@@ -64,51 +64,11 @@ class DataInput {
   }
 }
 
-class NewSaleView {
-  constructor() {
-    this.visible = true;
-    this.saleMoment = "now";
-    this.saleDate = new DataInput();
-    this.maxDate = moment().format("yyyy-MM-DD");
-    this.categoryID = new DataInput();
-    this.description = new DataInput();
-    this.amount = new DataInput();
-    this.showAlert = false;
-    this.alertMessage = "";
-    this.processSuccess = false;
-    this.biweeklyChart = undefined;
-  }
-
-  resetView() {
-    this.saleMoment = "now";
-    this.saleDate.resetInput();
-    this.categoryID.resetInput();
-    this.description.resetInput();
-    this.amount.resetInput();
-  }
-}
 
 class NewSaleModal {
   constructor() {
     this.visible = false;
-    this.date = "";
-    this.description = "";
-    this.amount = "";
     this.formData = undefined;
-  }
-
-  showModal(date, description, amount) {
-    this.visible = true;
-    this.date = date;
-    this.description = description;
-    this.amount = amount;
-  }
-
-  hiddenModal() {
-    this.visible = false;
-    this.date = "";
-    this.description = "";
-    this.amount = "";
   }
 }
 class WaitingModal {
@@ -950,6 +910,7 @@ Vue.component("category-view", {
 });
 
 Vue.component("sales-view", {
+  props:['id'],
   data(){
     return {
       title: "Sistema de ventas"
@@ -959,7 +920,7 @@ Vue.component("sales-view", {
     ...Vuex.mapState(['sales']),
   },
   template: /*html*/`
-  <div class="view" id="newSale">
+  <div class="view" :id="id">
     <section class="view__section">
       <div class="container">
         <container-header :title="title" subtitle="Gestion de Ventas"></container-header>
@@ -1145,196 +1106,10 @@ const vm = new Vue({
   el: "#app",
   store,
   data: {
-    title: "Sistema de ventas",
-    subtitle: "Gestion de categorías",
-    categories: [], //Fin de categories
-    sales: [],
-    salesAmount: 0,
     actualView: "newSaleView", //newSaleView, categoryView
-    views: {
-      newCategory: {
-        visible: false,
-        categoryName: "",
-        categoryNameError: false,
-        errorMessage: "",
-        requestStart: false,
-        response: true,
-        responseMessage: "",
-        responseMessageShow: false,
-        buttomMessage: "Registrar categoría",
-        categorySelected: null,
-        categorySales: [],
-      }, //Fin de newCategory
-      newSale: new NewSaleView(),
-    }, //Fin de views
-    modals: {
-      newSale: new NewSaleModal(),
-      waiting: new WaitingModal(),
-    },
-    actualView: "newSale",
   }, //Fin de data
   methods: {
     ...Vuex.mapActions(["getModel"]),
-    //----------------------------------------------------------
-    //METODOS PARA CREAR UNA NUEVA VENTA
-    //----------------------------------------------------------
-    validateSaleDate() {
-      let isOk = false;
-      let date = this.views.newSale.saleDate;
-
-      if (this.views.newSale.saleMoment === "now") {
-        isOk = true;
-      } else {
-        if (moment(date.value).isValid()) {
-          if (date.value <= this.views.newSale.maxDate) {
-            date.isCorrect();
-            isOk = true;
-          } else {
-            date.isIncorrect("Selecciona o escribe una fecha valida");
-          }
-        } else {
-          date.isIncorrect("Selecciona una fecha valida");
-        }
-      }
-
-      return isOk;
-    },
-    validateSaleCategory() {
-      let isOk = false;
-      let categoryID = this.views.newSale.categoryID;
-      let categoryExist = this.categories.some(
-        (c) => c.id === categoryID.value
-      );
-
-      if (categoryExist) {
-        categoryID.isCorrect();
-        isOk = true;
-      } else {
-        categoryID.isIncorrect("Selecciona una categoría valida");
-      }
-
-      return isOk;
-    },
-    validateSaleDescription() {
-      let description = this.views.newSale.description;
-
-      if (description.value) {
-        if (description.value.length >= 5) {
-          description.isCorrect();
-        } else {
-          description.isIncorrect("Descripción demasiado corta");
-        }
-      } else {
-        description.isIncorrect("Campo obligatorio");
-      }
-
-      return !description.hasError;
-    },
-    validateSaleAmount() {
-      let amount = this.views.newSale.amount;
-
-      //Elimino el formato de moneda y trato de convertir a numero
-      let amountValue = parseFloat(this.deleteFormaterOfAmount(amount.value));
-
-      if (!isNaN(amountValue)) {
-        if (amountValue > 0) {
-          amount.isCorrect();
-        } else {
-          amount.isIncorrect("Debe ser mayor que cero (0)");
-        }
-      } else {
-        amount.isIncorrect("Ingresa un valor valido");
-      }
-
-      return !amount.hasError;
-    },
-    validateNewSale() {
-      let dateVal = this.validateSaleDate();
-      let categoryVal = this.validateSaleCategory();
-      let descriptionVal = this.validateSaleDescription();
-      let amountVal = this.validateSaleAmount();
-
-      if (dateVal && categoryVal && descriptionVal & amountVal) {
-        let view = this.views.newSale;
-        let date = moment().format("dddd LL");
-        if (view.saleMoment !== "now") {
-          date = moment(view.saleDate.value).format("dddd LL");
-        }
-        let description = view.description.value;
-        let amount = view.amount.value;
-
-        this.modals.newSale.showModal(date, description, amount);
-      }
-    },
-    registerNewSale() {
-      let view = this.views.newSale;
-      let moment = view.saleMoment;
-      let date = view.saleDate.value;
-      let categoryID = view.categoryID.value;
-      let description = view.description.value;
-      let amount = parseFloat(this.deleteFormaterOfAmount(view.amount.value));
-
-      const data = new FormData();
-      data.append("moment", moment);
-      data.append("date", date);
-      data.append("category_id", categoryID);
-      data.append("description", description);
-      data.append("amount", amount);
-
-      //Ahora oculto el modal de confirmacion y se muestra el de carga
-      this.modals.newSale.hiddenModal();
-      this.modals.waiting.showModal();
-
-      //Se realiza la peticion al servidor
-      fetch("./api/new_sale.php", {
-        method: "POST",
-        body: data,
-      })
-        .then((res) => res.json())
-        .then((res) => {
-          console.log(res);
-          if (res.sessionActive) {
-            view.showAlert = true;
-            if (res.request) {
-              view.resetView();
-              //Metodo que recargue las vantas
-              view.alertMessage = "Proceso exitoso";
-              view.processSuccess = true;
-              this.updateModel();
-            } else {
-              view.alertMessage = res.message;
-              view.processSuccess = false;
-            }
-
-            this.modals.waiting.hiddenModal();
-
-            setTimeout(() => {
-              view.showAlert = false;
-              view.alertMessage = "";
-              view.processSuccess = true;
-            }, 3000);
-          } else {
-            location.reload();
-          }
-        });
-    },
-    //----------------------------------------------------------
-    //MANEJO DE EVENTOS PERSONALIZADOS
-    //----------------------------------------------------------
-    onCategorySelected(category) {
-      let view = this.views.newCategory;
-
-      if (view.categorySelected) {
-        view.categorySelected.selected = false;
-        view.categorySelected = category;
-        category.selected = true;
-        view.categorySales = category.sales;
-      } else {
-        view.categorySelected = category;
-        category.selected = true;
-        view.categorySales = category.sales;
-      }
-    },
     //----------------------------------------------------------
     //UTILIDADES
     //----------------------------------------------------------
@@ -1352,269 +1127,162 @@ const vm = new Vue({
       value = value.join("");
 
       return value;
-    },
-    async updateModel() {
-      try {
-        const res = await fetch("./api/sales_api.php");
-        const data = await res.json();
-        if (data.sessionActive) {
-          let categoriesTemporal = [];
-          let salesTemporal = [];
-
-          //Se crean las categorías
-          data.categories.forEach((c) => {
-            //Se crea la instancia de categoría
-            let category = new Category(
-              c.id,
-              c.name,
-              c.totalAmount,
-              c.averageSale
-            );
-            //Se agregan las ventas asociadas a esta categoría
-            c.sales.forEach((s) => {
-              category.addSale(s.id, s.saleDate, s.description, s.amount);
-            });
-            //Finalmente se agrega al arreglo temporal
-            categoriesTemporal.push(category);
-          });
-
-          //Ahora se crean las ventas
-
-          let totalAmount = 0;
-          data.sales.forEach((s) => {
-            // console.log(s.saleDate);
-            let sale = new Sale(s.id, s.saleDate, s.description, s.amount);
-            salesTemporal.push(sale);
-            totalAmount += sale.amount;
-          });
-
-          //Se agregan a los arreglos principales
-          this.categories = categoriesTemporal.sort(
-            (c1, c2) => c2.totalAmount - c1.totalAmount
-          );
-          this.sales = salesTemporal;
-          this.salesAmount = totalAmount;
-
-          //Se actualizan las graficas
-          this.updateBiweeklyChart();
-        } else {
-          location.reload();
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    showView(viewName) {
-      if (this.actualView != viewName) {
-        //En primer lugar oculto todas las vistas
-        for (const key in this.views) {
-          if (this.views.hasOwnProperty(key)) {
-            const view = this.views[key];
-            view.visible = false;
-          }
-        } //Fin de for in
-
-        switch (viewName) {
-          case "newCategory":
-            {
-              this.views.newCategory.visible = true;
-              this.actualView = viewName;
-              showMenu(document.getElementById("navbar-collapse"));
-            }
-            break;
-          case "newSale":
-            {
-              this.views.newSale.visible = true;
-              this.actualView = viewName;
-              showMenu(document.getElementById("navbar-collapse"));
-            }
-            break;
-          default:
-            {
-              this.views.newSale.visible = true;
-              this.actualView = "newSale";
-            }
-            break;
-        } //Fin de swith
-      } //Fin de if
     }, //Fin del metoo
-    createBarChart(ctx, data, title, money = false) {
-      let displayTitle = typeof title === "string" && title.length > 0;
-      let myBar = new Chart(ctx, {
-        type: "bar",
-        data: data,
-        options: {
-          responsive: true,
-          legend: {
-            position: "top",
-          }, //Fin de legend
-          title: {
-            display: displayTitle,
-            text: title,
-          }, //Fin de title
-          tooltips: {
-            callbacks: {
-              label: (tooltipItem, data) => {
-                let label = data.datasets[tooltipItem.datasetIndex].label || "";
+    // createBarChart(ctx, data, title, money = false) {
+    //   let displayTitle = typeof title === "string" && title.length > 0;
+    //   let myBar = new Chart(ctx, {
+    //     type: "bar",
+    //     data: data,
+    //     options: {
+    //       responsive: true,
+    //       legend: {
+    //         position: "top",
+    //       }, //Fin de legend
+    //       title: {
+    //         display: displayTitle,
+    //         text: title,
+    //       }, //Fin de title
+    //       tooltips: {
+    //         callbacks: {
+    //           label: (tooltipItem, data) => {
+    //             let label = data.datasets[tooltipItem.datasetIndex].label || "";
 
-                if (label) {
-                  label += ": ";
+    //             if (label) {
+    //               label += ": ";
 
-                  if (money) {
-                    label += this.formatCurrency(tooltipItem.yLabel);
-                  } else {
-                    label += tooltipItem.yLabel;
-                  }
-                  return label;
-                } //Fin de if
-              }, //Fin de ()=>{}
-            }, //Fin de callbacks
-          }, //Fin de tooltips
-          scales: {
-            yAxes: [
-              {
-                ticks: {
-                  beginAtZero: true,
-                  callback: (value, index, values) => {
-                    if (money) {
-                      return this.formatCurrency(value);
-                    } else {
-                      return value;
-                    } //Fin de if-else
-                  }, //Fin de callback
-                }, //Fin de ticks
-              },
-            ], //Fin de yAxes
-          }, //Fin de scales
-        }, //Fin de options
-      }); //Fin del constructor
+    //               if (money) {
+    //                 label += this.formatCurrency(tooltipItem.yLabel);
+    //               } else {
+    //                 label += tooltipItem.yLabel;
+    //               }
+    //               return label;
+    //             } //Fin de if
+    //           }, //Fin de ()=>{}
+    //         }, //Fin de callbacks
+    //       }, //Fin de tooltips
+    //       scales: {
+    //         yAxes: [
+    //           {
+    //             ticks: {
+    //               beginAtZero: true,
+    //               callback: (value, index, values) => {
+    //                 if (money) {
+    //                   return this.formatCurrency(value);
+    //                 } else {
+    //                   return value;
+    //                 } //Fin de if-else
+    //               }, //Fin de callback
+    //             }, //Fin de ticks
+    //           },
+    //         ], //Fin de yAxes
+    //       }, //Fin de scales
+    //     }, //Fin de options
+    //   }); //Fin del constructor
 
-      return myBar;
-    },
-    updateBiweeklyChart() {
-      if (this.views.biweeklyChart) {
-        let datasets = [this.lastWeekDataset, this.thisWeekDataset];
-        this.views.newSale.biweeklyChart.data.datasets = datasets;
-        this.views.newSale.biweeklyChart.update();
-      } else {
-        let ctx = document.getElementById("biweeklyChart");
-        let labels = ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"];
-        let datasets = [this.lastWeekDataset, this.thisWeekDataset];
-        let barCharData = {
-          labels,
-          datasets,
-        };
-        this.views.newSale.biweeklyChart = this.createBarChart(
-          ctx,
-          barCharData,
-          "",
-          true
-        );
-      }
-    },
+    //   return myBar;
+    // },
+    // updateBiweeklyChart() {
+    //   if (this.views.biweeklyChart) {
+    //     let datasets = [this.lastWeekDataset, this.thisWeekDataset];
+    //     this.views.newSale.biweeklyChart.data.datasets = datasets;
+    //     this.views.newSale.biweeklyChart.update();
+    //   } else {
+    //     let ctx = document.getElementById("biweeklyChart");
+    //     let labels = ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"];
+    //     let datasets = [this.lastWeekDataset, this.thisWeekDataset];
+    //     let barCharData = {
+    //       labels,
+    //       datasets,
+    //     };
+    //     this.views.newSale.biweeklyChart = this.createBarChart(
+    //       ctx,
+    //       barCharData,
+    //       "",
+    //       true
+    //     );
+    //   }
+    // },
   }, //Fin de methods
   computed: {
-    newCategoryNameLength() {
-      let categoryLength = this.views.newCategory.categoryName.length;
+    // biweeklyReports() {
+    //   let thisWeekStart = moment().startOf("week").startOf("day");
+    //   let thisWeekEnd = moment().endOf("week").endOf("days");
+    //   let lasWeekStart = moment(thisWeekStart).subtract(7, "days");
+    //   let lasWeekEnd = moment(thisWeekEnd).subtract(7, "days");
+    //   let saleOfThisWeek = [];
+    //   let salesOfLastWeek = [];
+    //   let lastWeekReport = undefined;
+    //   let thisWeekReport = undefined;
 
-      let maxLength = 45;
-      if (categoryLength > maxLength) {
-        maxLength = 0;
-        this.validateCategoryName();
-      } else {
-        maxLength -= categoryLength;
-      }
+    //   //En primer lugar procedo a recuperar las ventas de la ultimas dos semanas
+    //   for (let index = 0; index < this.sales.length; index++) {
+    //     const sale = this.sales[index];
+    //     if (
+    //       sale.saleDate.isSameOrBefore(thisWeekEnd) &&
+    //       sale.saleDate.isSameOrAfter(thisWeekStart)
+    //     ) {
+    //       saleOfThisWeek.push(sale);
+    //     } else if (
+    //       sale.saleDate.isSameOrBefore(lasWeekEnd) &&
+    //       sale.saleDate.isSameOrAfter(lasWeekStart)
+    //     ) {
+    //       salesOfLastWeek.push(sale);
+    //     } else {
+    //       break;
+    //     }
+    //   } //Fin de for
 
-      return maxLength;
-    }, //Fin del metodo
+    //   //Ahora se crean los dos reportes
+    //   lastWeekReport = new WeeklyReport(
+    //     1,
+    //     salesOfLastWeek,
+    //     lasWeekStart,
+    //     lasWeekEnd
+    //   );
+    //   lastWeekReport.calculateStatistics();
+    //   thisWeekReport = new WeeklyReport(
+    //     2,
+    //     saleOfThisWeek,
+    //     thisWeekStart,
+    //     thisWeekEnd
+    //   );
+    //   thisWeekReport.calculateStatistics();
 
-    newSaleDescriptionLength() {
-      let length = this.views.newSale.description.value.length;
-      const maxLength = 45;
-      let availableLength = maxLength - length;
+    //   return { lastWeekReport, thisWeekReport, thisWeekStart };
+    // },
+    // thisWeekDataset() {
+    //   let report = this.biweeklyReports;
+    //   let data = [];
+    //   report.thisWeekReport.dailyReports.forEach((r) => {
+    //     data.push(r.amount);
+    //   });
 
-      return availableLength;
-    },
-    biweeklyReports() {
-      let thisWeekStart = moment().startOf("week").startOf("day");
-      let thisWeekEnd = moment().endOf("week").endOf("days");
-      let lasWeekStart = moment(thisWeekStart).subtract(7, "days");
-      let lasWeekEnd = moment(thisWeekEnd).subtract(7, "days");
-      let saleOfThisWeek = [];
-      let salesOfLastWeek = [];
-      let lastWeekReport = undefined;
-      let thisWeekReport = undefined;
+    //   return {
+    //     label: "Esta Semana",
+    //     backgroundColor: color(chartColors.green).alpha(0.5).rgbString(),
+    //     borderColor: chartColors.green,
+    //     borderWidth: 1,
+    //     data: data,
+    //   };
+    // },
+    // lastWeekDataset() {
+    //   let report = this.biweeklyReports;
+    //   let data = [];
+    //   report.lastWeekReport.dailyReports.forEach((r) => {
+    //     data.push(r.amount);
+    //   });
 
-      //En primer lugar procedo a recuperar las ventas de la ultimas dos semanas
-      for (let index = 0; index < this.sales.length; index++) {
-        const sale = this.sales[index];
-        if (
-          sale.saleDate.isSameOrBefore(thisWeekEnd) &&
-          sale.saleDate.isSameOrAfter(thisWeekStart)
-        ) {
-          saleOfThisWeek.push(sale);
-        } else if (
-          sale.saleDate.isSameOrBefore(lasWeekEnd) &&
-          sale.saleDate.isSameOrAfter(lasWeekStart)
-        ) {
-          salesOfLastWeek.push(sale);
-        } else {
-          break;
-        }
-      } //Fin de for
-
-      //Ahora se crean los dos reportes
-      lastWeekReport = new WeeklyReport(
-        1,
-        salesOfLastWeek,
-        lasWeekStart,
-        lasWeekEnd
-      );
-      lastWeekReport.calculateStatistics();
-      thisWeekReport = new WeeklyReport(
-        2,
-        saleOfThisWeek,
-        thisWeekStart,
-        thisWeekEnd
-      );
-      thisWeekReport.calculateStatistics();
-
-      return { lastWeekReport, thisWeekReport, thisWeekStart };
-    },
-    thisWeekDataset() {
-      let report = this.biweeklyReports;
-      let data = [];
-      report.thisWeekReport.dailyReports.forEach((r) => {
-        data.push(r.amount);
-      });
-
-      return {
-        label: "Esta Semana",
-        backgroundColor: color(chartColors.green).alpha(0.5).rgbString(),
-        borderColor: chartColors.green,
-        borderWidth: 1,
-        data: data,
-      };
-    },
-    lastWeekDataset() {
-      let report = this.biweeklyReports;
-      let data = [];
-      report.lastWeekReport.dailyReports.forEach((r) => {
-        data.push(r.amount);
-      });
-
-      return {
-        label: "Semana Pasada",
-        backgroundColor: color(chartColors.orange).alpha(0.5).rgbString(),
-        borderColor: chartColors.orange,
-        borderWidth: 1,
-        data: data,
-      };
-    },
+    //   return {
+    //     label: "Semana Pasada",
+    //     backgroundColor: color(chartColors.orange).alpha(0.5).rgbString(),
+    //     borderColor: chartColors.orange,
+    //     borderWidth: 1,
+    //     data: data,
+    //   };
+    // },
   }, //Fin de computed
   created() {
     moment.locale("es-do");
-    this.updateModel();
     this.getModel();
   },
 });

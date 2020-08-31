@@ -81,8 +81,8 @@
                   <li class="dropdown__item">
                     <a 
                       href="#" 
-                      :class="['dropdown__link', {'dropdown__link--active' : actualView === 'salesView'}]" 
-                      @click="actualView='salesView'"
+                      :class="['dropdown__link', {'dropdown__link--active' : actualView === 'newSaleView'}]" 
+                      @click="actualView='newSaleView'"
                     >
                       Registrar Venta <!--span class="dropdown__link__new">New</span-->
                     </a>
@@ -128,39 +128,8 @@
     <!--Fin de la barra de navegacion-->
 
     <main class="main">
-      <div class="view" id="categories" v-show="views.newCategory.visible">
-        <section class="view__section">
-          <div class="container">
-            <container-header :title="title" subtitle="Gestion de Categorías"></container-header>
-            <new-category-form id="newCategory"></new-category-form>
-            <category-module :categories="categories" v-on:category-selected="onCategorySelected"></category-module>
-          </div>
-        </section>
-
-        <aside class="view__sidebar">
-          <sales-module :sales="views.newCategory.categorySales" :amount="views.newCategory.categorySelected ? views.newCategory.categorySelected.totalAmount : 0" :subtitle="views.newCategory.categorySelected ? views.newCategory.categorySelected.name : ''"></sales-module>
-        </aside>
-      </div>
-
-
-      <div class="view" id="newSale" v-show="views.newSale.visible">
-        <section class="view__section">
-          <div class="container">
-            <container-header :title="title" subtitle="Gestion de Ventas"></container-header>
-            <!-- Formulario de nueva venta -->
-            <new-sale-form id="saleForm"></new-sale-form>
-            <sales-module id="salesMovil" class="view-desktop-colapse" :sales="sales"></sales-module>
-
-            <category-module class="view-movil-colapse"></category-module>
-          </div>
-        </section>
-
-        <aside class="view__sidebar">
-          <sales-module id="salesDesktop" :sales="sales"></sales-module>
-
-        </aside>
-      </div>
-
+      <category-view id="categoryView" v-show="actualView === 'categoryView'"></category-view>
+      <sales-view id="salesView" v-show="actualView === 'newSaleView'"></sales-view>
       <!-- <div class="report">
         <h2 class="report__title">Informe Semanal</h2>
         <figure class="report__fig">
@@ -242,35 +211,7 @@
     <process-result></process-result>
     <confirm-new-sale></confirm-new-sale>
 
-    <!-- Modal para confirmar la venta -->
-    <div class="modal" :class="{show: modals.newSale.visible}" @click.self="modals.newSale.hiddenModal()">
-      <div class="modal__content">
-        <div class="modal__close" @click="modals.newSale.hiddenModal()">
-          <i class="fas fa-times-circle"></i>
-        </div>
-
-        <h2 class="modal__title">
-          Nueva Venta
-        </h2>
-        <p class="modal__info">
-          Se va a registra la venta de
-          <span class="text-bold">"{{modals.newSale.description}}"</span>
-          realizada el
-          <span class="text-bold">"{{modals.newSale.date}}"</span>
-          por valor de <span class="text-bold">{{modals.newSale.amount}}</span>
-        </p>
-
-        <button class="btn btn--success" @click="registerNewSale">Registrar</button>
-      </div>
-    </div>
-
-    <div class="modal" :class="{show: modals.waiting.visible}">
-      <div class="modal__content" style="padding-top: 140px;">
-        <div class="loader"></div>
-        <p class="modal__info" style="text-align: center;">Procesando Solicitud</p>
-      </div>
-    </div>
-
+    
   </div>
 
   </div>
