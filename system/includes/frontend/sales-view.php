@@ -135,94 +135,15 @@
           <div class="container">
             <container-header :title="title" subtitle="Gestion de Ventas"></container-header>
             <!-- Formulario de nueva venta -->
-            <form class="form form--bg-light" @submit.prevent="validateNewSale">
-              <h2 class="form__title">Registrar Venta</h2>
-              <div class="form__group">
+            <new-sale-form id="saleForm"></new-sale-form>
+            <sales-module id="salesMovil" class="view-desktop-colapse"></sales-module>
 
-                <div class="form__body">
-                  <label for="newSaleDate" class="form__label">Establecer el momento</label>
-                  <div class="form__radio-content">
-                    <!-- Seleccion de este momento -->
-                    <div>
-                      <input type="radio" name="newSaleDate" id="newSaleNow" class="form__radio" value="now" v-model="views.newSale.saleMoment">
-                      <label for="newSaleNow" class="form__label-inline">Ahora</label>
-                    </div>
-
-                    <!-- Seleccion de otro momento -->
-                    <div>
-                      <input type="radio" name="newSaleDate" id="newSaleDateOther" class="form__radio" value="other" v-model="views.newSale.saleMoment">
-                      <label for="newSaleDateOther" class="form__label-inline">Otra Fecha</label>
-                    </div>
-                  </div>
-
-                  <!-- Seleccion de la fecha -->
-                  <input type="date" name="saleDate" id="saleDate" placeholder="Selecciona una fecha" :class="['form__input', {error: views.newSale.saleDate.hasError}]" v-if="views.newSale.saleMoment === 'other'" v-model="views.newSale.saleDate.value" :max="views.newSale.maxDate" @blur="validateSaleDate" @change="validateSaleDate">
-
-                  <span class="alert alert--danger" :class="{show: views.newSale.saleDate.hasError}">
-                    {{views.newSale.saleDate.message}}
-                  </span>
-                </div>
-
-              </div>
-
-              <!-- Seleccion de la categoría -->
-              <div class="form__group">
-                <label for="newSaleCategory" class="form__label">Categoría</label>
-                <select name="newSaleCategory" id="newSaleCategory" class="form__input" :class="{error: views.newSale.categoryID.hasError}" v-model="views.newSale.categoryID.value" @blur="validateSaleCategory" @change="validateSaleCategory">
-                  <option value="" disabled selected>Selecciona una categoría</option>
-                  <option :value="category.id" v-for="category in categories" :key="category.id">{{category.name}}</option>
-                </select>
-
-                <span class="alert alert--danger" :class="{show: views.newSale.categoryID.hasError}">
-                  {{views.newSale.categoryID.message}}
-                </span>
-              </div>
-
-              <!-- Ingreso de la descripcion de la venta -->
-              <div class="form__group">
-                <div class="form__group__body">
-                  <label for="newSaleDescription" class="form__label form__label--center">Descripción de la venta</label>
-                  <textarea name="credit_description" id="newSaleDescription" cols="30" rows="3" class="form__input" :class="{error: views.newSale.description.hasError}" placeholder="Escribe los detalles aquí" required v-model.trim="views.newSale.description.value" @focus="$event.target.select()" @change="validateSaleDescription" @blur="validateSaleDescription">
-                        </textarea>
-                </div>
-
-                <div class="form__group__footer">
-                  <span class="alert alert--danger" :class="{show: views.newSale.description.hasError}" id="newSaleDescriptionAlert">
-                    {{views.newSale.description.message}}
-                  </span>
-                  <span class="form__input__length" id="newSaleDescriptionLength">{{newSaleDescriptionLength}}</span>
-                </div>
-              </div>
-
-              <!-- Ingreso del inporte de la venta -->
-              <div class="form__group">
-                <div class="form__group__body">
-                  <label class="form__label" for="creditAmount">Importe</label>
-                  <input-money id="creditAmount" required v-model="views.newSale.amount.value" @blur="validateSaleAmount" @change="validateSaleAmount">
-                  </input-money>
-                </div>
-                <div class="form__group__footer">
-                  <span class="alert alert--danger" :class="{show: views.newSale.amount.hasError}">
-                    {{views.newSale.amount.message}}
-                  </span>
-                </div>
-              </div>
-
-              <p class="alert alert--big" :class="{show: views.newSale.showAlert, 'alert--danger': !views.newSale.processSuccess, 'alert--success':views.newSale.processSuccess}">
-                {{views.newSale.alertMessage}}
-              </p>
-
-              <input type="submit" value="Registrar Venta" class="btn btn--success" id="newCreditBtn">
-            </form>
-
-            <sales-module :sales="sales" :amount="salesAmount" class="view-desktop-colapse"></sales-module>
-
-            <category-module :categories="categories" class="view-movil-colapse"></category-module>
+            <category-module class="view-movil-colapse"></category-module>
           </div>
         </section>
 
         <aside class="view__sidebar">
-          <sales-module :sales="sales" :amount="salesAmount"></sales-module>
+          <sales-module id="salesDesktop"></sales-module>
           <div class="report">
             <h2 class="report__title">Informe Semanal</h2>
             <figure class="report__fig">
@@ -304,6 +225,7 @@
     </main>
     <waiting-modal></waiting-modal>
     <process-result></process-result>
+    <confirm-new-sale></confirm-new-sale>
 
     <!-- Modal para confirmar la venta -->
     <div class="modal" :class="{show: modals.newSale.visible}" @click.self="modals.newSale.hiddenModal()">
