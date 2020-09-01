@@ -73,7 +73,7 @@
                     <a href="#" :class="['dropdown__link', {active: actualView === 'newCustomerAndUpdate'}]" @click="actualView = 'newCustomerAndUpdate'">Nuevo y Actualización</a>
                   </li>
                   <li class="dropdown__item">
-                    <a href="#" class="dropdown__link disabled">Historial de movimientos</a>
+                    <a href="#" :class="['dropdown__link', {active: actualView === 'historyView'}]" @click="actualView = 'historyView'">Historial de movimientos</a>
                   </li>
                   <li class="dropdown__item">
                     <a href="#" class="dropdown__link disabled">Informes</a>
@@ -110,6 +110,8 @@
     </customer-register>
 
     <operation-register id="customerOperation" v-show="actualView === 'newOperation'"></operation-register>
+
+    <history-view v-show="actualView === 'historyView'"></history-view>
     
     <waiting-modal></waiting-modal>
     <process-result></process-result>

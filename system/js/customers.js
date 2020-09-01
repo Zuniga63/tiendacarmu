@@ -402,6 +402,51 @@ class Payment extends Transaction {
     this.cash = cash;
   }
 }
+
+/**
+ * Instancia de una tupla de historial
+ */
+class CustomerHistory {
+	/**
+	 * @constructor
+	 * @param {string} author Nombre completo del usuario que realizó la accion
+	 * @param {string} customer Nombre complto del cliente asociado a este historial
+	 * @param {string} historyDate Fecha del momento exacto en el que se creo el registro
+	 * @param {bool} newCustomer Si fue un nuevo cliente
+	 * @param {bool} updateData Si se actualizaron los datos del cliente
+	 * @param {bool} updateCredit Si se actualizaron los datos de un credito
+	 * @param {bool} updatePayment Si se actualizaron los datos de algun abono
+	 * @param {bool} newPayment Si se agregó un nuevo abono al cliente
+	 * @param {bool} newCredit Sis se agrego un nuevo credito al clienta
+	 * @param {number} amount Diferente de cero para el caso de que se actualicen creditos o abonos
+	 */
+  constructor(author, customer, historyDate, newCustomer, updateData, updateCredit, updatePayment, newPayment, newCredit, amount) {
+    this.author = author;
+    this.customer = customer;
+    this.historyDate = historyDate;
+    this.recently = false;
+    this.newCustomer = newCustomer;
+    this.updateData = updateData;
+    this.updateCredit = updateCredit;
+    this.updatePayment = updatePayment;
+    this.newPayment = newPayment;
+    this.newCredit = newCredit;
+    this.amount = amount;
+    this.defineRecently();
+  }
+
+	/**
+	 * Establece si este historial es reciente o antiguo
+	 */
+  defineRecently() {
+    this.historyDate = moment(this.historyDate);
+    let now = moment();
+    let diff = now.diff(this.historyDate, 'days');
+    if (diff <= 8) {
+      this.recently = true;
+    }
+  }
+}
 //---------------------------------------------
 //  COMPONENTES
 //---------------------------------------------
@@ -1967,6 +2012,104 @@ Vue.component("operation-register", {
   </div>`,
 });
 
+Vue.component("history-view", {
+  data(){
+    return {
+      historyList: [
+        {id:0, value: "credits", name:"Creditos"},
+        {id:1, value: "payments", name:"Abonos"},
+        {id:2, value: "updates", name:"Actualizaciones"},
+      ],
+      historyName: "credits",
+    }
+  },
+  computed:{
+    ...Vuex.mapState(['customers', 'history']),
+    cards(){
+      let cards = [];
+      switch (this.historyName) {
+        case 'credits':
+          cards = this.history.filter(record => record.newCredit);
+          break;
+        case 'payments':
+          cards = this.history.filter(record => record.newPayment);
+          break;
+        case 'updates':
+          cards = this.history.filter(record => record.updateData || record.updateCredit || record.updatePayment);
+          break;
+
+      
+        default:
+          break;
+      }
+      return cards;
+    },
+    info(){
+      let message = "";
+      switch (this.historyName) {
+        case 'credits':
+          message = "Se registró un crédito por valor de ";
+          break;
+        case 'payments':
+          message = "Se registró un pago por valor de ";
+          break;
+        case 'updates':
+          message = "Se modificaron los datos personales ";
+          break;
+        default:
+          break;
+      }
+
+      return message;
+    }
+  },
+  methods:{
+    formatCurrency: formatCurrencyLite,
+  },
+  template:
+  /*html*/`
+  <div class="view">
+    <section class="view__section">
+      <div class="container">
+        <div class="container__header container__header--success">
+          <h1 class="container__title">Sistema de Clientes</h1>
+          <p class="container__subtitle">Historial de operaciones</p>
+        </div>
+          
+        <div class="card-container">
+          <h2 class="card-container__title">Historial de operaciones</h2>
+          <select  class="form__input" v-model="historyName">
+            <option v-for="item of historyList" :key="item.id" :value="item.value">{{item.name}}</option>
+          </select>
+          <div class="card-container__box scroll">
+            <div 
+              v-for="(card, index) of cards"
+              :key="index"
+              class="history__card" 
+              :class="{'history__card--recently': card.recently}"
+            >
+              <p class="history__card__title">
+                {{card.customer}}
+              </p>
+              <p class="history__card__date">
+                {{card.historyDate.calendar()}}
+              </p>
+              <p class="history__card__info">
+                {{info}} <span class="history__card__bold">{{card.amount ? formatCurrency(card.amount, 0) : ''}}</span>
+              </p>
+              <p class="history__card__author">Responsable: <span class="history__card__bold">{{card.author}}</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+    <aside class="view__sidebar">
+    </aside>
+  </div>
+  `
+})
+
 
 //---------------------------------------------
 //  RAIZ DE LA APLICACION
@@ -1974,6 +2117,7 @@ Vue.component("operation-register", {
 const store = new Vuex.Store({
   state: {
     customers: [],
+    history: [],
     waiting: false,
     processResult: new RequesProcess(),
     eventHub: new Vue(),
@@ -2039,6 +2183,13 @@ const store = new Vuex.Store({
       }
       this.commit("waitingRequest", false);
     },
+    updateHistory(state, data){
+      state.history = [];
+      data.history.forEach(record => {
+        let history = new CustomerHistory(record.author, record.customer, record.historyDate, record.newCustomer, record.updateData, record.updateCredit, record.updatePayment, record.newPayment, record.newCredit, record.amount);
+        state.history.push(history);
+      })
+    },
     waitingRequest(state, value) {
       state.waiting = value;
     },
@@ -2076,8 +2227,25 @@ const store = new Vuex.Store({
       try {
         const res = await fetch("./api/all_customers.php");
         const data = await res.json();
-        commit("waitingRequest", true);
         commit("updateCustomerList", data);
+        commit("waitingRequest", false);
+      } catch (error) {
+        console.log(error);
+        commit("waitingRequest", false);
+        commit(
+          "requestResult",
+          false,
+          "No se pudo recuperar los datos de los clientes"
+        );
+      }
+    },
+    async getHistory({commit}){
+      commit("waitingRequest", true);
+      try {
+        const res = await fetch("./api/customer_history.php");
+        const data = await res.json();
+        commit("waitingRequest", false);
+        commit("updateHistory", data);
       } catch (error) {
         console.log(error);
         commit("waitingRequest", true);
@@ -2293,14 +2461,16 @@ const app = new Vue({
   store,
   data: {
     actualView: "newOperation",
+    // actualView: "historyView",
   },
   methods: {
-    ...Vuex.mapActions(["getCustomers"]),
+    ...Vuex.mapActions(["getCustomers", "getHistory"]),
   }, //Fin de methods
   computed: {
     ...Vuex.mapState(['sales']),
   }, //Fin de compute
   created() {
     this.getCustomers();
+    this.getHistory();
   }, //Fin de create
 });
