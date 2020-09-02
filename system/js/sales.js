@@ -479,15 +479,14 @@ Vue.component("sales-module", {
   data() {
     return {
       periods: [
-        { id: 0, value: "thisMonth", name: "Este mes" },
-        { id: 1, value: "thisBiweekly", name: "Esta quincena" },
-        { id: 2, value: "thisWeek", name: "Esta semana" },
-        { id: 3, value: "thisYear", name: "Este año" },
-        {
-          id: 4,
-          value: "fromTheOriginOfTheTime",
-          name: "Desde el origen de los tiempos",
-        },
+        { id: 1, value: "thisWeek", name: "Esta semana" },
+        { id: 2, value: "lastWeek", name: "La semana pasada" },
+        { id: 5, value: "thisBiweekly", name: "Esta quincena" },
+        { id: 6, value: "lastBiweekly", name: "Quincena pasada" },
+        { id: 3, value: "thisMonth", name: "Este mes" },
+        { id: 4, value: "lastMonth", name: "El mes pasado" },
+        { id: 7, value: "thisYear", name: "Este año" },
+        { id: 8, value: "lastYear", name: "El año pasado" },
       ],
       period: "thisMonth",
     };
@@ -496,42 +495,57 @@ Vue.component("sales-module", {
     salesList() {
       let list = [];
       let start, end;
+      let dayOfMonth = moment().date();
       switch (this.period) {
-        case "thisMonth":
-          start = moment().startOf("month");
-          end = moment().endOf("month");
-          list = this.getSales(start, end);
-          break;
         case "thisWeek":
           start = moment().startOf("week");
           end = moment().endOf("week");
-          list = this.getSales(start, end);
+          break;
+        case "lastWeek":
+          start = moment().subtract(7, 'day').startOf('week');
+          end = moment(start).endOf('week');
+          break;
+        case "thisBiweekly":
+          if (dayOfMonth > 15) {
+            start = moment().startOf('month').add(15, 'days');
+            end = moment().endOf("month");
+          } else {
+            start = moment().startOf("month");
+            end = moment(start).add(14, 'days').endOf("day");
+          }
+          break;
+        case "lastBiweekly":
+          // let dayOfMonth = moment().date();
+          if (dayOfMonth > 15) {
+            start = moment().startOf("month");
+            end = moment(start).add(14, 'days').endOf("day");
+          } else {
+            start = moment().subtract(1, 'month').startOf("month").add(15, 'days');
+            end = moment(start).endOf("month");
+          }
+          break;
+        case "thisMonth":
+          start = moment().startOf("month");
+          end = moment().endOf("month");
+          break;
+        case "lastMonth":
+          start = moment().subtract(1, 'month').startOf("month");
+          end = moment(start).endOf("month");
           break;
         case "thisYear":
           start = moment().startOf("year");
           end = moment().endOf("year");
-          list = this.getSales(start, end);
           break;
-        case "thisBiweekly":
-          let now = moment();
-          let year = now.year();
-          let month = now.month();
-          let dayOfMonth = now.date();
-          if (dayOfMonth > 15) {
-            start = moment([year, month, 16]);
-            end = moment().endOf("month");
-          } else {
-            start = moment().startOf("month");
-            end = moment([year, month, 15]).endOf("day");
-          }
-          console.log(start.format("ll"));
-          list = this.getSales(start, end);
+        case "lastYear":
+          start = moment().subtract(1, 'year').startOf("year");
+          end = moment(start).endOf("year");
           break;
         default:
-          list = this.sales;
+          start = moment().startOf("year");
+          end = moment().endOf("year");
           break;
       } //Fin de swith
-
+      list = this.getSales(start, end);
       return list;
     },
     saleListAmount() {
@@ -541,6 +555,15 @@ Vue.component("sales-module", {
       });
 
       return amount;
+    },
+    averageSale() {
+      let average = 0;
+      let sales = this.salesList.length;
+      if(sales > 0){
+        average = this.saleListAmount / sales;
+      }
+
+      return Math.floor(average);
     },
   },
   methods: {
@@ -601,6 +624,7 @@ Vue.component("sales-module", {
     </div>
     <footer class="history__footer">
       <p class="history__info">Total: <span class="text-bold">{{formatCurrency(saleListAmount)}}</span></p>
+      <p class="history__info" v-show="averageSale">Prom: <span class="text-bold">{{formatCurrency(averageSale)}}</span></p>
       <p class="history__info">Ventas: <span class="text-bold">{{salesList.length}}</span></p>
     </footer>
   </div>
@@ -910,13 +934,13 @@ Vue.component("category-view", {
 });
 
 Vue.component("sales-view", {
-  props:['id'],
-  data(){
+  props: ['id'],
+  data() {
     return {
       title: "Sistema de ventas"
     }
   },
-  computed:{
+  computed: {
     ...Vuex.mapState(['sales']),
   },
   template: /*html*/`
