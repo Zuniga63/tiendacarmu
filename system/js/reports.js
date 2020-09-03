@@ -71,6 +71,21 @@ const DayOfWeek = Object.freeze({
   7: "Domingo",
 });
 
+const Month = Object.freeze({
+  0: "Enero",
+  1: "Febrero",
+  2: "Marzo",
+  3: "Abril",
+  4: "Mayo",
+  5: "Junio",
+  6: "Julio",
+  7: "Agosto",
+  8: "Septiembre",
+  9: "Octubre",
+  10: "Noviembre",
+  11: "Diciembre",
+});
+
 /**
  * Super clase para gestionar los reportes de ventas
  */
@@ -101,7 +116,7 @@ class ReportBase {
     let correctSales = [];
     let incorretSales = [];
 
-    this.sales.forEach(sale => {
+    this.sales.forEach((sale) => {
       //En primer lugar se verifica que sea una instancia de Sale
       if (sale instanceof Sale) {
         correctSales.push(sale);
@@ -125,8 +140,8 @@ class ReportBase {
       this.maxSale = max;
       this.average = amount > 0 ? amount / correctSales.length : 0;
       this.salesWithError = incorretSales;
-    });//Fin de forEach
-  }//Fin del metodo
+    }); //Fin de forEach
+  } //Fin del metodo
 }
 
 /**
@@ -150,30 +165,31 @@ class DailyReport extends ReportBase {
   calculateStats() {
     this.__validateSales();
     super.calculateStats();
-  }//Fin del metodo
+  } //Fin del metodo
 
   /**
-   * Se encarga de verificar que las ventas se encuentren dentro de 
+   * Se encarga de verificar que las ventas se encuentren dentro de
    * la fecha del día.
    */
   __validateSales() {
     if (this.date instanceof Moment) {
-      let startDay = moment(this.date).startOf('day');
-      let endDay = moment(this.date).endOf('day');
+      let startDay = moment(this.date).startOf("day");
+      let endDay = moment(this.date).endOf("day");
       let temporal = [];
-      this.sales.forEach(sale => {
-        if (sale.saleDate.isSameOrAfter(startDay) && sale.saleDate.isSameOrBefore(endDay)) {
+      this.sales.forEach((sale) => {
+        if (sale.saleDate.isBetween(startDay, endDay, undefined, "[]")) {
           temporal.push(sale);
         } else {
           this.salesWithError.push(sale);
         }
-      });//Fin de forEach
+      }); //Fin de forEach
 
       this.sales = temporal;
-    } else { //Fin de if
+    } else {
+      //Fin de if
       this.sales = [];
-    }//Fin de else
-  }//Fin del metodo
+    } //Fin de else
+  } //Fin del metodo
 }
 
 /**
@@ -214,26 +230,98 @@ class PeriodicReport extends Report {
   __validateSales() {
     let temporal = [];
     let errors = [];
-    this.sales.forEach(sale => {
+    this.sales.forEach((sale) => {
       if (sale instanceof Sale) {
-        if(sale.saleDate.isSameOrAfter(this.since) && sale.saleDate.isSameOrBefore(this.until)){
+        if (sale.saleDate.isBetween(this.since, this.until, undefined, "[]")) {
           temporal.push(sale);
-        }else{
+        } else {
           errors.push(sale);
         }
-      }else{
+      } else {
         errors.push(sale);
-      }//Fin de if-else
-    });//Fin de forEach
+      } //Fin de if-else
+    }); //Fin de forEach
     this.sales = temporal;
     this.salesWithError = errors;
-  }//Fin del metodo
+  } //Fin del metodo
   /**
    * Se encarga de definir las estadisticas diarias
    */
   calculateDailyStats() {
-    //TODO
-  }
+    //-----------------------------------------------------
+    //  FECHAS
+    //-----------------------------------------------------
+    let minDate = moment(this.since);
+    let maxDate = moment(this.until);
+    let fromDate = moment(minDate);
+    let toDate = moment(fromDate).endOf("day");
+    //-----------------------------------------------------
+    //  PARAMETROS
+    //-----------------------------------------------------
+    let sales = this.sales.sort((s1, s2) => s1.saleDate.diff(s2.saleDate));
+    //-----------------------------------------------------
+    //  VARIABLES
+    //-----------------------------------------------------
+    let id = 0;
+    let actualIndex = 0;
+    let dayInWhite = 0;
+    let maxSale = undefined;
+    let minSale = undefined;
+    //-----------------------------------------------------
+    //  LISTADOS
+    //-----------------------------------------------------
+    let dailySales = [];
+    let dailyReports = [];
+    //-----------------------------------------------------
+    //  LOGICA DEL METODO
+    //-----------------------------------------------------
+    while (fromDate.isBefore(maxDate)) {
+      //cada que inicia un ciclo se debe limpiar la lista de ventas
+      dailySales = [];
+      //Se recorre la lista desde el punto anterior
+      for (let index = actualIndex; index < sales.length; index++) {
+        const sale = sales[index];
+        if (sale.saleDate.isBetween(fromDate, toDate, undefined, "[]")) {
+          dailySales.push(sale);
+          actualIndex++;
+        } else {
+          break;
+        }
+      }
+
+      //Aquí ya se tiene un listado oficial que se encuentra entre las dos fechas
+      //Por lo que se procede a crear el reporte diario
+      id++; //Se aumenta el contador antes con el fin de que no empiece en cero
+      let dailyReport = new DailyReport(id, dailySales, fromDate);
+      dailyReports.push(dailyReport);
+      if (dailyReport.amount > 0) {
+        dayInWhite++;
+      } else {
+        //Ahora se define si es una venta maxima, minima o ninguna
+        if (maxSale && minSale) {
+          minSale =
+            minSale.amount <= dailyReport.amount ? minSale : dailyReport;
+          maxSale =
+            maxSale.amount >= dailyReport.amount ? maxSale : dailyReport;
+        } else {
+          minSale = dailyReport;
+          maxSale = dailyReport;
+        } //Fin de if-else
+      } //Fin de if-else
+
+      //Se aumenta la fecha en un día
+      fromDate.add(1, "day");
+      toDate.add(1, "day");
+    } //Fin de while
+
+    //Finalmente se calcula el promedio diario y se asignan los valores
+    this.dailyReports = dailyReports;
+    this.dayInWhite = dayInWhite;
+    this.maxDailySale = maxSale;
+    this.minDailySale = minSale;
+    this.averageDailySale =
+      dailyReports.length > 0 ? this.amount / dailyReports.length : 0;
+  } //Fin del metodo
 
   /**
    * Verifica que sean instancia de moment y que la fecha inicial
@@ -244,126 +332,14 @@ class PeriodicReport extends Report {
    */
   __validatePeriod(since, until) {
     if (since instanceof Moment && until instanceof Moment) {
-      since.startOf('day');
-      until.endOf('day');
+      since.startOf("day");
+      until.endOf("day");
       //Se verifica que since sea menor que until
       if (since.isBefore(until)) {
         this.since = since.startOf("day");
         this.until = until.endOf("day");
       }
     }
-  } //Fin del metodo
-
-  /**
-   * Se verifica que las ventas esten dentro del periodo
-   * y se muta el array original de ventas. 
-   * OJO: ESTE METODO REVIERTE EL ARREGLO DE VENTAS YA QUE POR DEFECTO
-   * EN EL SERVIDOR ESTAS SON ENVIADAS EN ORDEN INVERSO
-   */
-  __validateSales() {
-    let salescorrect = [];
-    let salesIncorrect = [];
-
-    this.sales.forEach((sale) => {
-      if (
-        sale.saleDate.isSameOrAfter(this.since) &&
-        sale.saleDate.isSameOrBefore(this.until)
-      ) {
-        salescorrect.push(sale);
-      } else {
-        salesIncorrect.push(sale);
-      }
-    });
-
-    this.sales = salescorrect.reverse();
-    //TODO: Metodo que grantice un ordenamineto de fechas correcto siempre
-    this.salesWithError = salesIncorrect;
-  }
-
-  __calculateDailyStatistics() {
-    let actualSaleIndex = 0;
-    let lastID = 0;
-    let startDate = this.since; //La fecha inicial del reporte periodico
-    let endDate = this.until; //La fecha limite del repote periodico
-    let since = undefined;
-    let until = undefined;
-    let amount = 0;
-    let dailySales = [];
-    let dailyReports = [];
-    let dayInWhite = 0;
-    let maxDailySale = undefined;
-    let minDailySale = undefined;
-    let averageDailySale = 0;
-
-    //Se define la fecha del primer reporte diario
-    since = moment(startDate).startOf("day");
-    until = moment(since).endOf("day");
-
-    //Se inicia el cilo que va verificando la fechas de las ventas
-    while (since.isBefore(endDate)) {
-      //Empieza el bucle que recorre las ventas
-      for (let index = actualSaleIndex; index < this.sales.length; index++) {
-        const sale = this.sales[index];
-        actualSaleIndex = index;
-
-        if (
-          sale.saleDate.isSameOrAfter(since) &&
-          sale.saleDate.isSameOrBefore(until)
-        ) {
-          dailySales.push(sale);
-        } else {
-          break;
-        } //Fin de if-else
-      } //Fin de for
-
-      //En este punto o no hay mas ventas o se rompio el bucle
-      // alert('Ojo');
-      const dailyReport = new DailyReport(lastID + 1, dailySales, since);
-      dailyReport.calculateStatistics();
-      dailyReports.push(dailyReport);
-      amount += dailyReport.amount;
-      //Se limpian los datos para la siguiente vuelta
-      dailySales = [];
-      lastID++;
-
-      //Se asigna el rporte maximo y el minimo
-      if (dailyReport.amount > 0) {
-        if (
-          typeof minDailySale === "undefined" &&
-          typeof maxDailySale === "undefined"
-        ) {
-          minDailySale = dailyReport;
-          maxDailySale = dailyReport;
-        } else {
-          minDailySale =
-            minDailySale.amount <= dailyReport.amount
-              ? minDailySale
-              : dailyReport;
-          maxDailySale =
-            maxDailySale.amount >= dailyReport.amount
-              ? maxDailySale
-              : dailyReport;
-        } //fin de else
-      } else {
-        dayInWhite++;
-      } //Fin de else
-
-
-      //Se aumenta en un día las fecha limitantes
-      since.add(1, "day");
-      until.add(1, "day");
-    } //Fin de while
-
-    if (dailyReports.length > 0) {
-      averageDailySale = amount / dailyReports.length;
-    }
-
-    //Se actualiza la ifnormacion del objeto
-    this.dailyReports = dailyReports;
-    this.maxDailySale = maxDailySale;
-    this.minDailySale = minDailySale;
-    this.averageDailySale = averageDailySale;
-    this.dayInWhite = dayInWhite;
   } //Fin del metodo
 } //Fin de la clase
 
@@ -390,38 +366,82 @@ class WeeklyReport extends PeriodicReport {
       //Primero se define el numero de la semna
       this.week = this.since.isoWeek();
       //Ahora se define el inicio y el fin de la semana
-      this.since = this.since.startOf('week');
-      this.until = this.until.endOf('week');
+      this.since = this.since.startOf("week");
+      this.until = this.until.endOf("week");
     } else {
-      this.since = moment().startOf('week');
-      this.until = moment().endOf('week');
+      this.since = moment().startOf("week");
+      this.until = moment().endOf("week");
     }
   }
 }
 
 class MonthlyReport extends PeriodicReport {
   constructor(id, sales, since, until) {
-    //TODO
+    super(id, sales, since, until);
+    month: Month[since.month()];
+    fortnights: [];
   }
 
   calculateStats() {
-    //TODO
+    this.__validateMonth();
+    super.calculateStats();
+    this.calculateFortnigthsStats();
   }
 
   /**
    * Se encarga de verifica y corregir las fechas
-   * de los limites de este mes
+   * de los limites de este mes y verificar las ventas
    */
-  validateMonth() {
-    //TODO
-  }
+  __validateMonth() {
+    this.since.startOf("month");
+    this.until.endOf("month");
+    let temporal = [];
+    this.sales.forEach((sale) => {
+      if (sale.isBetween(this.since, this.until, undefined, "[]")) {
+        temporal.push(sale);
+      } else {
+        this.salesWithError.push(sale);
+      }
+    }); //Fin de forEach
+
+    this.sales = temporal;
+  } //Fin del metodo
 
   /**
-   * Encargado de crear las estadisticas correspondientes a las dos 
+   * Encargado de crear las estadisticas correspondientes a las dos
    * quincenas del mes
    */
   calculateFortnigthsStats() {
-    //TODO
+    //Se inicializan las variables y se crea la primera quincea
+    let fromDate = moment(this.since).startOf("day");
+    let toDate = moment(fromDate).add(14, "day").endOf("day");
+    
+    let fortnightSales = this.sales.filter((sale) =>
+      sale.saleDate.isBetween(fromDate, toDate, undefined, "[]")
+    );
+
+    let firtsFortnight = new PeriodicReport(
+      1,
+      fortnightSales,
+      fromDate,
+      toDate
+    );
+    firtsFortnight.calculateStats();
+    this.fortnights.push(firtsFortnight);
+
+    //Se crea el reporte de la segunda quincena
+    fromDate = moment(this.since).add(15, "days");
+    toDate = moment(toDate).endOf("month");
+    fortnightSales = this.sales.filter((sale) =>
+      sale.saleDate.isBetween(fromDate, toDate, undefined, "[]")
+    );
+    let secondFortnight = new PeriodicReport(
+      2,
+      fortnightSales,
+      fromDate,
+      toDate
+    );
+    secondFortnight.calculateStats();
   }
 }
 

@@ -4,8 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Documento para pruebas</title>
-    <link rel="stylesheet" href="./css/normalize.css">
-    <link rel="stylesheet" href="./css/main.css">
+    <!-- <script src="https://use.fontawesome.com/7ebcf381fa.js"></script> -->
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.14.0/css/all.css"
+      integrity="sha384-HzLeBuhoNPvSl5KYnjx0BT+WB0QEEqLprO+NBkkk5gbc67FTaL7XIGa2w1L0Xbgc"
+      crossorigin="anonymous"
+    />
+
+    <link rel="stylesheet" href="./css/normalize.css" />
+    <link rel="stylesheet" href="./css/main.css" />
   </head>
   <body>
     <div class="view">
@@ -13,34 +21,45 @@
         <div class="container">
           <div class="container__header container__header--success">
             <h1 class="container__title">Sistema de Clientes</h1>
-            <p class="container__subtitle">Historial de operaciones</p>
+            <p class="container__subtitle">Informes</p>
           </div>
-          
-          <div class="card-container">
-            <h2 class="card-container__title">Historial de operaciones</h2>
-            <select  class="form__input">
-              <option value="0">Creditos</option>
+
+          <div class="form form--bg-light">
+            <div class="form__header">
+              <h2 class="form__title">Parametros</h2>
+            </div>
+            <select name="category" id="category" class="form__input">
+              <option value="0" selected>Todas las categorías</option>
             </select>
-            <div class="card-container__box scroll">
-              <div class="history__card">
-                <p class="history__card__title">Nombre del cliente</p>
-                <p class="history__card__date">La semana pasada</p>
-                <p class="history__card__info">Se registró un credito por valor de <span class="history__card__bold">$1.200.000</span></p>
-                <p class="history__card__author">Responsable: <span class="history__card__bold">Julanito de Tal</span></p>
-              </div>
-              <div class="history__card">
-                <p class="history__card__title">Nombre del cliente</p>
-                <p class="history__card__date">La semana pasada</p>
-                <p class="history__card__info">Se registró un credito por valor de <span class="history__card__bold">$1.200.000</span></p>
-                <p class="history__card__author">Responsable: <span class="history__card__bold">Julanito de Tal</span></p>
-              </div>
+            <select name="year" id="year" class="form__input">
+              <option value="0" selected>2020</option>
+            </select>
+            <div class="form__group">
+              <input
+                type="checkbox"
+                name="fortnights"
+                id="fortnights"
+                class="form__checkbox form__checkbox--big"
+              />
+              <label for="fortnights">Dividir meses en quincenas</label>
+            </div>
+
+            <button class="btn btn--success">Generar grafico</button>
+          </div>
+
+          <div class="chart-section">
+            <h2 class="chart-section__title">Ventas</h2>
+            <canvas class="chart-section__chart"></canvas>
+            <div class="form__actions-double">
+              <button class="btn btn--success">
+                <span class="btn__prepend fas fa-plus-circle"></span>
+                Enero
+              </button>
             </div>
           </div>
         </div>
-
       </section>
-      <aside class="view__sidebar">
-      </aside>
+      <aside class="view__sidebar"></aside>
     </div>
   </body>
 </html>

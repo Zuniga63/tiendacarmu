@@ -506,8 +506,17 @@ body {
   text-align: center;
 }
 
-.form__radio {
+.form__radio, 
+.form__checkbox{
   vertical-align: middle;
+}
+
+.form__radio--big,
+.form__checkbox--big{
+  transform: scale(1.5);
+  margin-bottom: 5px;
+  margin-right: 5px;
+  padding: 5px;
 }
 
 .form__label,
@@ -600,7 +609,9 @@ body {
 /* Las etiqueas label, inputs y alertas se ubican dentro de este contenedor */
 .form__group {
   margin-bottom: 0.6rem;
-  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  width: 95%;
 }
 
 /* Para los campos como stock o genero que ocupan solo un bloque */
@@ -1774,9 +1785,10 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 }
 
 .chart-section__title {
-  text-align: left;
   margin-bottom: 0.8rem;
   font-size: 1.2em;
+  text-align: center;
+  color: var(--dark);
 }
 
 .chart-section__chart {
