@@ -7,12 +7,7 @@
   <title>Panel de control</title>
   <!-- FONT AWESOME -->
   <!-- <script src="https://use.fontawesome.com/7ebcf381fa.js"></script> -->
-  <link 
-    rel="stylesheet" 
-    href="https://use.fontawesome.com/releases/v5.14.0/css/all.css" 
-    integrity="sha384-HzLeBuhoNPvSl5KYnjx0BT+WB0QEEqLprO+NBkkk5gbc67FTaL7XIGa2w1L0Xbgc" 
-    crossorigin="anonymous"
-  >
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.14.0/css/all.css" integrity="sha384-HzLeBuhoNPvSl5KYnjx0BT+WB0QEEqLprO+NBkkk5gbc67FTaL7XIGa2w1L0Xbgc" crossorigin="anonymous">
 
   <!-- SE CARGAN LOS ESTILOS GENERALES -->
   <link rel="stylesheet" href=<?= "./css/normalize.css?v=" . VERSION ?> />
@@ -30,9 +25,12 @@
 </head>
 
 <body>
-
-<!-- se carga el escrip personalizado -->
-<script src=<?= "./js/app.js?v=" . VERSION ?>></script>
+  <div id="app">
+    <nav-bar></nav-bar>
+  </div>
+  <!-- se carga el escrip personalizado -->
+  <script src=<?= "./js/components.js?v=" . VERSION ?>></script>
+  <script src=<?= "./js/app.js?v=" . VERSION ?>></script>
 </body>
 
 </html>
