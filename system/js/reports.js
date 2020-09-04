@@ -115,6 +115,7 @@ class ReportBase {
     let min = undefined;
     let correctSales = [];
     let incorretSales = [];
+    console.log('Llamada al metodo calculate Stats Base');
 
     this.sales.forEach((sale) => {
       //En primer lugar se verifica que sea una instancia de Sale
@@ -213,7 +214,7 @@ class PeriodicReport extends Report {
     this.maxDailySale = undefined;
     this.minDailySale = undefined;
     this.averageDailySale = 0;
-    this.dayInWhite = 0;
+    this.blankDays = [];
     this.__validatePeriod(since, until);
   }
 
@@ -264,7 +265,7 @@ class PeriodicReport extends Report {
     //-----------------------------------------------------
     let id = 0;
     let actualIndex = 0;
-    let dayInWhite = 0;
+    let blankDays = [];
     let maxSale = undefined;
     let minSale = undefined;
     //-----------------------------------------------------
@@ -295,8 +296,6 @@ class PeriodicReport extends Report {
       let dailyReport = new DailyReport(id, dailySales, fromDate);
       dailyReports.push(dailyReport);
       if (dailyReport.amount > 0) {
-        dayInWhite++;
-      } else {
         //Ahora se define si es una venta maxima, minima o ninguna
         if (maxSale && minSale) {
           minSale =
@@ -307,6 +306,8 @@ class PeriodicReport extends Report {
           minSale = dailyReport;
           maxSale = dailyReport;
         } //Fin de if-else
+      } else {
+        blankDays.push(dailyReport);
       } //Fin de if-else
 
       //Se aumenta la fecha en un día
@@ -316,7 +317,7 @@ class PeriodicReport extends Report {
 
     //Finalmente se calcula el promedio diario y se asignan los valores
     this.dailyReports = dailyReports;
-    this.dayInWhite = dayInWhite;
+    this.blankDays = blankDays;
     this.maxDailySale = maxSale;
     this.minDailySale = minSale;
     this.averageDailySale =
@@ -378,8 +379,9 @@ class WeeklyReport extends PeriodicReport {
 class MonthlyReport extends PeriodicReport {
   constructor(id, sales, since, until) {
     super(id, sales, since, until);
-    month: Month[since.month()];
-    fortnights: [];
+    this.month = Month[since.month()];
+    this.fortnights = [];
+    this.calculateStats();
   }
 
   calculateStats() {
@@ -395,16 +397,7 @@ class MonthlyReport extends PeriodicReport {
   __validateMonth() {
     this.since.startOf("month");
     this.until.endOf("month");
-    let temporal = [];
-    this.sales.forEach((sale) => {
-      if (sale.isBetween(this.since, this.until, undefined, "[]")) {
-        temporal.push(sale);
-      } else {
-        this.salesWithError.push(sale);
-      }
-    }); //Fin de forEach
-
-    this.sales = temporal;
+    this.__validateSales();
   } //Fin del metodo
 
   /**
@@ -415,7 +408,7 @@ class MonthlyReport extends PeriodicReport {
     //Se inicializan las variables y se crea la primera quincea
     let fromDate = moment(this.since).startOf("day");
     let toDate = moment(fromDate).add(14, "day").endOf("day");
-    
+
     let fortnightSales = this.sales.filter((sale) =>
       sale.saleDate.isBetween(fromDate, toDate, undefined, "[]")
     );
@@ -442,19 +435,105 @@ class MonthlyReport extends PeriodicReport {
       toDate
     );
     secondFortnight.calculateStats();
+    this.fortnights.push(secondFortnight);
   }
 }
 
 class AnnualReport extends PeriodicReport {
   constructor(id, sales, since, until) {
-    //TODO
+    super(id, sales, since, until);
+    this.year = undefined;
+    this.blankMonths = [];
+    this.monthlyReports = [];
+    this.minMonthlySale = undefined;
+    this.maxMonthlySale = undefined;
+    this.averageMonthlySale = 0;
   }
 
   calculateStats() {
-    //TODO
+    this.__verifyDate();
+    super.calculateStats();
+    this.calculateMonthlyStats();
   }
 
+  /**
+   * this method select the sales for Each month 
+   * and creates the reports.
+   */
   calculateMonthlyStats() {
-    //TODO
-  }
+    let fromDate = moment(this.since);
+    let toDate = moment(fromDate).endOf('month');
+    let id = 0;
+    let maxSale = undefined;
+    let minSale = undefined;
+    let montlyReports = [];
+    let blankMonths = [];
+    let actualIndex = 0;
+    /**
+     * The loop is broken when fromDate 
+     * reaches january of the next year.
+     */
+    while (fromDate.isBefore(this.until)) {
+      let monthlySales = [];
+      /**
+       * this loop is broken when there is no more item
+       * or when the sale date excceds the maximum date
+       */
+      for(let index = actualIndex; index < this.sales; index++){
+        const sale = this.sales[index];
+        if(sale.saleDate.isBetween(fromDate, toDate, undefined, '[]')){
+          monthlySales.push(sale);
+        }else{
+          break;
+        }
+        actualIndex++;
+      }
+
+      /**
+       * Now we have the sales of the month
+       */
+      id++;
+      let monthlyReport = new MonthlyReport(id, monthlySales, fromDate, toDate);
+      montlyReports.push(monthlyReport);
+
+      if(monthlyReport.amount > 0){
+        if(minSale && maxSale){
+          minSale = minSale.amount <= monthlyReport.amount ? minSale : monthlyReport;
+          maxSale = maxSale.amount >= monthlyReport.amount ? maxSale : monthlyReport;
+        }else{
+          minSale = monthlyReport;
+          maxSale = monthlyReport;
+        }//end of if-else
+      }else{
+        blankMonths.push(monthlyReport);
+      }//end of if-else
+
+      fromDate = moment(fromDate).add(1, 'month');
+      toDate = moment(fromDate).endOf('month');
+    }//en of switch
+
+    /**
+     * finally the object fields are updated
+     */
+    this.monthlyReports = montlyReports;
+    this.minMonthlySale = minSale;
+    this.maxMonthlySale = maxSale;
+    this.blankMonths = blankMonths;
+    this.averageMonthlySale = monthlyReports.length > 0 ? this.amount / this.monthlyReports.length : 0;
+  }//end of method
+
+  __verifyDate() {
+    if (this.since instanceof Moment && this.until instanceof Moment) {
+      this.since.startOf('year');
+      this.until.endOf('year');
+      this.__validateSales();
+    } else {
+      //if the date isnt a instance of moment
+      //this method reset sales to zero
+      this.since = moment();
+      this.until = moment();
+      this.sale = [];
+    }//end of if-else
+  }//end of method
+
 }
