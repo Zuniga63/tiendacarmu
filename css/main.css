@@ -72,6 +72,10 @@ body {
   max-width: 1000px;
   margin-left: auto;
   margin-right: auto;
+  background-color: #ffffff;
+  background-image: url(../img/floating-cogs.svg);
+  min-height: calc(100vh - 60px);
+  padding-top: 60px;
 }
 
 .text-center {
