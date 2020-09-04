@@ -157,7 +157,9 @@ body {
   font-size: 1.2em;
   font-weight: 700;
 }
-
+/****************************************************/
+/* CLASES PARA MOSTRAR LAS CATEGORÍAS
+/****************************************************/
 .sumary {
   padding: 0.8rem;
   margin-bottom: 1rem;
@@ -332,8 +334,6 @@ body {
 .btn__prepend{
   margin-right: 0.5em;
 }
-
-
 
 .btn:hover {
   background-color: #e2e6ea;
@@ -511,6 +511,16 @@ body {
   vertical-align: middle;
 }
 
+.form__radio-content {
+  display: flex;
+  justify-content: space-evenly;
+  background-color: var(--concrete);
+  padding: 5px;
+  border: 1px solid var(--asbestos);
+  border-radius: 5px;
+  margin-bottom: 0.5em;
+}
+
 .form__radio--big,
 .form__checkbox--big{
   transform: scale(1.5);
@@ -556,56 +566,6 @@ body {
   letter-spacing: 2px;
 }
 
-.form__group-flex--small{
-  font-size: 0.8em;
-  padding: 0.5rem;
-}
-
-.form__container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  position: relative; /*Con el fin de ubicar el nombre del contenedor*/
-  width: 95%;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 1.25rem;
-  padding: 1rem 0.5rem 0;
-  border: 1px solid var(--midnightblue);
-  background-color: var(--clouds);
-}
-
-/* 
- *  Corresponde a una pestaña que se ubica en medio del borde superior del contenedor
- */
-.form__container__name {
-  display: inline-block;
-  position: absolute;
-  left: 5px;
-  /* 
-  Para poder calcular la posicion respecto al borde superior del contenedor se tiene
-  en cuenta el tamaño de la fuente, el line-height y el paddin top y bottom de este elemento
-  */
-  top: calc((-1 * (0.8rem * 1.15 + 8px)) / 2);
-  font-size: 0.8rem;
-  padding: 4px 10px;
-  background-color: var(--wetasphalt);
-  color: white;
-  border-radius: 10px;
-}
-
-/* Para que un elemento dentro del contenedero ocupe todo el ancho */
-.form__container__row-span {
-  grid-column: 1/-1;
-}
-
-/* Los checkbox del formulario utilizan esta clase */
-.form__container-flex {
-  display: flex;
-  justify-content: space-between;
-  grid-column: 1/-1;
-}
-
 /* Las etiqueas label, inputs y alertas se ubican dentro de este contenedor */
 .form__group {
   margin-bottom: 0.6rem;
@@ -614,15 +574,9 @@ body {
   width: 95%;
 }
 
-/* Para los campos como stock o genero que ocupan solo un bloque */
-.form__group--oneline {
-  display: grid;
-  grid-template-columns: auto 1fr;
-}
-
-.form__group--oneline-flex {
-  display: flex;
-  justify-content: center;
+.form__group-flex--small{
+  font-size: 0.8em;
+  padding: 0.5rem;
 }
 
 /* Son dos columnas porque me permite ubicar la longitud de la cadena en una parte */
@@ -631,24 +585,9 @@ body {
   grid-template-columns: 1fr auto;
 }
 
-.form__radio-content {
-  display: flex;
-  justify-content: space-evenly;
-  background-color: var(--concrete);
-  padding: 5px;
-  border: 1px solid var(--asbestos);
-  border-radius: 5px;
-  margin-bottom: 0.5em;
-}
-
-.form__label-inline,
-.form__input-inline {
+.form__label-inline{
   align-content: center;
   display: inline-block;
-}
-
-.form__input-inline {
-  width: 100%;
 }
 
 .form__input.error {
@@ -671,121 +610,11 @@ body {
   font-size: 1.2em;
 }
 
-.form__input--check {
-  align-self: center;
-}
-
 .form__input__length {
   text-align: right;
   align-self: center;
 }
 
-.form__gallery {
-  margin-bottom: 0.5rem;
-}
-
-.form__gallery__container {
-  background-color: #fff;
-  border-radius: 20px;
-  padding: 10px;
-  height: 225px;
-  overflow: scroll;
-  overflow-y: auto;
-  overflow-x: auto;
-}
-/* ESTILOS PARA MODIFICAR EL SCROLL */
-.form__gallery__container::-webkit-scrollbar {
-  width: 8px; /* Tamaño del scroll en vertical */
-  height: 8px; /* Tamaño del scroll en horizontal */
-  /* display: none; Ocultar scroll */
-}
-
-/* Ponemos un color de fondo y redondeamos las esquinas del thumb */
-.form__gallery__container::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 4px;
-}
-
-/* Cambiamos el fondo y agregamos una sombra cuando esté en hover */
-.form__gallery__container::-webkit-scrollbar-thumb:hover {
-  background: #b3b3b3;
-  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
-}
-
-/* Cambiamos el fondo cuando esté en active */
-.form__gallery__container::-webkit-scrollbar-thumb:active {
-  background-color: #999999;
-}
-
-/* Ponemos un color de fondo y redondeamos las esquinas del track */
-.form__gallery__container::-webkit-scrollbar-track {
-  background: #e1e1e1;
-  border-radius: 4px;
-}
-
-/* Cambiamos el fondo cuando esté en active o hover */
-.form__gallery__container::-webkit-scrollbar-track:hover,
-.form__gallery__container::-webkit-scrollbar-track:active {
-  background: #d4d4d4;
-}
-/* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-.form__gallery__fig {
-  width: 100px;
-  height: 100px;
-  padding: 5px;
-  margin: 5px;
-  display: inline-block;
-}
-
-.form__gallery__fig.select {
-  background-color: var(--nephritis);
-}
-
-.form__gallery__fig:hover {
-  background-color: var(--primary);
-}
-
-.form__gallery__img {
-  width: 100%;
-  object-fit: cover;
-}
-
-.form__selected {
-  padding: 5px;
-  background-color: white;
-  height: 150px;
-  border-radius: 5px;
-  overflow: scroll;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.form__selected__item {
-  background-color: var(--primary);
-  border-radius: 5px;
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  padding: 10px;
-  border: 2px solid var(--belizehole);
-  box-shadow: 0 10px 10px -10px #000;
-}
-
-.form__selected__item__body {
-  vertical-align: middle;
-}
-
-.form__selected__item__append {
-  background-color: transparent;
-  outline: none;
-  border: 1px solid rgba(0, 0, 0, 0.5);
-  padding: 3px;
-}
-
-.form__selected__item__append:hover {
-  color: var(--belizehole);
-  border-color: var(--belizehole);
-}
 
 /********************************************************************************************/
 /*                            ESTILOS DEL LOGIN                                             */
@@ -1043,229 +872,6 @@ body {
 .dropdown__link--disabled,
 .dropdown__link.disabled {
   color: var(--asbestos);
-}
-
-/********************************************************************************************/
-/*                      ESTILOS DEL HOME DEL PANEL DE CONTROL                               */
-/********************************************************************************************/
-
-.home-html {
-  background-image: linear-gradient(
-    to right top,
-    #051937,
-    #004d7a,
-    #008793,
-    #00bf72,
-    #a8eb12
-  );
-  background-repeat: no-repeat;
-  background-size: cover;
-  min-height: 100vh;
-}
-
-.home-body {
-  margin-top: 60px;
-  padding: 1rem 0;
-  margin-left: auto;
-  margin-right: auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  /* Los 60 px corresponden al borde superior de este elemento */
-  max-height: calc(100vh - 60px);
-}
-
-.section {
-  width: 95%;
-  /* 
-   *  Como section está dentro del body y es el unico elemento dentro de este debe ocupar 
-   *  todo el espacio disponible por lo que es 100% de viewport menos los 60px del
-   *  margen superior del body y le resto el paddin del body
-   */
-  max-height: calc(100vh - 60px - 2rem);
-  margin-right: auto;
-  margin-left: auto;
-  padding-top: 1rem;
-  background-color: var(--concrete);
-  border: 2px solid var(--midnightblue);
-  border-radius: 20px;
-  display: grid;
-  /* En total se utilizan tres filas, una para el header, otra para el body y otra para el footer */
-  grid-template-rows: auto 1fr auto;
-}
-
-.section__header {
-  border-radius: 20px 20px 0 0;
-  margin-bottom: 0.5rem;
-}
-
-.section__title {
-  font-family: var(--title_font);
-  text-align: center;
-  text-transform: uppercase;
-}
-
-.section__body {
-  overflow: scroll;
-  overflow-x: auto;
-  overflow-y: auto;
-  margin-bottom: 1rem;
-}
-
-/* A continuacion se encuentran las reglas que modifican la barra del scroll */
-.section__body::-webkit-scrollbar {
-  width: 8px; /* Tamaño del scroll en vertical */
-  height: 8px; /* Tamaño del scroll en horizontal */
-  /* display: none; Ocultar scroll */
-}
-
-/* Ponemos un color de fondo y redondeamos las esquinas del thumb */
-.section__body::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 4px;
-}
-
-/* Cambiamos el fondo y agregamos una sombra cuando esté en hover */
-.section__body::-webkit-scrollbar-thumb:hover {
-  background: #b3b3b3;
-  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
-}
-
-/* Cambiamos el fondo cuando esté en active */
-.section__body::-webkit-scrollbar-thumb:active {
-  background-color: #999999;
-}
-
-/* Ponemos un color de fondo y redondeamos las esquinas del track */
-.section__body::-webkit-scrollbar-track {
-  background: #e1e1e1;
-  border-radius: 4px;
-}
-
-/* Cambiamos el fondo cuando esté en active o hover */
-.section__body::-webkit-scrollbar-track:hover,
-.section__body::-webkit-scrollbar-track:active {
-  background: #d4d4d4;
-}
-
-/* SE FIANLIZAN LAS REGLAS QUE MODIFICAN EL SCOLL */
-.section__footer {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  width: 95%;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 1.25rem;
-}
-
-/* Es la caja de texto que me permite filtrar los items */
-.search-box__temporal {
-  display: block;
-  width: 95%;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 1rem;
-  padding: 5px;
-  border-radius: 5px;
-  border: 1px solid #666;
-}
-
-/********************************************************************************************/
-/*                      TARJETAS DE VISUALIZACION DE PRODUCTOS                              */
-/********************************************************************************************/
-.items-list {
-  width: 95%;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 5px;
-  background-color: white;
-  border-radius: 5px;
-  border: 2px solid var(--clouds);
-  overflow: hidden;
-  min-height: 300px;
-}
-
-.items-list .item-info:nth-child(even) {
-  background-color: var(--success);
-}
-
-.items-list .item-info:nth-child(even):hover {
-  background-color: lightgreen;
-}
-
-.item-info {
-  background-color: var(--peterriver);
-  border: 2px solid var(--midnightblue);
-  border-radius: 10px;
-  box-shadow: 0 5px 10px -5px var(--midnight-blue);
-  padding: 10px;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  margin-bottom: 20px;
-}
-
-.item-info:hover {
-  background-color: lightskyblue;
-}
-
-.item-info__fig {
-  width: 120px;
-  height: 120px;
-  margin-right: 10px;
-  padding: 10px;
-  background-color: white;
-  box-shadow: 5px 5px 10px 0 rgba(0, 0, 0, 0.5);
-}
-
-.item-info__img {
-  width: 100%;
-}
-
-.item-info__body {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-auto-rows: min-content;
-}
-
-.item-info__name {
-  grid-column: 1/-1;
-  font-size: 1.2em;
-  font-family: var(--title_font);
-}
-
-.item-info__label {
-  font-size: 0.9em;
-  margin-bottom: 2px;
-}
-
-.item-info__value {
-  font-size: 0.8em;
-  font-weight: 700;
-}
-
-.item-info__inputs {
-  grid-column: 1/-1;
-  border: 1px dashed var(--midnightblue);
-  padding: 3px;
-  display: grid;
-  grid-template-columns: 10fr 8fr;
-  align-items: center;
-  gap: 5px;
-}
-
-.item-info__price {
-  display: block;
-  font-size: 1.5em;
-  width: 100%;
-  height: min-content;
-  outline: none;
-  border-color: var(--silver);
-  text-align: right;
-  padding-right: 10px;
-}
-
-.item-info__check {
-  display: block;
 }
 
 /********************************************************************************************/
@@ -1723,58 +1329,6 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 /********************************************************************************************/
 /*                      ESTILOS DE LA VIEW DE CLIENTES                                      */
 /********************************************************************************************/
-.customers-view {
-  background-color: #ffffff;
-  background-image: url("../img/floating-cogs.svg");
-  min-height: calc(100vh - 60px);
-  padding-top: 60px;
-}
-
-.customers-view__body {
-  width: 90%;
-  margin-left: auto;
-  margin-right: auto;
-  padding-top: 0.8rem;
-}
-
-.customers-view__container {
-  transform: scale(1, 0);
-  opacity: 0;
-  transform-origin: top;
-  transition: opacity 1s ease-in-out;
-  height: 0;
-  /* display: none; */
-}
-
-.customers-view__container.show {
-  height: auto;
-  display: block;
-  transform: scale(1, 1);
-  opacity: 1;
-}
-
-.customers-view__header {
-  font-family: var(--title_font);
-  text-align: center;
-  width: 100%;
-  background-color: #17a3b859;
-  border: 2px solid var(--belizehole);
-  border-color: var(--belizehole);
-  padding: 0.5rem;
-  border-radius: 10px;
-  margin-bottom: 1rem;
-}
-
-.customers-view__title {
-  margin: 0;
-  font-size: 1.5em;
-}
-
-.customers-view__subtitle {
-  font-size: 1.2em;
-  font-weight: 700;
-  font-family: var(--body_font);
-}
 
 .chart-section {
   width: 100%;
@@ -1804,6 +1358,10 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   font-size: 0.9rem;
   line-height: 1.5;
 }
+
+/********************************************************/
+/*  SEARCH BOX                                          */
+/********************************************************/
 
 .search-box {
   padding: 0.5rem;
@@ -1939,29 +1497,9 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   grid-column: 1/-1;
 }
 
-.customer-sumary__container {
-  /* display: grid; */
-  /* grid-template-columns: 1fr 1fr; */
-  padding: 0.8rem;
-  margin-bottom: 1rem;
-  background-color: #bdc3c7ad;
-  border: 2px solid #7f8c8d;
-  border-radius: 10px;
-}
-
-.customer-sumary__title {
-  grid-column: 1/-1;
-  text-align: center;
-}
-
-.customer-sumary__box {
-  height: 300px;
-  border: 2px solid var(--asbestos);
-  background-color: var(--light);
-  margin-bottom: 0.8rem;
-  padding-top: 0.8rem;
-}
-
+/***************************************************/
+/*  TARJETAS  QUE REPRESENTAN LAS DEUDAS           */
+/***************************************************/
 .debt-card {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -2012,19 +1550,6 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   font-weight: 800;
 }
 
-.payment-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  width: 95%;
-  margin: 0 auto 0.5rem;
-  border-bottom: 2px solid black;
-}
-
-.payment-row__amount {
-  text-align: right;
-  font-size: 1.2em;
-}
-
 /********************************************************************************************/
 /*                      ESTILOS DEL SCROLL                                    */
 /********************************************************************************************/
@@ -2072,62 +1597,65 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
 /******************************************************************************************/
 /*                      estilos del historial							                                */
 /******************************************************************************************/
-.history__options {
-  color: white;
-  padding: 0.5rem;
-  margin-right: auto;
-  margin-left: auto;
-  margin-bottom: 1rem;
-  border: 2px solid #444;
-  border-radius: 5px;
-  background-image: url(../img/background-board.jpg);
-  background-size: cover;
-  background-repeat: no-repeat;
-  box-shadow: 5px 10px 10px -2px rgba(46, 45, 46, 1);
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.5rem;
+.history {
+  margin-bottom: 1em;
 }
 
-.history__legend {
-  grid-column: 1/-1;
+.history__header {
+  padding: 0.5em;
+  border: 1px solid #ccc;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
   text-align: center;
-  font-size: 1.2em;
+  /* text-transform: uppercase; */
+  color: var(--dark);
+  background-color: var(--light);
 }
 
-.history__label {
+.history__title,
+.history__subtitle{
+  text-transform: uppercase;
+}
+
+.history__title {
+  font-family: var(--title_font);
+  letter-spacing: 1px;
+  padding: 0.25em;
+  font-size: 1.3em;
+}
+
+.history__subtitle {
   font-size: 1em;
 }
 
-.history__container {
-  padding: 0.5rem 0 1rem;
-  background-color: rgba(207, 204, 204, 0.281);
-  border: 2px solid rgb(172, 170, 170);
-  border-radius: 10px;
+.history__body {
+  max-height: 60vh;
 }
 
-.history__cards,
+.history__footer {
+  display: flex;
+  justify-content: space-between;
+  letter-spacing: 1px;
+  background-color: var(--dark);
+  color: var(--light);
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.history__info {
+  padding: 0.6em;
+  font-size: 0.8em;
+}
+
 .history__card {
-  border-radius: 5px;
   width: 95%;
+  padding: 0.5rem;
+  border: 1px solid var(--secondary);
+  border-radius: 5px;
   margin-right: auto;
   margin-left: auto;
-}
-
-.history__cards {
-  background-color: var(--light);
-  border: 2px solid rgb(78, 76, 76);
-  padding-top: 0.8rem;
-  margin-top: 0.8rem;
-  min-height: 40vh;
-  max-height: 80vh;
-}
-
-.history__card {
-  border: 1px solid var(--secondary);
-  background-color: rgba(51, 53, 50, 0.301);
   margin-bottom: 1rem;
-  padding: 0.5rem;
+  background-color: rgba(51, 53, 50, 0.301);
   box-shadow: 5px 10px 10px -2px rgba(46, 45, 46, 1);
 }
 
@@ -2171,6 +1699,9 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   font-weight: 800;
 }
 
+/******************************************************/
+/* MODALES						                                */
+/******************************************************/
 .modal {
   display: none;
   position: fixed;
@@ -2250,56 +1781,9 @@ input[id="3"]:checked ~ .banner__pagination__item[for="3"] {
   cursor: pointer;
 }
 
-.history {
-  margin-bottom: 1em;
-}
-
-.history__header {
-  padding: 0.5em;
-  border: 1px solid #ccc;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-  text-align: center;
-  /* text-transform: uppercase; */
-  color: var(--dark);
-  background-color: var(--light);
-}
-
-.history__title,
-.history__subtitle{
-  text-transform: uppercase;
-}
-
-.history__title {
-  font-family: var(--title_font);
-  letter-spacing: 1px;
-  padding: 0.25em;
-  font-size: 1.3em;
-}
-
-.history__subtitle {
-  font-size: 1em;
-}
-
-.history__body {
-  max-height: 60vh;
-}
-
-.history__footer {
-  display: flex;
-  justify-content: space-between;
-  letter-spacing: 1px;
-  background-color: var(--dark);
-  color: var(--light);
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
-}
-
-.history__info {
-  padding: 0.6em;
-  font-size: 0.8em;
-}
-
+/******************************************************/
+/* TABLAS   					                                */
+/******************************************************/
 .table {
   border: 1px solid #ccc;
   width: 100%;
