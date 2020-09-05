@@ -806,14 +806,15 @@ body {
   float: right;
 }
 
-.main-navbar__link:hover {
-  color: #fff;
-}
-
+.main-navbar__link:hover,
 .main-navbar__link--active {
   color: #fff;
 }
 
+.main-navbar__link--disabled,
+.main-navbar__link--disabled:hover{
+  color: rgba(255, 255, 255, 0.2);
+}
 /********************************************************************************************/
 /*               ESTILOS DEL DROPDOWN DEL PANEL DE NAVEGACION                               */
 /********************************************************************************************/
