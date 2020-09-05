@@ -31,12 +31,55 @@ Vue.component('nav-bar', {
   data() {
     return {
       actualView: '',
-      rootView:'',
+      rootView: '',
       links: [],
+      /**
+       * La siguiente variables es un valor estatico relacionado los cuatro
+       * link principales de la aplicacion, si se agrega o sis se quita uno
+       * entonces se debe modificar este valor hasta que se pueda solucionar 
+       * la forma de ocultar todos los dropdown al mismo tiempo que se abre uno nuevo.
+       */
       mainMenuHeight: 203,//Ojo: Este valor de momento está sujeto al numero de elementos actuales
     }
   },
   methods: {
+    /**
+     * Metodo encargado de crear los links y los 
+     * dropdown de la aplicación
+     */
+    createLinks() {
+      this.links.push(new Link(1, 'Home', 'home', false, 'fas fa-home'));
+      this.links.push(new Link(
+        2,
+        'Clientes',
+        'customers',
+        false,
+        'fas fa-users',
+        true,
+        [
+          new Link(1, 'Nuevo Cliente', 'newCustomer'),
+          new Link(2, 'Créditos y Abonos', 'newOperation'),
+          new Link(3, 'Historial de movimientos', 'history'),
+          new Link(4, 'Gestionar Cliente', 'customerGestion', true),
+          new Link(5, 'Informes', 'report', true),
+        ]
+      ));
+      this.links.push(new Link(
+        4,
+        'Ventas',
+        'sales',
+        false,
+        'fas fa-cart-plus',
+        true,
+        [
+          new Link(1, 'Categorías', 'categories'),
+          new Link(2, 'Registrar Venta', 'newSale'),
+          new Link(3, 'Estadisticas', 'stats', true),
+          new Link(4, 'Generar factura', 'newBill', true),
+        ]
+      ));
+      this.links.push(new Link(5, 'Mi cuenta', 'myAcount', true, 'fas fa-user'));
+    },
     /**
      * Recorre los hijos del elemento y va computando margenes y paddin para obtener el
      * alto en pixeles que el cliente ve en pantalla
@@ -115,91 +158,82 @@ Vue.component('nav-bar', {
         }
       }
     },
-    onTogglerClick() {
-      let mainMenu = document.getElementById("navbar-collapse");
-      this.showMenu(mainMenu);
-    },
-    createLinks() {
-      this.links.push(new Link(1, 'Home', 'home', false, 'fas fa-home'));
-      this.links.push(new Link(
-        2, 
-        'Clientes', 
-        'customers', 
-        false,
-        'fas fa-users',
-        true, 
-        [
-          new Link(1, 'Nuevo Cliente', 'newCustomer'), 
-          new Link(2, 'Créditos y Abonos', 'newOperation'),
-          new Link(3, 'Historial de movimientos', 'history'),
-          new Link(4, 'Gestionar Cliente', 'customerGestion', true),
-          new Link(5, 'Informes', 'report', true),
-        ]
-      ));
-      this.links.push(new Link(
-        4, 
-        'Ventas', 
-        'sales', 
-        false, 
-        'fas fa-cart-plus',
-        true, 
-        [
-          new Link(1, 'Categorías', 'categories'), 
-          new Link(2, 'Registrar Venta', 'newSale'),
-          new Link(3, 'Estadisticas', 'stats', true),
-          new Link(4, 'Generar factura', 'newBill', true),
-        ]
-      ));
-      this.links.push(new Link(5, 'Mi cuenta', 'myAcount', true, 'fas fa-user'));
-    },
-    onRootLinkClick(viewName){
-      this.rootView = viewName;
-      this.viewName = viewName;
-      this.closeAllDropdown();
-      this.onTogglerClick();
-    },
-    onDropdownClick(viewName, target){
-      if(this.rootView != viewName){
-        this.closeAllDropdown();
-      }
-
-      this.rootView = viewName;
-      while(!target.classList.contains('dropdown')){
-        target = target.parentElement;
-      }
-      let dropdownMenu = target.querySelector(".dropdown__nav");
-      if(dropdownMenu.classList.contains('show')){
-        this.dropdownController(target, false);
-      }else{
-        this.dropdownController(target);
-      }
-    },//Fin del metodo
-    closeAllDropdown(){
+    closeAllDropdown() {
       const dropdowns = document.querySelectorAll(".main-navbar .dropdown");
       dropdowns.forEach(dropdown => {
         this.dropdownController(dropdown, false);
       });
     },
-    dropdownController(dropdown, open = "true"){
+    /**
+     * Se encarga de abrir o cerrar el dropdown en cuestion
+     * @param {object} dropdown Elemento del dom correspondiente a un dropdown
+     * @param {bool} open Si se desea abrir el menú, por defecto es true
+     */
+    dropdownController(dropdown, open = true) {
       let mainMenu = document.getElementById("navbar-collapse");
       let dropdownMenu = dropdown.querySelector(".dropdown__nav");
       let dropdownIcon = dropdown.querySelector(".dropdown__icon");
 
-      if(dropdownMenu){
-        if(open && !dropdownMenu.classList.contains("show")){
+      if (dropdownMenu) {
+        if (open && !dropdownMenu.classList.contains("show")) {
           dropdownIcon.classList.add("rotate");
           this.showMenu(dropdownMenu, mainMenu);
-        }else if(!open && dropdownMenu.classList.contains("show")){
+        } else if (!open && dropdownMenu.classList.contains("show")) {
           dropdownIcon.classList.remove("rotate");
           this.showMenu(dropdownMenu, mainMenu);
           console.log('cerrando!')
         }
       }
     },
-    onDropdownItemClick(viewName, rootViewName){
+    /**
+     * Funcionalidad del boton toggler que hace que el menú 
+     * principal se oculte o se muestre
+     */
+    onTogglerClick() {
+      let mainMenu = document.getElementById("navbar-collapse");
+      this.showMenu(mainMenu);
+    },
+    /**
+     * Este metodo se ejecuta cuando se da click en un link
+     * normal, ya que en este caso la vista y la raiz tienen el mismo nombre.
+     * Al ejecutarse se oculta automaticamente el menú
+     * @param {string} viewName Nombre de la vista basica
+     */
+    onRootLinkClick(viewName) {
+      this.rootView = viewName;
+      this.viewName = viewName;
+      this.closeAllDropdown();
+      this.onTogglerClick();
+    },
+    /**
+     * Este metodo se encarga de mostrar solo el dropdown que se clico
+     * @param {string} viewName Nombre raiz de la vie que se quiere mostrar
+     * @param {objet} target Elemento del dom responsable de lanzar el evento
+     */
+    onDropdownClick(viewName, target) {
+      if (this.rootView != viewName) {
+        this.closeAllDropdown();
+      }
+      this.rootView = viewName;
+      while (!target.classList.contains('dropdown')) {
+        target = target.parentElement;
+      }
+      let dropdownMenu = target.querySelector(".dropdown__nav");
+      if (dropdownMenu.classList.contains('show')) {
+        this.dropdownController(target, false);
+      } else {
+        this.dropdownController(target);
+      }
+    },//Fin del metodo
+    /**
+     * Este metodo se encarga de actualizar el rootView y el actual view y de ocultar el panel
+     * de navegacion
+     * @param {string} viewName Nombre de la vista que se quiere mostrar
+     * @param {string} rootViewName Nombre de la raiz
+     */
+    onDropdownItemClick(viewName, rootViewName) {
       this.rootView = rootViewName;
       this.actualView = viewName;
-      console.log(viewName, rootViewName);
       this.onTogglerClick();
     }
   },
@@ -207,7 +241,7 @@ Vue.component('nav-bar', {
     this.createLinks();
   },
   template:
-/*html*/`
+  /*html*/`
   <header class="header">
     <nav class="main-navbar" id="mainNavbar">
       <a href="home.php" class="main-navbar__brand">
