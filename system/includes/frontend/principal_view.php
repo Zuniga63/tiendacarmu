@@ -20,6 +20,13 @@
     <category-view id="categoryView" v-show="actualView === 'categories'"></category-view>
     <sales-view id="salesView" v-show="actualView === 'newSale'"></sales-view>
 
+    <customer-register id="customerReg" v-show="actualView === 'newCustomer'">
+    </customer-register>
+
+    <operation-register id="customerOperation" v-show="actualView === 'newOperation'"></operation-register>
+
+    <history-view v-show="actualView === 'history'"></history-view>
+
     <waiting-modal></waiting-modal>
     <process-result></process-result>
     <confirm-new-sale></confirm-new-sale>

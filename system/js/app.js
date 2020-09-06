@@ -29,9 +29,25 @@ const store = new Vuex.Store({
     categories: [],
     sales: [],
     confirmSaleModal: new NewSaleModal(),
+    //---------------------------------------
+    //  Estado relacionado a los clientes
+    //---------------------------------------
+    customers: [],
+    history: [],
   },
   getters: {
-    //TODO
+    //---------------------------------------
+    //  CLIENTES
+    //---------------------------------------
+    inactiveCustomerList: (state) => {
+      return state.customers.filter((c) => c.inactive && !c.archived);
+    },
+    activeCustomerList: (state) => {
+      return state.customers.filter((c) => !c.inactive && !c.archived);
+    },
+    archivedCustomerList: (state) => {
+      return state.customers.filter((c) => c.archived);
+    },
   },
   mutations: {
     //---------------------------------------
@@ -122,8 +138,84 @@ const store = new Vuex.Store({
     updateSaleList(state, list) {
       state.sales = list;
     },
+    //---------------------------------------
+    //  Mutaciones los clientes
+    //---------------------------------------
+    updateCustomer(state, data) {
+      if (state.customers.some((c) => c.id === data.id)) {
+        let customer = state.customers.filter((c) => c.id === data.id)[0];
+        customer.update(data);
+      }
+    },
+    updateCustomerList(state, data) {
+      // this.commit("waitingRequest", true);
+      if (data.sessionActive) {
+        state.customers = [];
+        data.customers.forEach((c) => {
+          const customer = new Customer(
+            c.id,
+            c.firstName,
+            c.lastName,
+            c.nit,
+            c.phone,
+            c.email,
+            c.points,
+            c.archived
+          );
+          //Ahora agrego los creditos del cliente
+          c.credits.forEach((credit) => {
+            customer.addCredit(
+              credit.id,
+              credit.creditDate,
+              credit.description,
+              credit.amount,
+              credit.balance
+            );
+          });
+          //Se agregan los abonos
+          c.payments.forEach((payment) => {
+            customer.addPayment(
+              payment.id,
+              payment.paymentDate,
+              payment.amount,
+              payment.cash
+            );
+          });
+
+          customer.defineState();
+          state.customers.push(customer);
+        });
+      } else {
+        location.reload();
+      }
+      // this.commit("waitingRequest", false);
+    },
+    updateHistory(state, data){
+      state.history = [];
+      data.history.forEach(record => {
+        let history = new CustomerHistory(record.author, record.customer, record.historyDate, record.newCustomer, record.updateData, record.updateCredit, record.updatePayment, record.newPayment, record.newCredit, record.amount);
+        state.history.push(history);
+      })
+    },
+    archiveCustomer(state, customerId) {
+      let customerExist = state.customers.some((c) => c.id === customerId);
+      if (customerExist) {
+        const customer = state.customers.filter((c) => c.id === customerId)[0];
+        customer.archived = true;
+      }
+    },
+    unarchiveCustomer(state, customerId) {
+      let customerExist = state.customers.some((c) => c.id === customerId);
+      if (customerExist) {
+        const customer = state.customers.filter((c) => c.id === customerId)[0];
+        customer.archived = false;
+      }
+    },
   },
   actions: {
+    //---------------------------------------
+    //  Acciones de las ventas
+    //---------------------------------------
     /**
      * Se encarga de hacer la peticion al servidor para recuperar los
      * datos de las ventas y las categorías
@@ -237,6 +329,259 @@ const store = new Vuex.Store({
       }
       commit("requestResult", { isSuccess, message });
     },
+    //---------------------------------------
+    //  Acciones de los clientes
+    //---------------------------------------
+    async getCustomers({ commit }) {
+      // commit("waitingRequest", true);
+      commit("showWaitingRequest", "Recuperando clientes");
+      try {
+        const res = await fetch("./api/all_customers.php");
+        const data = await res.json();
+        commit("updateCustomerList", data);
+        // commit("waitingRequest", false);
+        commit("hiddenWaitingRequest");
+      } catch (error) {
+        console.log(error);
+        // commit("waitingRequest", false);
+        commit("hiddenWaitingRequest");
+        commit(
+          "requestResult",
+          false,
+          "No se pudo recuperar los datos de los clientes"
+        );
+      }
+    },
+    async getHistory({commit}){
+      // commit("waitingRequest", true);
+      commit("showWaitingRequest", "Recuperando historial");
+      try {
+        const res = await fetch("./api/customer_history.php");
+        const data = await res.json();
+        // commit("waitingRequest", false);
+        commit("updateHistory", data);
+        commit("hiddenWaitingRequest");
+      } catch (error) {
+        console.log(error);
+        // commit("waitingRequest", true);
+        commit("hiddenWaitingRequest");
+        commit(
+          "requestResult",
+          false,
+          "No se pudo recuperar los datos de los clientes"
+        );
+      }
+    },
+    async updateCustomer({ commit }, formData) {
+      // commit("waitingRequest", true);
+      commit("showWaitingRequest", "Actualizando cliente...");
+      isSuccess = false;
+      let eventName = "customer-was-updated";
+      message = "";
+      try {
+        const res = await fetch("./api/update_customer.php", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        console.log(data);
+        if (data.sessionActive) {
+          if (data.request) {
+            //Customer data is updated
+            commit("updateCustomer", data.customer);
+            isSuccess = true;
+            message = "Cliente actualizado";
+            commit("emitEvent", eventName);
+          } else {
+            message = "No se pudo actualizar";
+          }
+        } else {
+          location.reload();
+        }
+      } catch (error) {
+        console.log(error);
+        message = "Error al conectar!";
+      }
+      // commit("waitingRequest", false);
+      commit("hiddenWaitingRequest");
+      commit("requestResult", { isSuccess, message });
+      // return false;
+    },
+    async newCustomer({ commit, dispatch }, formData) {
+      // commit("waitingRequest", true);
+      commit("showWaitingRequest", "Registrando cliente");
+      isSuccess = false;
+      message = "";
+      let eventName = "customer-was-created";
+
+      try {
+        const res = await fetch("./api/new_customer.php", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+
+        if (data.sessionActive) {
+          if (data.request) {
+            await dispatch("getCustomers");
+            isSuccess = true;
+            message = "Cliente agregado";
+            commit("emitEvent", eventName);
+          } else {
+            message = "No se pudo agregar el cliente";
+          }
+        } else {
+          location.reload();
+        }
+      } catch (error) {
+        console.log(error);
+        message = "No se pudo hacer la petición";
+      }
+      // commit("waitingRequest", false);
+      commit("hiddenWaitingRequest");
+      commit("requestResult", { isSuccess, message });
+    },
+    async newPayment({ commit }, formData) {
+      // commit("waitingRequest", true);
+      commit("showWaitingRequest", "Registrando Pago...");
+      let isSuccess = false;
+      let message = "";
+      let eventName = "payment-was-created";
+      try {
+        const res = await fetch("./api/new_payment.php", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+
+        if (data.sessionActive) {
+          if (data.request) {
+            commit("updateCustomer", data.customer);
+            commit("emitEvent", eventName);
+            message = "Abono registrado con exito";
+            isSuccess = true;
+          } else {
+            message = "No se pudo registrar el abono";
+          }
+        } else {
+          location.reload();
+        }
+      } catch (error) {
+        message = "La petición falló";
+        console.log(error);
+      }
+      // commit("waitingRequest", false);
+      commit("hiddenWaitingRequest");
+      commit("requestResult", { isSuccess, message });
+    },
+    async newCredit({ commit }, formData) {
+      // commit("waitingRequest", true);
+      commit("showWaitingRequest", "Registrando credito...");
+      let isSuccess = false;
+      let message = "";
+      let eventName = "credit-was-created";
+      try {
+        const res = await fetch("./api/new_credit.php", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        if (data.sessionActive) {
+          if (data.request) {
+            commit("updateCustomer", data.customer);
+            commit("emitEvent", eventName);
+            message = "Credito registrado con exito";
+            isSuccess = true;
+          } else {
+            message = "No se pudo registrar el credito";
+          }
+        } else {
+          location.reload();
+        }
+      } catch (error) {
+        message = "La petición falló";
+        console.log(error);
+      }
+      // commit("waitingRequest", false);
+      commit("hiddenWaitingRequest");
+      commit("requestResult", { isSuccess, message });
+    },
+    async archiveUnarchiveCustomer({ commit }, formData) {
+      // commit("waitingRequest", true);
+      commit("showWaitingRequest", "Procesando solicitud...");
+      let isSuccess = false;
+      let message = "";
+      let customerId = parseInt(formData.get("customer_id"));
+      try {
+        const res = await fetch(
+          "./api/customers/archived_unarchived_customer.php",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+        const data = await res.json();
+        if (data.sessionActive) {
+          if (data.request) {
+            isSuccess = true;
+            if (formData.get("archive") === "true") {
+              commit("archiveCustomer", customerId);
+              message = "Cliente archivado";
+            } else {
+              commit("unarchiveCustomer", customerId);
+              message = "Cliente desarchivado";
+            }
+          } else {
+            if (formData.get("archive")) {
+              message = "No se pudo archivar el cliente";
+            } else {
+              message = "No se pudo desarchviar el cliente";
+            }
+          }
+        } else {
+          location.reload();
+        }
+      } catch (error) {
+        console.log(error);
+        message = "No se pudo hacer la petición";
+      }
+      // commit("waitingRequest", false);
+      commit("hiddenWaitingRequest");
+      commit("requestResult", { isSuccess, message });
+    },
+    async deleteCustomer({ commit, dispatch }, formData) {
+      // commit("waitingRequest", true);
+      commit("showWaitingRequest", "Eliminando cliente");
+      isSuccess = false;
+      message = "";
+      eventName = "customer-was-deleted";
+      try {
+        const res = await fetch("./api/customers/delete_customer.php", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        if (data.sessionActive) {
+          if (data.request) {
+            await dispatch("getCustomers");
+            commit("emitEvent", eventName);
+            isSuccess = true;
+            message = "Cliente Eliminado";
+          } else {
+            message = "No se pudo eliminar";
+          }
+        } else {
+          location.reload();
+        }
+      } catch (error) {
+        console.log(error);
+        message = "No se pudo hacer la peticion";
+      }
+      // commit("waitingRequest", false);
+      commit("hiddenWaitingRequest");
+      commit("requestResult", { isSuccess, message });
+    },
+
   }
 })
 //--------------------------------------------------------
@@ -252,7 +597,7 @@ const app = new Vue({
     ...Vuex.mapState(['actualView', 'rootView']),
   },
   methods: {
-    ...Vuex.mapActions(['getSalesAndCategories']),
+    ...Vuex.mapActions(['getSalesAndCategories', 'getCustomers', 'getHistory']),
     onLoadingResource() {
       this.loadingResource = false;
     },
@@ -260,6 +605,8 @@ const app = new Vue({
   created() {
     moment.locale("es-do");
     this.getSalesAndCategories();
+    this.getCustomers();
+    this.getHistory();
   },
   mounted() {
     
