@@ -165,7 +165,7 @@ Vue.component('nav-bar', {
      * principal se oculte o se muestre
      */
     onTogglerClick() {
-      let mainMenu = document.getElementById("navbar-collapse");
+      const mainMenu = document.getElementById("navbar-collapse");
       this.showMenu(mainMenu);
     },
     /**
@@ -211,7 +211,7 @@ Vue.component('nav-bar', {
      * @param {string} rootViewName Nombre de la raiz
      */
     onDropdownItemClick(viewName, rootViewName) {
-      this.changeRootView(viewName);
+      this.changeRootView(rootViewName);
       this.changeActualView(viewName);
       // this.rootView = rootViewName;
       // this.actualView = viewName;
@@ -389,3 +389,832 @@ Vue.component("process-result", {
   </div>
   `,
 });
+
+//---------------------------------------------------------------------------
+//  COMPONENTES DE LA VISTA DE VENTAS
+//---------------------------------------------------------------------------
+/**
+ * Componente utilizado para poder darle formato de moneda a los
+ * input que corresponden a importes
+ */
+Vue.component("input-money", {
+  props: ["value"],
+  template: `
+  <input
+    type="text"
+    class="form__input form__input--money form__input--money-big"
+    :value="value"
+    @focus="$event.target.select()"
+    @input="$emit('input', formatCurrencyInput($event.target.value))"
+    @blur="$emit('blur')"
+    @change="$emit('change')"
+    placeholder="$0"
+    style="letter-spacing: 5px; margin-bottom: 1em;"
+  />`,
+  methods: {
+    formatCurrencyInput(value) {
+      value = this.deleteCurrencyFormater(value);
+      value = parseFloat(value);
+      if (!isNaN(value)) {
+        value = this.formatCurrency(value);
+      } else {
+        value = "";
+      }
+
+      return value;
+    },
+    deleteCurrencyFormater(text) {
+      let value = text.replace("$", "");
+      value = value.split(".");
+      value = value.join("");
+
+      return value;
+    },
+    formatCurrency(value) {
+      var formatted = new Intl.NumberFormat("es-Co", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0,
+      }).format(value);
+      return formatted;
+    }, //Fin del metodo,
+  },
+});
+
+/**
+ * Este componente se engarga de confirmar las ventas 
+ * y de registrarlas en la base de datos
+ */
+Vue.component("confirm-new-sale", {
+  data() {
+    return {
+      title: "Registrar Venta",
+    };
+  },
+  computed: {
+    ...Vuex.mapState(["confirmSaleModal", "categories"]),
+    date() {
+      let value = "";
+      if (this.confirmSaleModal.formData) {
+        value = this.confirmSaleModal.formData.get("date");
+        if (value) {
+          value = moment(value).format("ll");
+        } else {
+          value = moment().format("lll");
+        }
+      }
+      return value;
+    },
+    description() {
+      let value = "";
+      if (this.confirmSaleModal.formData) {
+        value = this.confirmSaleModal.formData.get("description");
+      }
+      return value;
+    },
+    category() {
+      let value = "";
+      if (this.confirmSaleModal.formData) {
+        value = this.confirmSaleModal.formData.get("category_id");
+        value = parseInt(value);
+        value = this.categories.filter((c) => c.id === value);
+        value = value[0].name;
+      }
+      return value;
+    },
+    amount() {
+      let value = "";
+      if (this.confirmSaleModal.formData) {
+        value = this.confirmSaleModal.formData.get("amount");
+        value = parseFloat(value);
+        value = formatCurrencyLite(value, 0);
+      }
+      return value;
+    },
+  },
+  methods: {
+    ...Vuex.mapMutations(["hiddenConfirmSaleModal"]),
+    ...Vuex.mapActions(["addNewSale"]),
+    onClick() {
+      this.addNewSale(this.confirmSaleModal.formData);
+      this.hiddenConfirmSaleModal();
+    },
+  },
+  template: /*template*/ `
+  <div
+    class="modal"
+    :class="{show: confirmSaleModal.visible}"
+    @click.self="hiddenConfirmSaleModal"
+  >
+    <div class="modal__content">
+      <div class="modal__close" @click="hiddenConfirmSaleModal">
+        <i class="fas fa-times-circle"></i>
+      </div>
+
+      <h2 class="modal__title">{{title}}</h2>
+      <p class="modal__info">
+        Fecha: 
+        <span class="text-bold">"{{date}}"</span> <br>
+        Concepto: 
+        <span class="text-bold">"{{description}}"</span> <br>
+        Categoría: 
+        <span class="text-bold">"{{category}}"</span> <br>
+        Valor: 
+        <span class="text-bold">"{{amount}}"</span> <br>
+      </p>
+
+      <button class="btn btn--success" @click="onClick">
+        Registrar
+      </button>
+    </div>
+  </div>
+  `,
+});
+
+/**
+ * Este modulo es utilizado para mostrar en pantalla el listado de categorías
+ * ordenadas de la que tiene mas ventas a la de menor y que emite un evento con
+ * los datos de la categoría que fue seleccionada
+ */
+Vue.component("category-module", {
+  data: function () {
+    return {
+      categorySelected: undefined,
+    };
+  },
+  methods: {
+    onClick(category) {
+      this.categorySelected = category.id;
+      this.$emit("category-selected", category);
+    },
+    formatCurrency(value) {
+      var formatted = new Intl.NumberFormat("es-Co", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0,
+      }).format(value);
+      return formatted;
+    }, //Fin formatCurrency
+  },
+  computed: {
+    ...Vuex.mapState(["categories"]),
+  },
+  /*html*/
+  template: `
+  <div class="sumary">
+    <h3 class="sumary__title">Listado de categorías</h3>
+    <div class="sumary__box scroll">
+      <div 
+        class="category-card" 
+        :class="{selected : category.id === categorySelected}" 
+        v-for="category in categories" 
+        :key="category.id" 
+        @click="onClick(category)"
+      >
+        <header class="category-card__header">
+          <h3 class="category-card__name">
+            {{category.name}}
+          </h3>
+          <div class="category-card__details">
+            <p class="category-card__info">
+              Promedio: <span class="text-bold">{{formatCurrency(category.averageSale)}}</span>
+            </p>
+            <p class="category-card__info">
+              Ventas: <span class="text-bold">{{category.sales.length}}</span>
+            </p>
+          </div>
+        </header>
+        <p class="category-card__amount">{{formatCurrency(category.totalAmount)}}</p>
+      </div>
+    </div>
+    <p class="sumary__count">{{categories.length}} categorías</p>
+  </div>`,
+});
+
+Vue.component("new-category-form", {
+  props: ["id"],
+  data() {
+    return {
+      categoryName: new DataInput(),
+    };
+  },
+  computed: {
+    ...Vuex.mapState(["categories", "eventHub"]),
+    newCategoryNameLength() {
+      let length = this.categoryName.value.length;
+      let maxChar = 45;
+      let diff = maxChar - length;
+      return diff;
+    },
+    disabledSubmit() {
+      let result = true;
+      if (
+        !this.categoryName.hasError &&
+        this.categoryName.value.length >= 4 &&
+        this.newCategoryNameLength >= 0
+      ) {
+        result = false;
+      }
+      return result;
+    },
+  },
+  methods: {
+    ...Vuex.mapActions(["addNewCategory"]),
+    onSubmit() {
+      categoryNameIsOk = this.validateCategoryName();
+      if (categoryNameIsOk) {
+        const data = new FormData();
+        data.append("category_name", this.categoryName.value);
+        this.addNewCategory(data);
+      }
+    },
+    validateCategoryName() {
+      let name = this.categoryName.value;
+      let isOk = false;
+
+      //Se verifica que el nombre no está en blanco
+      if (name) {
+        //Se verifica que el nombre esté dentro del rango permitido
+        if (name.length >= 4 && name.length <= 45) {
+          /**
+           * Se comprueba que el nombre de la nueva categoría
+           * no se encuentre asignado ya.
+           */
+          let coincidence = this.categories.some(
+            (c) => c.name.toUpperCase() === name.toUpperCase()
+          );
+
+          /**
+           * Se notificca que el nombre es correcto
+           */
+          if (!coincidence) {
+            this.categoryName.isCorrect();
+            isOk = true;
+          } else {
+            this.categoryName.isIncorrect("¡Nombre asignado!");
+          }
+        } else {
+          let message = "";
+          if (name.length < 4) {
+            message = "¡Nombre de categoría demasiado corto!";
+          } else {
+            message = "¡Nombre demasiado largo!";
+          }
+          this.categoryName.isIncorrect(message);
+        }
+      } else {
+        this.categoryName.isIncorrect("¡Este campo es obligatorio!");
+      }
+
+      return isOk;
+    }, //Fin del metodo
+    resetFields() {
+      this.categoryName.resetInput();
+    },
+  },
+  mounted() {
+    this.eventHub.$on("category-was-created", this.resetFields);
+  },
+  template: /*html*/ `
+  <form class="form form--bg-light" @submit.prevent="onSubmit">
+    <h2 class="form__title">Nueva categoría</h2>
+
+    <!-- Campo para agregar el nombre -->
+    <div class="form__group">
+      <!-- Cuerpo del formulario -->
+      <div class="form__group__body">
+        <label :for="id + 'CategoryName'" class="form__label">Nombre</label>
+        <input 
+          type="text" 
+          name="category-name" 
+          :id="id + 'CategoryName'" 
+          :class="['form__input', {error : categoryName.hasError}]" 
+          placeholder="Ingresa la nueva categoría" 
+          v-model.trim="categoryName.value" 
+          @focus="$event.target.select()" 
+          @blur="validateCategoryName" 
+          @input="validateCategoryName" 
+          required
+        >
+      </div>
+
+      <!-- Seccion para mostrar alertas e informacion adicional -->
+      <div class="form__group__footer">
+        <span :class="['alert', 'alert--danger', {show: categoryName.hasError}]">
+          {{categoryName.message}}
+        </span>
+        <span class="form__input__length" :class="{'text-danger': newCategoryNameLength < 0}">
+          {{newCategoryNameLength}}
+        </span>
+      </div>
+
+    </div>
+    <!-- Fin del campo -->
+
+    
+    <input 
+      type="submit" 
+      value = "Registrar Categoría" 
+      :disabled="disabledSubmit" 
+      :class="['btn', {'btn--success':!disabledSubmit, 'btn--disabled':disabledSubmit}]"
+    >
+
+  </form>
+  `,
+});
+
+Vue.component("container-header", {
+  props: ["title", "subtitle"],
+  template: `
+  <div class="container__header">
+    <h1 class="container__title">{{title}}</h1>
+    <p class="container__subtitle">{{subtitle}}</p>
+  </div>`,
+});
+
+Vue.component("sales-module", {
+  props: ["subtitle", "id", "sales"],
+  data() {
+    return {
+      periods: [
+        { id: 1, value: "thisWeek", name: "Esta semana" },
+        { id: 2, value: "lastWeek", name: "La semana pasada" },
+        { id: 5, value: "thisBiweekly", name: "Esta quincena" },
+        { id: 6, value: "lastBiweekly", name: "Quincena pasada" },
+        { id: 3, value: "thisMonth", name: "Este mes" },
+        { id: 4, value: "lastMonth", name: "El mes pasado" },
+        { id: 7, value: "thisYear", name: "Este año" },
+        { id: 8, value: "lastYear", name: "El año pasado" },
+      ],
+      period: "thisMonth",
+    };
+  },
+  computed: {
+    salesList() {
+      let list = [];
+      let start, end;
+      let dayOfMonth = moment().date();
+      switch (this.period) {
+        case "thisWeek":
+          start = moment().startOf("week");
+          end = moment().endOf("week");
+          break;
+        case "lastWeek":
+          start = moment().subtract(7, 'day').startOf('week');
+          end = moment(start).endOf('week');
+          break;
+        case "thisBiweekly":
+          if (dayOfMonth > 15) {
+            start = moment().startOf('month').add(15, 'days');
+            end = moment().endOf("month");
+          } else {
+            start = moment().startOf("month");
+            end = moment(start).add(14, 'days').endOf("day");
+          }
+          break;
+        case "lastBiweekly":
+          // let dayOfMonth = moment().date();
+          if (dayOfMonth > 15) {
+            start = moment().startOf("month");
+            end = moment(start).add(14, 'days').endOf("day");
+          } else {
+            start = moment().subtract(1, 'month').startOf("month").add(15, 'days');
+            end = moment(start).endOf("month");
+          }
+          break;
+        case "thisMonth":
+          start = moment().startOf("month");
+          end = moment().endOf("month");
+          break;
+        case "lastMonth":
+          start = moment().subtract(1, 'month').startOf("month");
+          end = moment(start).endOf("month");
+          break;
+        case "thisYear":
+          start = moment().startOf("year");
+          end = moment().endOf("year");
+          break;
+        case "lastYear":
+          start = moment().subtract(1, 'year').startOf("year");
+          end = moment(start).endOf("year");
+          break;
+        default:
+          start = moment().startOf("year");
+          end = moment().endOf("year");
+          break;
+      } //Fin de swith
+      list = this.getSales(start, end);
+      return list;
+    },
+    saleListAmount() {
+      let amount = 0;
+      this.salesList.forEach((sale) => {
+        amount += sale.amount;
+      });
+
+      return amount;
+    },
+    averageSale() {
+      let average = 0;
+      let sales = this.salesList.length;
+      if(sales > 0){
+        average = this.saleListAmount / sales;
+      }
+
+      return Math.floor(average);
+    },
+  },
+  methods: {
+    formatCurrency(value) {
+      var formatted = new Intl.NumberFormat("es-Co", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0,
+      }).format(value);
+      return formatted;
+    }, //Fin del metodo
+    getSales(since, until) {
+      let list = [];
+      for (let index = 0; index < this.sales.length; index++) {
+        const sale = this.sales[index];
+        if (
+          sale.saleDate.isSameOrAfter(since) &&
+          sale.saleDate.isSameOrBefore(until)
+        ) {
+          list.push(sale);
+        }
+      }
+      return list;
+    },
+  },
+  template: /*html*/ `
+  <div class="history">
+    <div class="history__header">
+      <h2 class="history__title">Historial de ventas</h2>
+      <p class="history__subtitle">{{subtitle}}</p>
+      <select name="" id="" class="form__input" v-model="period">
+        <option v-for="item of periods" :key="item.id" :value="item.value">{{item.name}}</option>
+      </select>
+    </div>
+    <div class="history__head">
+      <table class="table">
+        <thead>
+          <tr class="table__row-header">
+            <th class="table__header table--25">Fecha</th>
+            <th class="table__header table--50">Descripción</th>
+            <th class="table__header table--25">Valor</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+    <div class="history__body scroll">
+      <table class="table">
+        <tbody class="table__body">
+          <template v-for="sale in salesList">
+            <tr class="table__row" :key="sale.id">
+              <td class="table__data table--25" data-label="id">{{sale.dateToString}}</td>
+              <td class="table__data table--50 table--lef" data-label="description">{{sale.description}}</td>
+              <td class="table__data table--25 table--right" data-label="amount">{{formatCurrency(sale.amount)}}</td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+    <footer class="history__footer">
+      <p class="history__info">Total: <span class="text-bold">{{formatCurrency(saleListAmount)}}</span></p>
+      <p class="history__info" v-show="averageSale">Prom: <span class="text-bold">{{formatCurrency(averageSale)}}</span></p>
+      <p class="history__info">Ventas: <span class="text-bold">{{salesList.length}}</span></p>
+    </footer>
+  </div>
+  `,
+});
+
+Vue.component("new-sale-form", {
+  props: ["id"],
+  data() {
+    return {
+      saleMoment: "now",
+      saleDate: new DataInput(),
+      maxDate: moment().format("yyyy-MM-DD"),
+      categoryID: new DataInput(),
+      description: new DataInput(),
+      amount: new DataInput(),
+    };
+  },
+  computed: {
+    ...Vuex.mapState(["categories", "eventHub"]),
+    newSaleDescriptionLength() {
+      let length = this.description.value.length;
+      const maxLength = 45;
+      let availableLength = maxLength - length;
+
+      return availableLength;
+    },
+  },
+  methods: {
+    ...Vuex.mapMutations(["showConfirmSaleModal"]),
+    onSubmit() {
+      let dateVal = this.validateSaleDate();
+      let categoryVal = this.validateSaleCategory();
+      let descriptionVal = this.validateSaleDescription();
+      let amountVal = this.validateSaleAmount();
+
+      if (dateVal && categoryVal && descriptionVal & amountVal) {
+        let amount = parseFloat(this.deleteFormaterOfAmount(this.amount.value));
+        const data = new FormData();
+        data.append("moment", this.saleMoment);
+        data.append("date", this.saleDate.value);
+        data.append("category_id", this.categoryID.value);
+        data.append("description", this.description.value);
+        data.append("amount", amount);
+        this.showConfirmSaleModal(data);
+      }
+    },
+    validateSaleDate() {
+      let isOk = false;
+      let date = this.saleDate;
+
+      if (this.saleMoment === "now") {
+        isOk = true;
+      } else {
+        if (moment(date.value).isValid()) {
+          if (date.value <= this.maxDate) {
+            date.isCorrect();
+            isOk = true;
+          } else {
+            date.isIncorrect("Selecciona o escribe una fecha valida");
+          }
+        } else {
+          date.isIncorrect("Selecciona una fecha valida");
+        }
+      }
+
+      return isOk;
+    },
+    validateSaleCategory() {
+      let isOk = false;
+      let categoryID = this.categoryID;
+      let categoryExist = this.categories.some(
+        (c) => c.id === categoryID.value
+      );
+
+      if (categoryExist) {
+        categoryID.isCorrect();
+        isOk = true;
+      } else {
+        categoryID.isIncorrect("Selecciona una categoría valida");
+      }
+
+      return isOk;
+    },
+    validateSaleDescription() {
+      let description = this.description;
+
+      if (description.value) {
+        if (description.value.length >= 5) {
+          description.isCorrect();
+        } else {
+          description.isIncorrect("Descripción demasiado corta");
+        }
+      } else {
+        description.isIncorrect("Campo obligatorio");
+      }
+
+      return !description.hasError;
+    },
+    validateSaleAmount() {
+      let amount = this.amount;
+
+      //Elimino el formato de moneda y trato de convertir a numero
+      let amountValue = parseFloat(this.deleteFormaterOfAmount(amount.value));
+
+      if (!isNaN(amountValue)) {
+        if (amountValue > 0) {
+          amount.isCorrect();
+        } else {
+          amount.isIncorrect("Debe ser mayor que cero (0)");
+        }
+      } else {
+        amount.isIncorrect("Ingresa un valor valido");
+      }
+
+      return !amount.hasError;
+    },
+    deleteFormaterOfAmount(text) {
+      let value = text.replace("$", "");
+      value = value.split(".");
+      value = value.join("");
+
+      return value;
+    },
+    resetFields() {
+      this.saleMoment = "now";
+      this.saleDate.resetInput();
+      this.categoryID.resetInput();
+      this.description.resetInput();
+      this.amount.resetInput();
+    },
+  },
+  mounted() {
+    this.eventHub.$on("sale-was-created", this.resetFields);
+  },
+  template: /*html*/ `
+  <form class="form form--bg-light" @submit.prevent="onSubmit">
+    <h2 class="form__title">Registrar Venta</h2>
+    <div class="form__group">
+      <div class="form__body">
+        <label for="newSaleDate" class="form__label">Momento de la venta</label>
+        <div class="form__radio-content">
+          <!-- Seleccion de este momento -->
+          <div>
+            <input 
+              type="radio" 
+              name="newSaleDate" 
+              :id="id +'newSaleNow'" 
+              class="form__radio" 
+              value="now" 
+              v-model="saleMoment"
+            >
+            <label :for="id +'newSaleNow'" class="form__label-inline">Ahora</label>
+          </div>
+
+          <!-- Seleccion de otro momento -->
+          <div>
+            <input 
+              type="radio" 
+              name="newSaleDate" 
+              :id="id + 'newSaleDateOther'" 
+              class="form__radio" 
+              value="other" 
+              v-model="saleMoment"
+            >
+            <label :for="id + 'newSaleDateOther'" class="form__label-inline">En otra fecha</label>
+          </div>
+        </div>
+
+        <!-- Seleccion de la fecha -->
+        <input 
+          type="date" 
+          name="saleDate" 
+          id="saleDate" 
+          placeholder="Selecciona una fecha" 
+          :class="['form__input', {error: saleDate.hasError}]" 
+          v-if="saleMoment === 'other'" 
+          v-model="saleDate.value" 
+          :max="maxDate" 
+          @blur="validateSaleDate" 
+          @change="validateSaleDate"
+        >
+
+        <span class="alert alert--danger" :class="{show: saleDate.hasError}">
+          {{saleDate.message}}
+        </span>
+      </div>
+    </div>
+      <!-- Seleccion de la categoría -->
+      <div class="form__group">
+        <label :for="id + 'newSaleCategory'" class="form__label">Categoría</label>
+        <select 
+          name="newSaleCategory" 
+          :id="id + 'newSaleCategory'" 
+          class="form__input" 
+          :class="{error: categoryID.hasError}" 
+          v-model="categoryID.value" 
+          @blur="validateSaleCategory" 
+          @change="validateSaleCategory"
+        >
+          <option value="" disabled selected>Selecciona una categoría</option>
+          <option :value="category.id" v-for="category in categories" :key="category.id">{{category.name}}</option>
+        </select>
+
+        <span class="alert alert--danger" :class="{show: categoryID.hasError}">
+          {{categoryID.message}}
+        </span>
+      </div>
+
+      <!-- Ingreso de la descripcion de la venta -->
+      <div class="form__group">
+        <div class="form__group__body">
+          <label :for="id + 'newSaleDescription'" class="form__label form__label--center">Descripción de la venta</label>
+          <textarea 
+            name="credit_description" 
+            :id="id + 'newSaleDescription'" 
+            cols="30" 
+            rows="3" 
+            class="form__input" 
+            :class="{error: description.hasError}" 
+            placeholder="Escribe los detalles aquí" 
+            required 
+            v-model.trim="description.value" 
+            @focus="$event.target.select()" 
+            @change="validateSaleDescription" 
+            @blur="validateSaleDescription"
+          >
+          </textarea>
+        </div>
+
+        <div class="form__group__footer">
+          <span class="alert alert--danger" :class="{show: description.hasError}" id="newSaleDescriptionAlert">
+            {{description.message}}
+          </span>
+          <span class="form__input__length" id="newSaleDescriptionLength">{{newSaleDescriptionLength}}</span>
+        </div>
+      </div>
+
+      <!-- Ingreso del inporte de la venta -->
+      <div class="form__group">
+        <div class="form__group__body">
+          <label class="form__label" :for="id + 'creditAmount'">Importe de la venta</label>
+          <input-money 
+            :id="id + 'creditAmount'" 
+            required 
+            v-model="amount.value" 
+            @blur="validateSaleAmount" 
+            @change="validateSaleAmount"
+          >
+          </input-money>
+        </div>
+        <div class="form__group__footer">
+          <span class="alert alert--danger" :class="{show: amount.hasError}">
+            {{amount.message}}
+          </span>
+        </div>
+      </div>
+
+      <input type="submit" value="Registrar Venta" class="btn btn--success">
+  </form>
+  `,
+});
+
+Vue.component("category-view", {
+  data() {
+    return {
+      categorySelected: undefined,
+      title: ""
+    };
+  },
+  computed: {
+    ...Vuex.mapState(["categories"]),
+    sales() {
+      let sales = [];
+      if (this.categorySelected) {
+        sales = this.categorySelected.sales;
+      }
+      return sales;
+    },
+    subtitle() {
+      let value = "";
+      if (this.categorySelected) {
+        value = this.categorySelected.name;
+      }
+      return value;
+    },
+  },
+  methods: {
+    onCategorySelected(category) {
+      this.categorySelected = category;
+    },
+  },
+  template: /*html*/ `
+  <div class="view" id="categories">
+    <section class="view__section">
+      <div class="container">
+        <container-header :title="title" subtitle="Gestion de Categorías"></container-header>
+        <new-category-form id="newCategory"></new-category-form>
+        <category-module v-on:category-selected="onCategorySelected"></category-module>
+      </div>
+    </section>
+
+    <aside class="view__sidebar">
+      <sales-module :sales="sales" :subtitle="subtitle"></sales-module>
+    </aside>
+  </div>`,
+});
+
+Vue.component("sales-view", {
+  props: ['id'],
+  data() {
+    return {
+      title: "Sistema de ventas"
+    }
+  },
+  computed: {
+    ...Vuex.mapState(['sales']),
+  },
+  template: /*html*/`
+  <div class="view" :id="id">
+    <section class="view__section">
+      <div class="container">
+        <container-header :title="title" subtitle="Gestion de Ventas"></container-header>
+        <new-sale-form id="saleForm"></new-sale-form>
+        <sales-module id="salesMovil" class="view-desktop-colapse" :sales="sales"></sales-module>
+
+        <category-module class="view-movil-colapse"></category-module>
+      </div>
+    </section>
+
+    <aside class="view__sidebar">
+      <sales-module id="salesDesktop" :sales="sales"></sales-module>
+    </aside>
+  </div>`
+})

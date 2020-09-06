@@ -16,9 +16,13 @@
   </div>
   <div id="app">
     <nav-bar></nav-bar>
+    
+    <category-view id="categoryView" v-show="actualView === 'categories'"></category-view>
+    <sales-view id="salesView" v-show="actualView === 'newSale'"></sales-view>
 
     <waiting-modal></waiting-modal>
     <process-result></process-result>
+    <confirm-new-sale></confirm-new-sale>
   </div>
   <!-- FONT AWESOME -->
   <!-- <script src="https://use.fontawesome.com/7ebcf381fa.js"></script> -->

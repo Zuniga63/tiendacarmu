@@ -23,6 +23,12 @@ const store = new Vuex.Store({
     //  Controlador de eventos globales
     //---------------------------------------
     eventHub: new Vue(),
+    //---------------------------------------
+    //  Estado de la vista de ventas
+    //---------------------------------------
+    categories: [],
+    sales: [],
+    confirmSaleModal: new NewSaleModal(),
   },
   getters: {
     //TODO
@@ -99,9 +105,138 @@ const store = new Vuex.Store({
     emitEvent(state, eventName) {
       state.eventHub.$emit(eventName);
     },
+    //---------------------------------------
+    //  Mutaciones de las ventas
+    //---------------------------------------
+    showConfirmSaleModal(state, payload) {
+      state.confirmSaleModal.visible = true;
+      state.confirmSaleModal.formData = payload;
+    },
+    hiddenConfirmSaleModal(state) {
+      state.confirmSaleModal.visible = false;
+      state.confirmSaleModal.formData = undefined;
+    },
+    updateCategoryList(state, list) {
+      state.categories = list.sort((c1, c2) => c2.totalAmount - c1.totalAmount);
+    },
+    updateSaleList(state, list) {
+      state.sales = list;
+    },
   },
   actions: {
-    //TODO
+    /**
+     * Se encarga de hacer la peticion al servidor para recuperar los
+     * datos de las ventas y las categorías
+     */
+    async getSalesAndCategories({ commit }) {
+      commit("showWaitingRequest", "Recuperando ventas y categorías");
+      try {
+        const res = await fetch("./api/sales_api.php");
+        const data = await res.json();
+
+        if (data.sessionActive) {
+          let categoriesTemporal = [];
+          let salesTemporal = [];
+
+          //Se crean las categorías
+          data.categories.forEach((c) => {
+            //Se crea la instancia de categoría
+            let category = new Category(
+              c.id,
+              c.name,
+              c.totalAmount,
+              c.averageSale
+            );
+            //Se agregan las ventas asociadas a esta categoría
+            c.sales.forEach((s) => {
+              category.addSale(s.id, s.saleDate, s.description, s.amount);
+            });
+            //Finalmente se agrega al arreglo temporal
+            categoriesTemporal.push(category);
+          });
+
+          //Ahora se crean las ventas
+          let totalAmount = 0;
+          data.sales.forEach((s) => {
+            // console.log(s.saleDate);
+            let sale = new Sale(s.id, s.saleDate, s.description, s.amount);
+            salesTemporal.push(sale);
+            totalAmount += sale.amount;
+          });
+
+          commit("updateCategoryList", categoriesTemporal);
+          commit("updateSaleList", salesTemporal);
+          commit("hiddenWaitingRequest");
+        } else {
+          location.reload();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async addNewCategory({ commit, dispatch }, formData) {
+      let isSuccess = false;
+      let message = "";
+      let eventName = "category-was-created";
+      commit("showWaitingRequest", "Realizando registro...");
+      try {
+        const res = await fetch("./api/new_sale_category.php", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+
+        if (data.sessionActive) {
+          commit("hiddenWaitingRequest");
+          if (data.request) {
+            await dispatch("getSalesAndCategories");
+            message = "Categoría creada con exito";
+            isSuccess = true;
+            commit("emitEvent", eventName);
+          } else {
+            message = "No se pudo crear la nueva categoría";
+          }
+        } else {
+          location.reload();
+        }
+      } catch (error) {
+        commit("hiddenWaitingRequest");
+        message = "Error en la petición";
+      }
+
+      commit("requestResult", { isSuccess, message });
+    },
+    async addNewSale({ commit, dispatch }, formData) {
+      let isSuccess = false;
+      let message = "";
+      let eventName = "sale-was-created";
+      commit("showWaitingRequest", "Registrando nueva venta...");
+      try {
+        const res = await fetch("./api/new_sale.php", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+
+        if (data.sessionActive) {
+          commit("hiddenWaitingRequest");
+          if (data.request) {
+            await dispatch("getSalesAndCategories");
+            message = "¡Venta creada con exito!";
+            isSuccess = true;
+            commit("emitEvent", eventName);
+          } else {
+            message = "¡No se pudo registrar la venta!";
+          }
+        } else {
+          location.reload();
+        }
+      } catch (error) {
+        commit("hiddenWaitingRequest");
+        message = "Error en la petición";
+      }
+      commit("requestResult", { isSuccess, message });
+    },
   }
 })
 //--------------------------------------------------------
@@ -113,13 +248,21 @@ const app = new Vue({
   data: {
     loadingResource: true,
   },
+  computed: {
+    ...Vuex.mapState(['actualView', 'rootView']),
+  },
   methods: {
+    ...Vuex.mapActions(['getSalesAndCategories']),
     onLoadingResource() {
       this.loadingResource = false;
     },
   },
+  created() {
+    moment.locale("es-do");
+    this.getSalesAndCategories();
+  },
   mounted() {
-    window.addEventListener('load', this.onLoadingResource);
+    
   },
   //TODO
 });
