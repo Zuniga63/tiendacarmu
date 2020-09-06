@@ -1,4 +1,4 @@
-window.addEventListener('load', ()=>{
+window.addEventListener('load', () => {
   document.getElementById('preload').classList.remove('show');
 })
 
@@ -6,18 +6,28 @@ window.addEventListener('load', ()=>{
 //  STORE DE VUEX
 //--------------------------------------------------------
 const store = new Vuex.Store({
-  state:{
+  state: {
     //---------------------------------------
     //  Estado del navbar
     //---------------------------------------
-    actualView: '',
-    rootView: '',
+    rootView: 'sales',
+    actualView: 'categories',
     links: [],
+    //---------------------------------------
+    //  Estado de los modales globales
+    //---------------------------------------
+    waiting: false,
+    waitingMessage: "Procesando solicitud",
+    processResult: new RequesProcess(),
+    //---------------------------------------
+    //  Controlador de eventos globales
+    //---------------------------------------
+    eventHub: new Vue(),
   },
-  getters:{
+  getters: {
     //TODO
   },
-  mutations:{
+  mutations: {
     //---------------------------------------
     //  Mutaciones del navbar
     //---------------------------------------
@@ -25,7 +35,7 @@ const store = new Vuex.Store({
      * Metodo encargado de crear los links y los 
      * dropdown de la aplicación
      */
-    createLinks(state){
+    createLinks(state) {
       state.links.push(new Link(1, 'Home', 'home', false, 'fas fa-home'));
       state.links.push(new Link(
         2,
@@ -58,17 +68,39 @@ const store = new Vuex.Store({
       ));
       state.links.push(new Link(5, 'Mi cuenta', 'myAcount', true, 'fas fa-user'));
     },
-    changeRootView(state, viewName){
+    changeRootView(state, viewName) {
       state.rootView = viewName;
     },
-    changeActualView(state, viewName){
+    changeActualView(state, viewName) {
       state.actualView = viewName;
-    }
+    },
     //---------------------------------------
-    //  Mutaciones del navbar
+    //  Mutaciones relacionados a los modales
+    //  globales
     //---------------------------------------
+    showWaitingRequest(state, message) {
+      state.waiting = true;
+      state.waitingMessage = message;
+    },
+    hiddenWaitingRequest(state) {
+      state.waiting = false;
+      state.waitingMessage = "";
+    },
+    requestResult(state, { isSuccess, message }) {
+      if (isSuccess) {
+        state.processResult.isSuccess(message);
+      } else {
+        state.processResult.isDanger(message);
+      }
+    },
+    hiddenRequest(state) {
+      state.processResult.visible = false;
+    },
+    emitEvent(state, eventName) {
+      state.eventHub.$emit(eventName);
+    },
   },
-  actions:{
+  actions: {
     //TODO
   }
 })
@@ -76,13 +108,13 @@ const store = new Vuex.Store({
 //  RAiZ DE LA APLICACION
 //--------------------------------------------------------
 const app = new Vue({
-  el:'#app',
+  el: '#app',
   store,
-  data:{
-    loadingResource:true,
+  data: {
+    loadingResource: true,
   },
   methods: {
-    onLoadingResource(){
+    onLoadingResource() {
       this.loadingResource = false;
     },
   },

@@ -332,3 +332,60 @@ Vue.component('nav-bar', {
   </header>
 `
 })
+
+//---------------------------------------------------------------------------
+//  COMPONENTES DE LOS MODALES GLOBALES
+//---------------------------------------------------------------------------
+/**
+ * Componente reutilizable para notificarle al usuario
+ * que la peticion fue enviada al servidor y se está esperando
+ * una respuestas. Requiere que se le pasa la propiedad visible
+ */
+Vue.component("waiting-modal", {
+  computed: {
+    ...Vuex.mapState(["waiting", "waitingMessage"]),
+  },
+  template: /*html*/ `
+  <div :class="['modal', {show:waiting}]">
+    <div class="modal__content" style="padding-top: 140px;">
+      <div class="loader"></div>
+        <p class="modal__info" style="text-align: center; padding-top: 1em">{{waitingMessage}}</p>
+      </div>
+    </div>
+  </div>    `,
+});
+
+/**
+ * Componente reutilizable para notificar al usuario el
+ * resultado de la peticion al servidor. Requiere un objeto
+ * process-result con los resultados de la peiicion.
+ * Este componente emite un evento hidden-modal para que el estado visible
+ * pueda ser cambiado desde la raiz
+ */
+Vue.component("process-result", {
+  computed: {
+    ...Vuex.mapState(["processResult"]),
+  },
+  methods: {
+    ...Vuex.mapMutations(["hiddenRequest"]),
+  },
+  template: /*html*/ `
+  <div
+    class="modal"
+    :class="{show: processResult.visible}"
+    @click.self="hiddenRequest"
+  >
+    <div class="modal__content">
+      <div class="modal__close" @click="hiddenRequest">
+        <i class="fas fa-times-circle"></i>
+      </div>
+
+      <div class="modal__icon">
+        <img :src="'../icon/'+ (processResult.hasError ? 'error' : 'success') +'.svg'" class="modal__icon__img">
+        <p class="modal__icon__caption">{{processResult.message}}</p>
+      </div>
+
+    </div>
+  </div>
+  `,
+});

@@ -16,6 +16,9 @@
   </div>
   <div id="app">
     <nav-bar></nav-bar>
+
+    <waiting-modal></waiting-modal>
+    <process-result></process-result>
   </div>
   <!-- FONT AWESOME -->
   <!-- <script src="https://use.fontawesome.com/7ebcf381fa.js"></script> -->
