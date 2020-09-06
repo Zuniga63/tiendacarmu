@@ -4,9 +4,6 @@
 Vue.component('nav-bar', {
   data() {
     return {
-      actualView: '',
-      rootView: '',
-      links: [],
       /**
        * La siguiente variables es un valor estatico relacionado los cuatro
        * link principales de la aplicacion, si se agrega o sis se quita uno
@@ -16,7 +13,11 @@ Vue.component('nav-bar', {
       mainMenuHeight: 203,//Ojo: Este valor de momento está sujeto al numero de elementos actuales
     }
   },
+  computed: {
+    ...Vuex.mapState(['actualView', 'rootView', 'links']),
+  },
   methods: {
+    ...Vuex.mapMutations(['createLinks', 'changeRootView', 'changeActualView']),
     /**
      * Metodo encargado de crear los links y los 
      * dropdown de la aplicación
@@ -174,8 +175,10 @@ Vue.component('nav-bar', {
      * @param {string} viewName Nombre de la vista basica
      */
     onRootLinkClick(viewName) {
-      this.rootView = viewName;
-      this.viewName = viewName;
+      this.changeRootView(viewName);
+      this.changeActualView(viewName);
+      // this.rootView = viewName;
+      // this.viewName = viewName;
       this.closeAllDropdown();
       this.onTogglerClick();
     },
@@ -188,7 +191,9 @@ Vue.component('nav-bar', {
       if (this.rootView != viewName) {
         this.closeAllDropdown();
       }
-      this.rootView = viewName;
+      this.changeRootView(viewName);
+      // this.changeActualView(viewName);
+      // this.rootView = viewName;
       while (!target.classList.contains('dropdown')) {
         target = target.parentElement;
       }
@@ -206,8 +211,10 @@ Vue.component('nav-bar', {
      * @param {string} rootViewName Nombre de la raiz
      */
     onDropdownItemClick(viewName, rootViewName) {
-      this.rootView = rootViewName;
-      this.actualView = viewName;
+      this.changeRootView(viewName);
+      this.changeActualView(viewName);
+      // this.rootView = rootViewName;
+      // this.actualView = viewName;
       this.onTogglerClick();
     }
   },
