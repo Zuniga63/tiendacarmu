@@ -1,3 +1,6 @@
+window.addEventListener('load', ()=>{
+  document.getElementById('preload').classList.remove('show');
+})
 //--------------------------------------------------------
 //  STORE DE VUEX
 //--------------------------------------------------------
@@ -21,5 +24,16 @@ const store = new Vuex.Store({
 const app = new Vue({
   el:'#app',
   store,
+  data:{
+    loadingResource:true,
+  },
+  methods: {
+    onLoadingResource(){
+      this.loadingResource = false;
+    },
+  },
+  mounted() {
+    window.addEventListener('load', this.onLoadingResource);
+  },
   //TODO
 });
