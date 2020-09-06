@@ -30,6 +30,7 @@
   <!-- Librería de moment.js -->
   <script src="./js/library/moment-with-locales.js"></script>
   <!-- se carga el escrip personalizado -->
+  <script src=<?= "./js/utilities.js?v=" . VERSION ?>></script>
   <script src=<?= "./js/components.js?v=" . VERSION ?>></script>
   <script src=<?= "./js/app.js?v=" . VERSION ?>></script>
 </body>
