@@ -738,7 +738,7 @@ class DailyReport extends ReportBase {
  * Super clase encargada de gestionar las ventas
  * que estan comprendidas entre dos fechas distintas
  */
-class PeriodicReport extends Report {
+class PeriodicReport extends ReportBase {
   /**
    * @constructor
    * @param {number} id Identificador del reporte
